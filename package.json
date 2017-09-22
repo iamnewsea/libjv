@@ -1,6 +1,6 @@
 {
   "name": "libjv",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Es6的单页应用常用扩展",
   "main": "libjv.js",
   "author": "于新海 <13466396863@163.com>",
@@ -12,9 +12,9 @@
     "type": "Git",
     "url": "https://gitee.com/imnewsea/libjv.git"
   },
-  "bin": {
-    "": ""
-  },
+  "files": [
+    "livjv.js"
+  ],
   "keywords": [
     "jv",
     "Object.defineProperty"

@@ -1,8 +1,8 @@
 {
   "name": "libjv",
-  "version": "0.0.3",
+  "version": "0.1.2",
   "description": "Es6的单页应用常用扩展",
-  "main": "libjv.js",
+  "main": "index.js",
   "author": "于新海 <13466396863@163.com>",
   "private": false,
   "repository": {

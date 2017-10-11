@@ -1,4 +1,3 @@
-
 import jv from "./libjv"
 
 //init router permission
@@ -110,7 +109,16 @@ jv.initApp = function (vueProtype) {
         return ret;
       }
     }
-  }
+  };
+  vueProtype.closest = function (ele) {
+    let cur = this;
+    while (cur) {
+      if (cur.$el == ele) {
+        return cur;
+      }
+      cur = cur.$parent;
+    }
+  };
 }
 
 jv.initAxios = function (axios) {

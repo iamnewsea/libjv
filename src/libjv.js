@@ -3,9 +3,6 @@ import "./defineProperty"
 
 //---------------------------------------------
 var jv = {};
-Date.from = function (year, dates) {
-  return new Date(new Date(year + "-01-01").valueOf() + dates * 86400000);
-}
 
 jv.enumer = function (typeName, json, sep) {
   var ret = {type: typeName};

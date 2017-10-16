@@ -1,15 +1,21 @@
-
 //-------------------------------------------------------------
+Date.from = function (year, dates) {
+  return new Date(new Date(year + "-01-01").valueOf() + dates * 86400000);
+}
+Date.today = function () {
+  var now = new Date();
+  return new Date(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate());
+}
 if (!Node.prototype.addEventListener && Node.prototype.attachEvent) {
   //兼容性添加。
   Object.defineProperty(Node.prototype, "addEventListener", {
-    value:function(event, fn) {
+    value: function (event, fn) {
       return this.attachEvent("on" + event, fn);
     }, enumerable: false
   });
 
   Object.defineProperty(Node.prototype, "removeEventListener", {
-    value:function(event, fn) {
+    value: function (event, fn) {
       return this.detachEvent("on" + event, fn);
     }, enumerable: false
   });
@@ -54,6 +60,12 @@ Object.defineProperty(Number.prototype, "toDateString", {
   }, enumerable: false
 });
 
+Object.defineProperty(Date.prototype, "addDays", {
+  value(days) {
+    if (!days) return this;
+    return new Date(this.valueOf() + days * 86400000);
+  }, enumerable: false
+});
 
 Object.defineProperty(Array.prototype, "spliceDate", {
   value() {

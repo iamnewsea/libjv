@@ -1,6 +1,6 @@
 //-------------------------------------------------------------
 Date.from = function (year, dates) {
-  return new Date(new Date(year + "-01-01").valueOf() + dates * 86400000);
+  return new Date(new Date(year + "-01-01").valueOf() + (dates - 1) * 86400000);
 }
 Date.today = function () {
   var now = new Date();
@@ -70,7 +70,7 @@ Object.defineProperty(Date.prototype, "addDays", {
 //一年的第几天。
 Object.defineProperty(Date.prototype, "dayOfYear", {
   value() {
-    return  Math.ceil( this.valueOf()/86400000 - new Date( this.getFullYear() + "-01-01").valueOf()/86400000 )
+    return Math.ceil(this.valueOf() / 86400000 - new Date(this.getFullYear() + "-01-01").valueOf() / 86400000)
   }, enumerable: false
 });
 

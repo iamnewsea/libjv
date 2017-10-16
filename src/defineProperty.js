@@ -63,7 +63,10 @@ Object.defineProperty(Number.prototype, "toDateString", {
 Object.defineProperty(Date.prototype, "addDays", {
   value(days) {
     if (!days) return this;
-    return new Date(this.valueOf() + days * 86400000);
+    var ret = this.valueOf() / 86400000 - new Date(this.getFullYear() + "-01-01").valueOf() / 86400000;
+    var zheng = parseInt(ret);
+    var da = Math.ceil(ret);
+    return zheng == da ? zheng : da;
   }, enumerable: false
 });
 

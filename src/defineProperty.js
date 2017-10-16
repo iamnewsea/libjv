@@ -66,8 +66,8 @@ Object.defineProperty(Date.prototype, "addDays", {
     var ret = this.valueOf() / 86400000 - new Date(this.getFullYear() + "-01-01").valueOf() / 86400000;
     var zheng = parseInt(ret);
     var da = Math.ceil(ret);
-    if( zheng == da ){
-      da = da +1;
+    if (zheng == da) {
+      da = da + 1;
     }
     return da;
   }, enumerable: false
@@ -398,4 +398,15 @@ document.cookieMap = (function () {
       this.set(key, "", -1);
     }
   };
+})();
+
+document.location.json = (function () {
+  // http://blog.csdn.net/lvjin110/article/details/37663067
+
+  let ret = {};
+  location.search.slice(1).split("&").forEach(it => {
+    var sects = it.split("=");
+    ret[sects[0]] = sects[1];
+  });
+  return ret;
 })();

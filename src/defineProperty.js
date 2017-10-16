@@ -66,7 +66,10 @@ Object.defineProperty(Date.prototype, "addDays", {
     var ret = this.valueOf() / 86400000 - new Date(this.getFullYear() + "-01-01").valueOf() / 86400000;
     var zheng = parseInt(ret);
     var da = Math.ceil(ret);
-    return zheng == da ? zheng : da;
+    if( zheng == da ){
+      da = da +1;
+    }
+    return da;
   }, enumerable: false
 });
 

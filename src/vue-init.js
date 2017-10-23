@@ -60,7 +60,7 @@ jv.initRouter = function (router) {
 //获取需要在菜单上设置的权限页面.
 jv.getPermissions = function () {
   var ret = {};
-  var routes = router.options.routes;
+  var routes = window._vue.$router.options.routes;
   routes.recursion(it => {
     return it.children;
   }, it => {

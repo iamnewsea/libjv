@@ -273,7 +273,7 @@ Object.defineProperty(Array.prototype, "distinct", {
     var ret = {};
 
     this.forEach(it => {
-      ret[idFunc ? idFunc(it) : it] = it;
+      ret[idFunc ? idFunc(it) : JSON.stringify(it)] = it;
     })
 
     return Object.values(ret);

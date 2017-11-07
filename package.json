@@ -1,8 +1,11 @@
 {
   "name": "libjv",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "Es6的单页应用常用扩展",
   "main": "index.js",
+  "scripts":{
+    "prepublish": "babel -d lib/ src/"
+  },
   "author": "于新海 <13466396863@163.com>",
   "private": false,
   "repository": {
@@ -15,7 +18,7 @@
   ],
   "license": "ISC",
   "engines": {
-    "node": ">= 7.7.0",
+    "node": ">= 8.2.0",
     "npm": ">= 5.0.0"
   },
   "dependencies": {

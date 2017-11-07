@@ -76,7 +76,13 @@ Object.defineProperty(Date.prototype, "addDays", {
 //一年的第几天。
 Object.defineProperty(Date.prototype, "dayOfYear", {
   value() {
-    return Math.ceil(this.valueOf() / 86400000 - new Date(this.getFullYear() + "-01-01").valueOf() / 86400000)
+      var ret = this.valueOf() / 86400000 - new Date(this.getFullYear() + "-01-01").valueOf() / 86400000;
+      var zheng = parseInt(ret);
+      var da = Math.ceil(ret);
+      if (zheng == da) {
+          da = da + 1;
+      }
+      return da;
   }, enumerable: false
 });
 

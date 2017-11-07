@@ -120,8 +120,9 @@ jv.initAxios = function (axios) {
 
   axios.defaults.transformRequest = function (data) {
     if (!data) return data;
-    if (data instanceof FormData) return data;
-    if (typeof(data) == "string") return data;
+    var type = data.getTypeName();
+    if (type == "formData") return data;
+    if (type == "string") return data;
     return JSON.stringify(data)
     // return jv.param(data);
   };

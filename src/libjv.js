@@ -199,7 +199,7 @@ jv.param_jmap = function (obj) {
         })
       }
     }
-    else if (value instanceof Date) {
+    else if (value.getTypeName() == "date") {
       ret[key] = value.toDateString();
     }
     else {

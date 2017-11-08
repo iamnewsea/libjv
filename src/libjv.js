@@ -68,10 +68,9 @@ jv.random = function (min, max) {
  * @param times      最多循环次数， 默认为 100
  * @returns {*}
  */
-jv.forDelay = function (delayTime, action, times) {
-  times = times || 100;
-
-  if (times == 1) {
+jv.await = function (delayTime, times, action) {
+  times = times || 0
+  if (!times) {
     return;
   }
 

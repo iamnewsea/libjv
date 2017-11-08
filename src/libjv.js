@@ -76,7 +76,7 @@ jv.await = function (delayTime, times, action) {
 
   if (action() !== false) {
     return setTimeout(() => {
-      jv.forDelay(delayTime, action, times - 1);
+      jv.await(delayTime, action, times - 1);
     }, delayTime);
   }
 }

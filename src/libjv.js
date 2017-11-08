@@ -1,4 +1,3 @@
-
 import "./defineProperty"
 
 //---------------------------------------------
@@ -76,7 +75,7 @@ jv.await = function (delayTime, times, action) {
 
   if (action() !== false) {
     return setTimeout(() => {
-      jv.await(delayTime, action, times - 1);
+      jv.await(delayTime, times - 1, action);
     }, delayTime);
   }
 }

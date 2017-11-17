@@ -1,7 +1,7 @@
 //-------------------------------------------------------------
 //返回 function ,string 等实际类名。
-Object.defineProperty(Object.prototype, "getTypeName", {
-  value() {
+Object.defineProperty(Object.prototype, "Type", {
+  get() {
     var ret = this.constructor.name || typeof(this);
     //把第一个非大写字母前面的全部变成小写字母。
 
@@ -34,6 +34,7 @@ Object.defineProperty(Object.prototype, "getTypeName", {
 Date.from = function (year, dates) {
   return new Date(new Date(year + "-01-01").valueOf() + (dates - 1) * 86400000);
 }
+
 Date.today = function () {
   var now = new Date();
   return new Date(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() +" 00:00:00.000");
@@ -99,9 +100,15 @@ Object.defineProperty(Date.prototype, "addDays", {
   }, enumerable: false
 });
 
+//获取时间的毫秒数
+Object.defineProperty(Date.prototype, "Time", {
+  get() {
+    return this.getHours() * 3600000 + this.getMinutes() * 60000 + this.getSeconds() * 1000 + this.getMilliseconds();
+  }, enumerable: false
+});
 //一年的第几天。
-Object.defineProperty(Date.prototype, "dayOfYear", {
-  value() {
+Object.defineProperty(Date.prototype, "DaysOfYear", {
+  get() {
     var ret = this.valueOf() / 86400000 - new Date(this.getFullYear() + "-01-01").valueOf() / 86400000;
     var zheng = parseInt(ret);
     var da = Math.ceil(ret);
@@ -114,7 +121,6 @@ Object.defineProperty(Date.prototype, "dayOfYear", {
 
 Object.defineProperty(Array.prototype, "spliceDate", {
   value() {
-
     if (this.length == 0) return [];
     return this.map(it => {
       if (!it) return it;
@@ -245,10 +251,10 @@ Object.defineProperty(Number.prototype, 'format', {
 
 
 /*
- obj.defEnum("sex",jv.SexEnum)
+ obj.Enumer("sex",jv.SexEnum)
  data.sex_res == "男"
  */
-Object.defineProperty(Object.prototype, "defEnum", {
+Object.defineProperty(Object.prototype, "Enumer", {
   value(key, enumDef, override) {
     var obj = this;
     var p = obj[key];
@@ -266,16 +272,16 @@ Object.defineProperty(Object.prototype, "defEnum", {
 });
 
 
-Object.defineProperty(Object.prototype, "regEnum", {
-  value(enumDef) {
-    this.$set(this, enumDef.type, enumDef.getData())
-  }, enumerable: false
-});
+// Object.defineProperty(Object.prototype, "RegEnum", {
+//   value(enumDef) {
+//     this.$set(this, enumDef.type, enumDef.getData())
+//   }, enumerable: false
+// });
 
 Object.defineProperty(Array.prototype, "last", {
   value(filter) {
     if (!this.length) return null;
-    if (filter && filter.getTypeName() == "function") {
+    if (filter && filter.Type == "function") {
       for (var i = this.length - 1; i > -1; i--) {
         if (filter(this[i])) return this[i];
       }
@@ -325,7 +331,7 @@ Object.defineProperty(Array.prototype, "swap", {
   }
 });
 //大于等于 and 小于等于
-Object.defineProperty(Object.prototype, "between", {
+Object.defineProperty(Object.prototype, "Between", {
   value(start, end) {
     if (start > end) {
       var t = start;
@@ -357,7 +363,7 @@ Object.defineProperty(Array.prototype, "recursion", {
 //可以push Array，及Set
 Object.defineProperty(Set.prototype, "push", {
   value(value) {
-    if (value && value.getTypeName() == "set") {
+    if (value && value.Type == "set") {
       value = Array.from(value);
     }
     for (var i = 0, len = value.length; i < len; i++) {

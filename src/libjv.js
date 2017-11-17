@@ -3,28 +3,23 @@ import "./defineProperty"
 //---------------------------------------------
 var jv = {};
 
-jv.enumer = function (typeName, json, sep) {
+//定义枚举
+jv.defEnum = function (typeName, json, sep) {
   var ret = {type: typeName};
-  if (sep) {
-    //枚举三部分： name,value,remark
-    Object.keys(json).forEach(it => {
-      var value = json[it];
-      if (!value.value && (value.value !== 0)) {
+  var i = -1;
+  Object.keys(json).forEach(it => {
+    var value = json[it];
+    i++;
+    if (!value.value && (value.value !== 0)) {
+      if (sep) {
         var sepIndex = value.indexOf(sep);
         json[it] = {value: parseInt(value.substr(0, sepIndex)), remark: value.substr(sepIndex + 1)};
       }
-    })
-  }
-  else {
-    var i = -1;
-    Object.keys(json).forEach(it => {
-      var value = json[it];
-      i++;
-      if (!value.value && (value.value !== 0)) {
+      else {
         json[it] = {name: it, value: i, remark: json[it]};
       }
-    })
-  }
+    }
+  })
 
   ret.getData = function (key) {
     if (key) {
@@ -197,7 +192,7 @@ jv.param_jmap = function (obj) {
         })
       }
     }
-    else if (value.getTypeName() == "date") {
+    else if (value.Type == "date") {
       ret[key] = value.toDateString();
     }
     else {

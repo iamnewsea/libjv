@@ -37,7 +37,7 @@ Date.from = function (year, dates) {
 
 Date.today = function () {
   var now = new Date();
-  return new Date(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() +" 00:00:00.000");
+  return new Date(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + " 00:00:00.000");
 }
 if (!Node.prototype.addEventListener && Node.prototype.attachEvent) {
   //兼容性添加。
@@ -297,11 +297,11 @@ Object.defineProperty(Array.prototype, "putDistinct", {
       if (this.filter(val, filterFunc)) {
         return;
       }
-
-      if (this.indexOf(val) >= 0) {
-        return;
-      }
     }
+    else if (this.indexOf(val) >= 0) {
+      return;
+    }
+
     this.push(val);
   }, enumerable: false
 });

@@ -281,7 +281,7 @@ Object.defineProperty(Object.prototype, "Enumer", {
 Object.defineProperty(Array.prototype, "last", {
   value(filter) {
     if (!this.length) return null;
-    if (filter && filter.Type == "function") {
+    if (filter) {
       for (var i = this.length - 1; i > -1; i--) {
         if (filter(this[i])) return this[i];
       }

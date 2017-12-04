@@ -365,6 +365,17 @@ Object.defineProperty(Array.prototype, "recursion", {
   }, enumerable: false
 });
 
+Object.defineProperty(Array.prototype, "unwind", {
+  value() {
+    var ret = [];
+    this.forEach(wai=>{
+      wai.forEach(it=>{
+        ret.push(it);
+      });
+    });
+    return ret;
+  }, enumerable: false
+});
 //可以push Array，及Set
 Object.defineProperty(Set.prototype, "push", {
   value(value) {

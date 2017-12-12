@@ -32,12 +32,12 @@ Object.defineProperty(Object.prototype, "Type", {
 
 
 Date.from = function (year, dates) {
-  return new Date(new Date(year + "-01-01").valueOf() + (dates - 1) * 86400000);
+  return new Date(new Date(year + "/01/01").valueOf() + (dates - 1) * 86400000);
 }
 
 Date.today = function () {
   var now = new Date();
-  return new Date(now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + " 00:00:00.000");
+  return new Date(now.getFullYear() + "/" + (now.getMonth() + 1) + "/" + now.getDate() + " 00:00:00");
 }
 if (!Node.prototype.addEventListener && Node.prototype.attachEvent) {
   //兼容性添加。
@@ -109,7 +109,7 @@ Object.defineProperty(Date.prototype, "Time", {
 //一年的第几天。
 Object.defineProperty(Date.prototype, "DayOfYear", {
   get() {
-    var ret = (this.valueOf()  - new Date(this.getFullYear() + "-01-01").valueOf()) / 86400000;
+    var ret = (this.valueOf()  - new Date(this.getFullYear() + "/01/01").valueOf()) / 86400000;
     return parseInt(ret) +1;
   }, enumerable: false
 });

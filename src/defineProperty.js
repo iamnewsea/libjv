@@ -360,6 +360,9 @@ Object.defineProperty(Array.prototype, "recursion", {
   }, enumerable: false
 });
 
+/**
+ * 把数组的数组,解开合成一个数组.
+ */
 Object.defineProperty(Array.prototype, "unwind", {
   value() {
     var ret = [];

@@ -1,5 +1,10 @@
 import jv from "./libjv"
 
+//默认实现。
+jv.error = alert;
+jv.info = alert;
+jv.warn = alert;
+
 //init router permission
 jv.initRouter = function (router) {
 //规则：如果没有定义，按上级配置。 如果最上级没有配置，按false

@@ -123,6 +123,7 @@ jv.citys.findByCode = function (code) {
   return findSubOne(jv.citys, code, iszhi ? 2 : 1, level);
 }
 
+jv.citys.url = "/open/getChildCitys" ;
 jv.citys.loadChildCitys = function (code, ajax, loaded) {
   code = parseInt(code);
   if (code % 100) return;
@@ -131,7 +132,7 @@ jv.citys.loadChildCitys = function (code, ajax, loaded) {
     return;
   }
 
-  ajax.post("/open/getChildCitys", {code: code})
+  ajax.post(jv.citys.url, {code: code})
       .then(res => {
         var json = res.data.data;
 

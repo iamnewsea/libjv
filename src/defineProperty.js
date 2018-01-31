@@ -109,8 +109,8 @@ Object.defineProperty(Date.prototype, "Time", {
 //一年的第几天。
 Object.defineProperty(Date.prototype, "DayOfYear", {
   get() {
-    var ret = (this.valueOf()  - new Date(this.getFullYear() + "/01/01").valueOf()) / 86400000;
-    return parseInt(ret) +1;
+    var ret = (this.valueOf() - new Date(this.getFullYear() + "/01/01").valueOf()) / 86400000;
+    return parseInt(ret) + 1;
   }, enumerable: false
 });
 
@@ -244,6 +244,25 @@ Object.defineProperty(Number.prototype, 'format', {
   }, enumerable: false
 });
 
+//获取整数的每一个二进制位的值。
+Object.defineProperty(Number.prototype, 'EachBitValue', {
+  get() {
+    var ret = [];
+    var value = parseInt(this);
+    var position = 0;
+    while (true) {
+      if (!value) break;
+      if (value & 1) {
+        ret.push(Math.pow(2, position));
+      }
+
+      value = value >> 1;
+      position++;
+    }
+    return ret;
+  }, enumerable: false
+});
+
 
 /*
  obj.Enumer("sex",jv.SexEnum)
@@ -366,8 +385,8 @@ Object.defineProperty(Array.prototype, "recursion", {
 Object.defineProperty(Array.prototype, "unwind", {
   value() {
     var ret = [];
-    this.forEach(wai=>{
-      wai.forEach(it=>{
+    this.forEach(wai => {
+      wai.forEach(it => {
         ret.push(it);
       });
     });

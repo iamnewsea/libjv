@@ -58,6 +58,12 @@ if (!Element.prototype.closest) {
   //兼容性添加。
 }
 
+Object.defineProperty(Date.prototype, "toDateString", {
+  value: function (format) {
+    return this.valueOf().toDateString(format);
+  }, enumerable: false
+});
+
 //格式化日期，将毫秒数转化为日期时间
 Object.defineProperty(Number.prototype, "toDateString", {
   value(format) {

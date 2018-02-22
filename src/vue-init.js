@@ -87,11 +87,11 @@ jv.getPermissions = function () {
 }
 
 jv.initApp = function (vueProtype) {
+  jv.Vue_Prototype = vueProtype;
   vueProtype.Base_Url = window.Base_Url;
   vueProtype.Upload_Url = window.Base_Url + "/sys/fileUpload";
 
   //file,需要 url ,type
-
   vueProtype.Find = function (ele) {
     if (this.$el == ele) {
       return this;

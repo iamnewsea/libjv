@@ -7,12 +7,27 @@ import jv from "./vue-init"
 
 var getDomValue = function (dom) {
   if (dom.tagName == "INPUT") {
-    return this.value;
+    return dom.value;
   }
   if (dom.tagName == "TEXTAREA") {
-    return this.value;
+    return dom.value;
   }
-  return this.innerHTML;
+
+  if( dom.childNodes.length == 0) return "";
+
+  var domInput = dom.querySelector("input[type=hidden]")
+  if (!domInput) {
+    domInput = dom.querySelector("input");
+  }
+  if (!domInput) {
+    domInput = dom.querySelector("textarea");
+  }
+
+  if( !domInput){
+    return "";
+  }
+
+  return getDomValue(domInput);
 }
 
 var chk_length = function () {
@@ -27,7 +42,10 @@ jv.chk_types = {
 
   },
   ":": function (chk_body, dom) {
-    return eval(" value => " + chk_body).call(dom, getDomValue(dom))
+    chk_body = chk_body.trim();
+    if (!chk_body) return;
+
+    return eval("(value,dom) => {" + chk_body + "}").call(dom, getDomValue(dom), dom)
   },
   "": function (chk_body, dom) {
 
@@ -47,7 +65,7 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
     var list = Array.from(this.querySelectorAll("[chk]"));
     list = list.concat(Array.from(this.querySelectorAll("[data-chk]")))
 
-    var ret = {}, chk_msg;
+    var chk_msg;
     for (var item of list) {
       var chk = item.dataset.chk || item.getAttribute("chk") || "";
       chk = chk.trim();
@@ -77,17 +95,13 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
         chk_body = chk.slice(chk_type_index);
       }
 
-      chk_msg = jv.chk_types[chk_type](chk_body, this);
+      chk_msg = jv.chk_types[chk_type](chk_body, item, this);
       if (chk_msg) {
-        ret[item] = chk_msg;
+        if(chk_show(item, chk_msg) === false){
+          break;
+        }
       }
     }
-
-
-    Object.keys(ret).forEach(it => {
-      chk_msg = ret[it];
-      chk_show(it, chk_msg);
-    })
 
     return !!chk_msg;
   }, enumerable: false

@@ -52,7 +52,7 @@ jv.toByteUnit = function (value) {
 
   var unit = value.slice(-1), unitCode = unit.charCodeAt();
 
-  if (unitCode.between(48, 57)) {
+  if (unitCode.Between(48, 57)) {
     return parseInt(value);
   }
 

@@ -56,7 +56,49 @@ if (!Node.prototype.addEventListener && Node.prototype.attachEvent) {
 
 if (!Element.prototype.closest) {
   //兼容性添加。
+  Object.defineProperty(Element.prototype, "popTip", {
+    value: function (selector) {
+      var el = this;
+      var matchesSelector = el.matches || el.webkitMatchesSelector || el.mozMatchesSelector || el.msMatchesSelector;
+
+      while (el) {
+        if (matchesSelector.call(el, selector)) {
+          break;
+        }
+        el = el.parentElement;
+      }
+      return el;
+    }, enumerable: false
+  });
 }
+
+//冒泡提示
+Object.defineProperty(HTMLElement.prototype, "popTip", {
+  value: function (msg) {
+    var tip = Array.from(this.children).filter(it => {
+      return it.className.split(" ").indexOf("chk-tip") >= 0;
+    })[0];
+
+    if (!tip) {
+      tip = document.createElement("div")
+      tip.classList.add("chk-tip")
+      this.appendChild(tip);
+    }
+    tip.innerHTML = msg || "";
+
+    if (msg) {
+      this.classList.add("chk-tip-wrapper")
+      tip.classList.remove("hide")
+    }
+    else {
+      this.classList.remove("chk-tip-wrapper")
+      tip.classList.add("hide")
+    }
+
+    return tip
+  }, enumerable: false
+});
+
 
 Object.defineProperty(Date.prototype, "toDateString", {
   value: function (format) {

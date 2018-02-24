@@ -5,15 +5,15 @@ import jv from "./vue-init"
 //   jv.error(msg);
 // }
 
-var getDomValue = function (dom) {
+var getInputDom = function (dom) {
   if (dom.tagName == "INPUT") {
-    return dom.value;
+    return dom;
   }
   if (dom.tagName == "TEXTAREA") {
-    return dom.value;
+    return dom;
   }
 
-  if( dom.childNodes.length == 0) return "";
+  if (dom.childNodes.length == 0) return "";
 
   var domInput = dom.querySelector("input[type=hidden]")
   if (!domInput) {
@@ -23,11 +23,11 @@ var getDomValue = function (dom) {
     domInput = dom.querySelector("textarea");
   }
 
-  if( !domInput){
-    return "";
+  if (!domInput) {
+    return null;
   }
 
-  return getDomValue(domInput);
+  return getInputDom(domInput);
 }
 
 var chk_length = function () {
@@ -35,17 +35,26 @@ var chk_length = function () {
 }
 
 jv.chk_types = {
-  "int": function (chk_body, dom) {
+  "int": function (chk_body, inputDom) {
 
   },
-  "enum": function (chk_body, dom) {
+  "enum": function (chk_body, inputDom) {
 
   },
-  ":": function (chk_body, dom) {
+  ":": function (chk_body, inputDom) {
     chk_body = chk_body.trim();
     if (!chk_body) return;
 
-    return eval("(value,dom) => {" + chk_body + "}").call(dom, getDomValue(dom), dom)
+    var value = "";
+    if (inputDom) {
+      if (inputDom.tagName == "INPUT" || inputDom.tagName == "TEXTAREA") {
+        value = inputDom.value;
+      }
+      else {
+        value = inputDom.innerHTML;
+      }
+    }
+    return eval("(value,dom) => {" + chk_body + "}").call(inputDom, value)
   },
   "": function (chk_body, dom) {
 
@@ -67,39 +76,59 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
 
     var chk_msg;
     for (var item of list) {
-      var chk = item.dataset.chk || item.getAttribute("chk") || "";
-      chk = chk.trim();
-      if (chk[0] == '*') {
-        chk = chk.slice(1).trim();
-      }
-      if (!chk) continue;
+      var inputDom = getInputDom(item);
+      if (!inputDom) continue;
 
-      var chk_type_index = Array.from(chk).findIndex(it => {
-        var code = it.charCodeAt()
-        if (code >= 65 && code <= 90) return false;
-        if (code >= 97 && code <= 122) return false;
-        return true;
-      });
+      inputDom.chk_dom = item;
 
-      if (chk_type_index < 0) {
-        chk_type_index = chk.length;
-      }
+      var ch = function(e){
+        var item = e.target.chk_dom;
+        var chk = item.dataset.chk || item.getAttribute("chk") || "";
+        chk = chk.trim();
+        if (chk[0] == '*') {
+          chk = chk.slice(1).trim();
+        }
+        if (!chk) return;
 
-      var chk_type, chk_body;
-      if (chk[0] == ':') {
-        chk_type = ":";
-        chk_body = chk.slice(1);
-      }
-      else {
-        chk_type = chk.slice(0, chk_type_index);
-        chk_body = chk.slice(chk_type_index);
-      }
+        var chk_type_index = Array.from(chk).findIndex(it => {
+          var code = it.charCodeAt()
+          if (code >= 65 && code <= 90) return false;
+          if (code >= 97 && code <= 122) return false;
+          return true;
+        });
 
-      chk_msg = jv.chk_types[chk_type](chk_body, item, this);
-      if (chk_msg) {
-        if(chk_show(item, chk_msg) === false){
+        if (chk_type_index < 0) {
+          chk_type_index = chk.length;
+        }
+
+        var chk_type, chk_body;
+        if (chk[0] == ':') {
+          chk_type = ":";
+          chk_body = chk.slice(1);
+        }
+        else {
+          chk_type = chk.slice(0, chk_type_index);
+          chk_body = chk.slice(chk_type_index);
+        }
+
+        if( !chk_body) return ;
+
+        chk_msg = jv.chk_types[chk_type](chk_body, e.target, item, this);
+
+        //即使没有消息,也要调用.使调用方隐藏提示.
+        if (chk_show(chk_msg, inputDom, item) === false) {
           break;
         }
+      }
+
+      inputDom.removeEventListener("change",ch);
+      inputDom.addEventListener("change",ch);
+
+      chk_msg = jv.chk_types[chk_type](chk_body, inputDom, item, this);
+
+      //即使没有消息,也要调用.使调用方隐藏提示.
+      if (chk_show(chk_msg, inputDom, item) === false) {
+        break;
       }
     }
 

@@ -30,11 +30,12 @@ var getInputDom = function (dom) {
   return getInputDom(domInput);
 }
 
+//如果返回字符串，则为验证消息， 另外返回布尔值，表示是否通过验证。
 jv.chk_range = function (chk_type, chk_body, value) {
   chk_body = chk_body.trim();
 
   var getNextCharIndex = function (exp, char, startIndex) {
-    for (var i = startIndex, len = exp.length; i < len; i++) {
+    for (var i = startIndex || 0, len = exp.length; i < len; i++) {
       if (exp[i] == char) return i;
     }
     return -1;
@@ -47,7 +48,7 @@ jv.chk_range = function (chk_type, chk_body, value) {
     if (valueRangeIndex < 0) {
       return "[Error]:表达式" + chk_body + "缺少 }";
     }
-    value = eval("(value) => { return  " + chk_body.slice(1, valueRangeIndex - 1) + "}")(value)
+    value = eval("(value) => { return  " + chk_body.slice(1, valueRangeIndex) + "}")(value)
 
     chk_body = chk_body.slice(valueRangeIndex + 1);
   }
@@ -75,10 +76,10 @@ jv.chk_range = function (chk_type, chk_body, value) {
     return false;
   }
   else if (range.length > 1) {
-    if (chk_body[chk_body.length - 1] == ")" && range[chk_body.length - 1] >= value) {
+    if (chk_body[chk_body.length - 1] == ")" && range[range.length - 1] >= value) {
       return false;
     }
-    else if (chk_body[chk_body.length - 1] == "]" && range[chk_body.length - 1] > value) {
+    else if (chk_body[chk_body.length - 1] == "]" && range[range.length - 1] > value) {
       return false;
     }
   }
@@ -87,14 +88,10 @@ jv.chk_range = function (chk_type, chk_body, value) {
 }
 jv.chk_types = {
   "float": function (chk_body, value, inputDom) {
-    if (value === 0) return true;
-    if (!value) return false;
-    return isFinite(parseFloat(value));
+    return (/^[+-]?[0-9]+.?[0-9]*$/).test(value);
   },
   "int": function (chk_body, value, inputDom) {
-    if (value === 0) return true;
-    if (!value) return false;
-    return isFinite(parseInt(value));
+    return (/^[+-]?[0-9]+$/).test(value);
   },
   //表示字符串
   "": function (chk_body, value, dom) {
@@ -188,6 +185,13 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
             if (chk_body) {
               // chk_body.split("&")
               chk_msg = jv.chk_range(chk_type, chk_body, value);
+
+              if( chk_msg === true){
+                chk_msg = "";
+              }
+              else if( chk_msg === false){
+                chk_msg = chk_define_msg;
+              }
             }
           }
         }

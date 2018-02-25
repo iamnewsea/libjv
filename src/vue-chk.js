@@ -63,8 +63,8 @@ jv.chk_range = function (chk_type, chk_body, value) {
 
   var range = chk_body.slice(1, chk_body.length - 1).split(",").map(it => it.trim());
 
-  if( chk_type == "enum"){
-    return  range.indexOf(value) >=0;
+  if (chk_type == "enum") {
+    return range.indexOf(value) >= 0;
   }
 
 
@@ -88,17 +88,13 @@ jv.chk_range = function (chk_type, chk_body, value) {
 jv.chk_types = {
   "float": function (chk_body, value, inputDom) {
     if (value === 0) return true;
-    if( !value) return false;
-    var ret = parseFloat(value);
-    if( ret == NaN) return false;
-    return true;
+    if (!value) return false;
+    return isFinite(parseFloat(value));
   },
   "int": function (chk_body, value, inputDom) {
     if (value === 0) return true;
-    if( !value) return false;
-    var ret = parseInt(value);
-    if( ret == NaN) return false;
-    return true;
+    if (!value) return false;
+    return isFinite(parseInt(value));
   },
   //表示字符串
   "": function (chk_body, value, dom) {
@@ -118,7 +114,7 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
     var list = Array.from(this.querySelectorAll("[chk]"));
     list = list.concat(Array.from(this.querySelectorAll("[data-chk]")))
 
-
+    var ret = true;
     for (var item of list) {
       var inputDom = getInputDom(item);
       if (!inputDom) continue;
@@ -157,13 +153,11 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
           chk_body = chk.slice(1);
         }
         else {
-          var chk_type_index = getNextNonCharIndex()
+          var chk_type_index = getNextNonCharIndex(chk)
 
           chk_type = chk.slice(0, chk_type_index);
           chk_body = chk.slice(chk_type_index);
         }
-
-        if (!chk_body) return;
 
         var value = "";
         if (inputDom) {
@@ -175,7 +169,7 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
           }
         }
 
-        var chk_msg, chk_define_msg = "";
+        var chk_msg = "", chk_define_msg = "";
         if (chk_type != ":") {
           chk_define_msg = item.dataset.chkMsg || item.getAttribute("chk-msg") || "";
         }
@@ -191,8 +185,10 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
           }
           else {
             chk_body = chk_body.slice(index);
-            // chk_body.split("&")
-            chk_msg = jv.chk_range(chk_type,chk_body, value);
+            if (chk_body) {
+              // chk_body.split("&")
+              chk_msg = jv.chk_range(chk_type, chk_body, value);
+            }
           }
         }
         else {
@@ -200,9 +196,10 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
           chk_msg = (new RegExp(chk)).test(value) ? "" : chk_define_msg;
         }
 
+        e.chk_msg = chk_msg;
         //即使没有消息,也要调用.使调用方隐藏提示.
         if (chk_show(chk_msg, inputDom, item) === false) {
-          e.chk_Value = false;
+          e.chk_return_value = false;
           return;
         }
       }
@@ -217,7 +214,8 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
         ev.initEvent("blur", true, true);
         inputDom.dispatchEvent(ev);
 
-        if (ev.chk_Value === false) {
+        ret = !!ev.chk_msg && ret;
+        if (ev.chk_return_value === false) {
           break;
         }
       }
@@ -226,7 +224,8 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
         var ev = document.createEventObject();
         inputDom.fireEvent("onblur", ev)
 
-        if (ev.chk_Value === false) {
+        ret = !!ev.chk_msg && ret;
+        if (ev.chk_return_value === false) {
           break;
         }
       }
@@ -238,7 +237,7 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
       // }
     }
 
-    return !!chk_msg;
+    return ret;
   }, enumerable: false
 });
 

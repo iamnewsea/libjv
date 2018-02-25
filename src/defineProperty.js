@@ -54,6 +54,15 @@ if (!Node.prototype.addEventListener && Node.prototype.attachEvent) {
   });
 }
 
+//
+// if( !document.createEvent && document.createEventObject){
+//   document.createEvent = document.createEventObject
+// }
+//
+// if( !Node.dispatchEvent  && HTMLElement.fireEvent){
+//   Node.dispatchEvent = HTMLElement.fireEvent
+// }
+
 if (!Element.prototype.closest) {
   //兼容性添加。
   Object.defineProperty(Element.prototype, "popTip", {

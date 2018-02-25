@@ -30,34 +30,78 @@ var getInputDom = function (dom) {
   return getInputDom(domInput);
 }
 
-var chk_length = function () {
+jv.chk_range = function (chk_type, chk_body, value) {
+  chk_body = chk_body.trim();
 
-}
-
-jv.chk_types = {
-  "int": function (chk_body, inputDom) {
-
-  },
-  "enum": function (chk_body, inputDom) {
-
-  },
-  ":": function (chk_body, inputDom) {
-    chk_body = chk_body.trim();
-    if (!chk_body) return;
-
-    var value = "";
-    if (inputDom) {
-      if (inputDom.tagName == "INPUT" || inputDom.tagName == "TEXTAREA") {
-        value = inputDom.value;
-      }
-      else {
-        value = inputDom.innerHTML;
-      }
+  var getNextCharIndex = function (exp, char, startIndex) {
+    for (var i = startIndex, len = exp.length; i < len; i++) {
+      if (exp[i] == char) return i;
     }
-    return eval("(value,dom) => {" + chk_body + "}").call(inputDom, value)
-  },
-  "": function (chk_body, dom) {
+    return -1;
+  }
 
+  //{value.length}(1,4] & ( {value[0]}[3,3] | {value[1]}[5,5] )
+  //{}表示表达式，后面接着 (] 表示区间。 中间用 & | 连接。
+  if (chk_body[0] == "{") {
+    var valueRangeIndex = getNextCharIndex(chk_body, "}");
+    if (valueRangeIndex < 0) {
+      return "[Error]:表达式" + chk_body + "缺少 }";
+    }
+    value = eval("(value) => { return  " + chk_body.slice(1, valueRangeIndex - 1) + "}")(value)
+
+    chk_body = chk_body.slice(valueRangeIndex + 1);
+  }
+
+  chk_body = chk_body.trim();
+
+  if (chk_body[0] != '(' && chk_body[0] != '[') {
+    return "[Error]:表达式" + chk_body + "非法";
+  }
+  if (chk_body[chk_body.length - 1] != ')' && chk_body[chk_body.length - 1] != ']') {
+    return "[Error]:表达式" + chk_body + "非法";
+  }
+
+  var range = chk_body.slice(1, chk_body.length - 1).split(",").map(it => it.trim());
+
+  if( chk_type == "enum"){
+    return  range.indexOf(value) >=0;
+  }
+
+
+  if (chk_body[0] == '(' && range[0] <= value) {
+    return false;
+  }
+  else if (chk_body[0] == "[" && range[0] < value) {
+    return false;
+  }
+  else if (range.length > 1) {
+    if (chk_body[chk_body.length - 1] == ")" && range[chk_body.length - 1] >= value) {
+      return false;
+    }
+    else if (chk_body[chk_body.length - 1] == "]" && range[chk_body.length - 1] > value) {
+      return false;
+    }
+  }
+
+  return true;
+}
+jv.chk_types = {
+  "float": function (chk_body, value, inputDom) {
+    if (value === 0) return true;
+    if( !value) return false;
+    var ret = parseFloat(value);
+    if( ret == NaN) return false;
+    return true;
+  },
+  "int": function (chk_body, value, inputDom) {
+    if (value === 0) return true;
+    if( !value) return false;
+    var ret = parseInt(value);
+    if( ret == NaN) return false;
+    return true;
+  },
+  //表示字符串
+  "": function (chk_body, value, dom) {
   }
 }
 
@@ -74,15 +118,32 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
     var list = Array.from(this.querySelectorAll("[chk]"));
     list = list.concat(Array.from(this.querySelectorAll("[data-chk]")))
 
-    var chk_msg;
+
     for (var item of list) {
       var inputDom = getInputDom(item);
       if (!inputDom) continue;
 
       inputDom.chk_dom = item;
 
-      var ch = function(e){
-        var item = e.target.chk_dom;
+      //取下一个非字符。 减号下划线除外
+      var getNextNonCharIndex = function (exp) {
+        var chk_type_index = Array.from(exp).findIndex(it => {
+          var code = it.charCodeAt()
+          if (code == 45 || code == 95) return true;
+          if (code >= 65 && code <= 90) return false;
+          if (code >= 97 && code <= 122) return false;
+          return true;
+        });
+
+        if (chk_type_index < 0) {
+          chk_type_index = exp.length;
+        }
+        return chk_type_index;
+      }
+
+      var ch = function (e) {
+        var inputDom = e.target;
+        var item = inputDom.chk_dom;
         var chk = item.dataset.chk || item.getAttribute("chk") || "";
         chk = chk.trim();
         if (chk[0] == '*') {
@@ -90,46 +151,91 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
         }
         if (!chk) return;
 
-        var chk_type_index = Array.from(chk).findIndex(it => {
-          var code = it.charCodeAt()
-          if (code >= 65 && code <= 90) return false;
-          if (code >= 97 && code <= 122) return false;
-          return true;
-        });
-
-        if (chk_type_index < 0) {
-          chk_type_index = chk.length;
-        }
-
         var chk_type, chk_body;
         if (chk[0] == ':') {
           chk_type = ":";
           chk_body = chk.slice(1);
         }
         else {
+          var chk_type_index = getNextNonCharIndex()
+
           chk_type = chk.slice(0, chk_type_index);
           chk_body = chk.slice(chk_type_index);
         }
 
-        if( !chk_body) return ;
+        if (!chk_body) return;
 
-        chk_msg = jv.chk_types[chk_type](chk_body, e.target, item, this);
+        var value = "";
+        if (inputDom) {
+          if (inputDom.tagName == "INPUT" || inputDom.tagName == "TEXTAREA") {
+            value = inputDom.value;
+          }
+          else {
+            value = inputDom.innerHTML;
+          }
+        }
+
+        var chk_msg, chk_define_msg = "";
+        if (chk_type != ":") {
+          chk_define_msg = item.dataset.chkMsg || item.getAttribute("chk-msg") || "";
+        }
+
+
+        if (chk_type == ":") {
+          chk_msg = eval("(value,dom) => {" + chk_body + "}").call(inputDom, value, inputDom)
+        }
+        else if (jv.chk_types[chk_type]) {
+          var index = getNextNonCharIndex(chk_body)
+          if (jv.chk_types[chk_type](chk_body.slice(0, index), value, inputDom, item) == false) {
+            chk_msg = chk_define_msg || "不符合 " + chk_type + " 规范";
+          }
+          else {
+            chk_body = chk_body.slice(index);
+            // chk_body.split("&")
+            chk_msg = jv.chk_range(chk_type,chk_body, value);
+          }
+        }
+        else {
+          //如果不是类型，则整体按正则算。
+          chk_msg = (new RegExp(chk)).test(value) ? "" : chk_define_msg;
+        }
 
         //即使没有消息,也要调用.使调用方隐藏提示.
         if (chk_show(chk_msg, inputDom, item) === false) {
-          break;
+          e.chk_Value = false;
+          return;
         }
       }
 
-      inputDom.removeEventListener("change",ch);
-      inputDom.addEventListener("change",ch);
+      inputDom.removeEventListener("blur", ch);
+      inputDom.addEventListener("blur", ch);
 
-      chk_msg = jv.chk_types[chk_type](chk_body, inputDom, item, this);
+      //Chrome
+      if (document.createEvent) {
+        //可以通过 ev 传值。
+        var ev = document.createEvent("HTMLEvents");
+        ev.initEvent("blur", true, true);
+        inputDom.dispatchEvent(ev);
 
-      //即使没有消息,也要调用.使调用方隐藏提示.
-      if (chk_show(chk_msg, inputDom, item) === false) {
-        break;
+        if (ev.chk_Value === false) {
+          break;
+        }
       }
+      //IE
+      else {
+        var ev = document.createEventObject();
+        inputDom.fireEvent("onblur", ev)
+
+        if (ev.chk_Value === false) {
+          break;
+        }
+      }
+      // chk_msg = jv.chk_types[chk_type](chk_body, inputDom, item, this);
+      //
+      // //即使没有消息,也要调用.使调用方隐藏提示.
+      // if (chk_show(chk_msg, inputDom, item) === false) {
+      //   break;
+      // }
     }
 
     return !!chk_msg;

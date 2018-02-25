@@ -69,17 +69,17 @@ jv.chk_range = function (chk_type, chk_body, value) {
   }
 
 
-  if (chk_body[0] == '(' && range[0] <= value) {
+  if (chk_body[0] == '(' && value <= range[0]) {
     return false;
   }
-  else if (chk_body[0] == "[" && range[0] < value) {
+  else if (chk_body[0] == "[" && value < range[0]) {
     return false;
   }
   else if (range.length > 1) {
-    if (chk_body[chk_body.length - 1] == ")" && range[range.length - 1] >= value) {
+    if (chk_body[chk_body.length - 1] == ")" && value >= range[range.length - 1]) {
       return false;
     }
-    else if (chk_body[chk_body.length - 1] == "]" && range[range.length - 1] > value) {
+    else if (chk_body[chk_body.length - 1] == "]" && value > range[range.length - 1]) {
       return false;
     }
   }
@@ -92,9 +92,6 @@ jv.chk_types = {
   },
   "int": function (chk_body, value, inputDom) {
     return (/^[+-]?[0-9]+$/).test(value);
-  },
-  //表示字符串
-  "": function (chk_body, value, dom) {
   }
 }
 
@@ -139,15 +136,16 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
         var item = inputDom.chk_dom;
         var chk = item.dataset.chk || item.getAttribute("chk") || "";
         chk = chk.trim();
-        if (chk[0] == '*') {
-          chk = chk.slice(1).trim();
-        }
         if (!chk) return;
 
         var chk_type, chk_body;
         if (chk[0] == ':') {
           chk_type = ":";
           chk_body = chk.slice(1);
+        }
+        else if (chk[0] == '{' || chk[0] == '(' || chk[0] == '[') {
+          chk_type = "";
+          chk_body = chk;
         }
         else {
           var chk_type_index = getNextNonCharIndex(chk)
@@ -171,8 +169,17 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
           chk_define_msg = item.dataset.chkMsg || item.getAttribute("chk-msg") || "";
         }
 
+        if (!chk_type) {
+          chk_msg = jv.chk_range(chk_type, chk_body, value);
 
-        if (chk_type == ":") {
+          if (chk_msg === true) {
+            chk_msg = "";
+          }
+          else if (chk_msg === false) {
+            chk_msg = chk_define_msg;
+          }
+        }
+        else if (chk_type == ":") {
           chk_msg = eval("(value,dom) => {" + chk_body + "}").call(inputDom, value, inputDom)
         }
         else if (jv.chk_types[chk_type]) {
@@ -186,10 +193,10 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
               // chk_body.split("&")
               chk_msg = jv.chk_range(chk_type, chk_body, value);
 
-              if( chk_msg === true){
+              if (chk_msg === true) {
                 chk_msg = "";
               }
-              else if( chk_msg === false){
+              else if (chk_msg === false) {
                 chk_msg = chk_define_msg;
               }
             }

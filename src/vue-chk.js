@@ -251,7 +251,7 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
                 ev.initEvent("blur", true, true);
                 inputDom.dispatchEvent(ev);
 
-                ret = !!ev.chk_msg && ret;
+                ret = !ev.chk_msg && ret;
                 if (ev.chk_return_value === false) {
                     break;
                 }

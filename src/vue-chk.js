@@ -75,6 +75,18 @@ jv.chk_types = {
   "int": function (chk_body, value, inputDom) {
     return (/^[+-]?[0-9]+$/).test(value);
   },
+  "date": function (chk_body, value, inputDom) {
+    return (/^\d{4}[-/]([01]?\d|2[0-4])[-/]([0-2]?\d|3[0-1])$/).test(value);
+  },
+  "date-time": function (chk_body, value, inputDom) {
+    return (/^\d{4}[-/]([01]?\d|2[0-4])[-/]([0-2]?\d|3[0-1]) ([01]?\d|2[0-3]):[0-5]?\d:[0-5]?\d$/).test(value);
+  },
+  "time": function (chk_body, value, inputDom) {
+    return (/^([01]?\d|2[0-3]):[0-5]?\d:[0-5]?\d$/).test(value);
+  },
+  "email": function (chk_body, value, inputDom) {
+    return (/^([\w-])+@([\w-])+(\.[\w-]{1,})$/).test(value);
+  },
   //文本类型，返回 true
   "": function () {
     return true;
@@ -233,7 +245,7 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
 
       }
       else if (chk_type == ":") {
-        chk_msg = eval("(value,dom) => {" + chk_body + "}").call(inputDom, value, inputDom)
+        chk_msg = eval("(value,dom) => {" + chk_body + "}")(value, inputDom)
       }
       else if (chk_type == "reg") {
         //如果不是类型，则整体按正则算。

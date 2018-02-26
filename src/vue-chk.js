@@ -5,7 +5,12 @@ import jv from "./vue-init"
 //   jv.error(msg);
 // }
 
-jv.chk_show = function(){};
+jv.chk_show = function (chk_msg, inputDom, dom) {
+  var tip = dom.popTip(chk_msg);
+  if (chk_msg) {
+    tip.style.marginLeft = (dom.offsetWidth - inputDom.offsetWidth) + "px";
+  }
+};
 
 //如果返回字符串，则为验证消息， 另外返回布尔值，表示是否通过验证。
 jv.chk_range = function (chk_type, chk_body, value) {
@@ -70,13 +75,6 @@ jv.chk_types = {
   "int": function (chk_body, value, inputDom) {
     return (/^[+-]?[0-9]+$/).test(value);
   },
-  "reg": function (chk_body, value, inputDom) {
-    if (chk_body[0] != ":") {
-      return "[Error]正则表达式缺少冒号"
-    }
-    chk_body = chk_body.slice(1);
-
-  },
   //文本类型，返回 true
   "": function () {
     return true;
@@ -106,14 +104,6 @@ jv.chk_types = {
 Object.defineProperty(HTMLElement.prototype, "chk", {
   //chk_show:如何显示的回调.
   value: function (chk_show) {
-    var self = this;
-    if (!chk_show) {
-      console.log("需要参数 chk_show")
-      return false;
-    }
-    // this.getElementsByClassName("chk-error").removeClass("chk-error")
-    var list = Array.from(this.querySelectorAll("[chk]"));
-    list = list.concat(Array.from(this.querySelectorAll("[data-chk]")))
 
     //
     var getInputDom = function (dom) {
@@ -162,10 +152,12 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
 
     var inputChanged = function (e) {
       var inputDom = e.target;
-      var item = inputDom.chk_dom;
-      var chk = item.dataset.chk || item.getAttribute("chk") || "";
+      var chk_dom = inputDom.chk_dom;
+      var chk = chk_dom.dataset.chk || chk_dom.getAttribute("chk") || "";
       chk = chk.trim();
       if (!chk) return;
+
+      var chk_msg = "", chk_define_msg = "";
 
       var chk_type_index = getNextNonCharIndex(chk),
           chk_type = chk.slice(0, chk_type_index),
@@ -176,6 +168,9 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
         chk_body = chk.slice(1);
       }
       else if (chk_type == "reg") {
+        if (chk[chk_type_index] != ':') {
+          chk_msg = "[Error]正则表达式缺少冒号"
+        }
         chk_body = chk.slice(chk_type_index + 1);
       }
       else {
@@ -192,20 +187,22 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
         }
       }
 
-      var chk_msg = "", chk_define_msg = "";
       if (chk_type != ":") {
-        chk_define_msg = item.dataset.chkMsg || item.getAttribute("chk-msg") || "";
+        chk_define_msg = chk_dom.dataset.chkMsg || chk_dom.getAttribute("chk-msg") || "";
       }
 
-      if (chk_type == ":") {
+      if (chk_msg) {
+
+      }
+      else if (chk_type == ":") {
         chk_msg = eval("(value,dom) => {" + chk_body + "}").call(inputDom, value, inputDom)
       }
       else if (chk_type == "reg") {
         //如果不是类型，则整体按正则算。
-        chk_msg = (new RegExp(chk_body)).test(value) ? "" : chk_define_msg;
+        chk_msg = (eval(chk_body)).test(value) ? "" : chk_define_msg;
       }
       else if (jv.chk_types[chk_type]) {
-        if (jv.chk_types[chk_type](chk_body, value, inputDom, item) == false) {
+        if (jv.chk_types[chk_type](chk_body, value, inputDom, chk_dom) == false) {
           chk_msg = chk_define_msg || "不符合 " + chk_type + " 规范";
         }
         else {
@@ -227,22 +224,25 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
       }
 
       e.chk_msg = chk_msg;
-      jv.chk_show(chk_msg, inputDom, item);
+      jv.chk_show(chk_msg, inputDom, chk_dom);
 
       //即使没有消息,也要调用.使调用方隐藏提示.
-      if (chk_show(chk_msg, inputDom, item) === false) {
+      if (chk_show && (chk_show(chk_msg, inputDom, chk_dom) === false)) {
         e.chk_return_value = false;
         return;
       }
     }
     //
 
-    var ret = true;
-    for (var item of list) {
-      var inputDom = getInputDom(item);
+
+    var ret = true, list = Array.from(this.querySelectorAll("[chk]"));
+    list = list.concat(Array.from(this.querySelectorAll("[data-chk]")))
+
+    for (var chk_dom of list) {
+      var inputDom = getInputDom(chk_dom);
       if (!inputDom) continue;
 
-      inputDom.chk_dom = item;
+      inputDom.chk_dom = chk_dom;
       inputDom.removeEventListener("blur", inputChanged);
       inputDom.addEventListener("blur", inputChanged);
 

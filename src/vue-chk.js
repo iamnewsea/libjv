@@ -58,10 +58,11 @@ jv.chk_range = function (chk_type, chk_body, value) {
     return false;
   }
   else if (range.length > 1) {
-    if (chk_body[chk_body.length - 1] == ")" && value >= range[range.length - 1]) {
+    var lastSign = chk_body[chk_body.length - 1], lastValue = range[1];
+    if (lastSign == ")" && value >= lastValue) {
       return false;
     }
-    else if (chk_body[chk_body.length - 1] == "]" && value > range[range.length - 1]) {
+    else if (lastSign == "]" && value > lastValue) {
       return false;
     }
   }

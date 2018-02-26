@@ -130,6 +130,36 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
 
       return getInputDom(domInput);
     }
+
+    //查找dom下第一个绑定 v-model 的值.如果找不到,则查找 inputDom 的值.
+    var getVModelValue = function (dom) {
+      var ret;
+      if (dom.tagName && !dom.__vue__) {
+        for (var item of dom.children) {
+          ret = getVModelValue(item);
+          if (ret) {
+            return ret;
+          }
+        }
+        return;
+      }
+
+      var component = dom.tagName ? dom.__vue__ : dom,
+          vdata = component.$vnode.data;
+      ret = vdata && vdata.model && vdata.model.expression
+      if (ret) {
+        return vdata.model;
+      }
+
+      for (var it of component.$children) {
+        ret = getVModelValue(it)
+        if (ret) {
+          return ret;
+        }
+      }
+      return ret;
+    }
+
     var isValidateChar = function (code) {
       if (code == 45 || code == 95) return true;
       if (code >= 65 && code <= 90) return true;
@@ -177,14 +207,22 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
         chk_body = chk.slice(chk_type_index);
       }
 
-      var value = "";
-      if (inputDom) {
+      var value = getVModelValue(chk_dom);
+      if (value) {
+        //返回 { expression : , value:}
+        value = value.value;
+      }
+      else if (inputDom) {
         if (inputDom.tagName == "INPUT" || inputDom.tagName == "TEXTAREA") {
           value = inputDom.value;
         }
         else {
-          value = inputDom.innerHTML;
+          value = null;
         }
+      }
+
+      if (value === null) {
+        chk_msg = "找不到输入框"
       }
 
       if (chk_type != ":") {
@@ -199,7 +237,14 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
       }
       else if (chk_type == "reg") {
         //如果不是类型，则整体按正则算。
-        chk_msg = (eval(chk_body)).test(value) ? "" : chk_define_msg;
+        var reg;
+        try {
+          reg = eval(chk_body);
+          chk_msg = reg.test(value) ? "" : chk_define_msg;
+        }
+        catch (e) {
+          chk_msg = "正则表达式不正确";
+        }
       }
       else if (jv.chk_types[chk_type]) {
         if (jv.chk_types[chk_type](chk_body, value, inputDom, chk_dom) == false) {

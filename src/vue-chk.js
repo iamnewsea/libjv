@@ -305,26 +305,12 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
       inputDom.addEventListener("blur", inputChanged);
 
       //Chrome
-      if (document.createEvent) {
-        //可以通过 ev 传值。
-        var ev = document.createEvent("HTMLEvents");
-        ev.initEvent("blur", true, true);
-        inputDom.dispatchEvent(ev);
 
-        ret = !ev.chk_msg && ret;
-        if (ev.chk_return_value === false) {
-          break;
-        }
-      }
-      //IE
-      else {
-        var ev = document.createEventObject();
-        inputDom.fireEvent("onblur", ev)
-
-        ret = !!ev.chk_msg && ret;
-        if (ev.chk_return_value === false) {
-          break;
-        }
+      //可以通过 ev 传值。
+      var ev = inputDom.trigger("blur");
+      ret = !ev.chk_msg && ret;
+      if (ev.chk_return_value === false) {
+        break;
       }
     }
 

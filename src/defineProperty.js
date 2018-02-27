@@ -59,8 +59,25 @@ if (!Node.prototype.addEventListener && Node.prototype.attachEvent) {
 //   document.createEvent = document.createEventObject
 // }
 //
+//触发无素事件.value附加到event上.返回event
+Node.trigger = function (event, value) {
+  if (Node.dispatchEvent) {
+    document.createEvent("HTMLEvents");
+    ev.initEvent(event, true, true);
+    this.dispatchEvent(ev);
+    return ev;
+  }
+  else {
+    var ev = document.createEventObject();
+    this.fireEvent("on" + event, ev)
+    return ev;
+  }
+}
+
 // if( !Node.dispatchEvent  && HTMLElement.fireEvent){
-//   Node.dispatchEvent = HTMLElement.fireEvent
+//   Node.dispatchEvent = function(){
+//
+//   }
 // }
 
 if (!Element.prototype.closest) {

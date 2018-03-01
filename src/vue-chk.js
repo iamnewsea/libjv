@@ -13,7 +13,7 @@ jv.chk_show = function (chk_msg, inputDom, dom) {
 };
 
 //如果返回字符串，则为验证消息， 另外返回布尔值，表示是否通过验证。
-jv.chk_range = function (chk_type, chk_body, value) {
+jv.chk_range = function (chk_type, chk_body, value, prevResult) {
   chk_body = chk_body.trim();
 
   var getNextCharIndex = function (exp, char, startIndex) {
@@ -88,7 +88,20 @@ jv.chk_types = {
   "email": function (chk_body, value, inputDom) {
     return (/^([\w-])+@([\w-])+(\.[\w-]{1,})$/).test(value);
   },
-  //文本类型，返回 true
+  //*号必填
+  "*": function (chk_body, value, inputDom) {
+    return !!value.length;
+  },
+  //?号表示,可空,但是非空,要验证
+  "?": function (chk_body, value, inputDom) {
+    if (!value.length) {
+      return true;
+    }
+    return new Promise((resolve, reject) => {
+        return !!value.length
+    });
+  },
+  //文本类型，返回 true,可空.
   "": function () {
     return true;
   }
@@ -220,6 +233,7 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
         chk_body = chk.slice(chk_type_index);
       }
 
+
       var value = getVModelValue(chk_dom);
       if (value) {
         //返回 { expression : , value:}
@@ -259,26 +273,37 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
           chk_msg = "正则表达式不正确";
         }
       }
-      else if (jv.chk_types[chk_type]) {
-        if (jv.chk_types[chk_type](chk_body, value, inputDom, chk_dom) == false) {
-          chk_msg = chk_define_msg || "不符合 " + chk_type + " 规范";
+      else {
+        //如果定义了 * 号,表示必填.
+        if (chk_type && !(chk_type in jv.chk_types)) {
+          chk_type = Object.keys(jv.chk_types).find(it => chk.startsWith(it)) || "";
+          if (chk_type) {
+            chk_body = chk.slice(chk_type.length).trim();
+          }
         }
-        else {
-          if (chk_body) {
-            // chk_body.split("&")
-            chk_msg = jv.chk_range(chk_type, chk_body, value);
 
-            if (chk_msg === true) {
-              chk_msg = "";
-            }
-            else if (chk_msg === false) {
-              chk_msg = chk_define_msg;
+
+        if (jv.chk_types[chk_type]) {
+          if (jv.chk_types[chk_type](chk_body, value, inputDom, chk_dom) === false) {
+            chk_msg = chk_define_msg || "不符合 " + chk_type + " 规范";
+          }
+          else {
+            if (chk_body) {
+              // chk_body.split("&")
+              chk_msg = jv.chk_range(chk_type, chk_body, value);
+
+              if (chk_msg === true) {
+                chk_msg = "";
+              }
+              else if (chk_msg === false) {
+                chk_msg = chk_define_msg;
+              }
             }
           }
         }
-      }
-      else {
-        chk_msg = "[Error]不识别的类型" + chk_type;
+        else {
+          chk_msg = "[Error]不识别的类型" + chk_type;
+        }
       }
 
       e.chk_msg = chk_msg;
@@ -291,7 +316,6 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
       }
     }
     //
-
 
     var ret = true, list = Array.from(this.querySelectorAll("[chk]"));
     list = list.concat(Array.from(this.querySelectorAll("[data-chk]")))

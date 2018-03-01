@@ -42,13 +42,13 @@ Date.today = function () {
 if (!Node.prototype.addEventListener && Node.prototype.attachEvent) {
   //兼容性添加。
   Object.defineProperty(Node.prototype, "addEventListener", {
-    value: function (event, fn) {
+    value(event, fn) {
       return this.attachEvent("on" + event, fn);
     }, enumerable: false
   });
 
   Object.defineProperty(Node.prototype, "removeEventListener", {
-    value: function (event, fn) {
+    value(event, fn) {
       return this.detachEvent("on" + event, fn);
     }, enumerable: false
   });
@@ -59,31 +59,34 @@ if (!Node.prototype.addEventListener && Node.prototype.attachEvent) {
 //   document.createEvent = document.createEventObject
 // }
 //
+
 //触发无素事件.value附加到event上.返回event
-Node.trigger = function (event, value) {
-  if (Node.dispatchEvent) {
-    document.createEvent("HTMLEvents");
-    ev.initEvent(event, true, true);
-    this.dispatchEvent(ev);
-    return ev;
-  }
-  else {
-    var ev = document.createEventObject();
-    this.fireEvent("on" + event, ev)
-    return ev;
-  }
-}
+
+Object.defineProperty(Node.prototype, "trigger", {
+  value(event, value) {
+    if (Node.dispatchEvent) {
+      document.createEvent("HTMLEvents");
+      ev.initEvent(event, true, true);
+      this.dispatchEvent(ev);
+      return ev;
+    }
+    else {
+      var ev = document.createEventObject();
+      this.fireEvent("on" + event, ev)
+      return ev;
+    }
+  }, enumerable: false
+});
 
 // if( !Node.dispatchEvent  && HTMLElement.fireEvent){
 //   Node.dispatchEvent = function(){
-//
 //   }
 // }
 
 if (!Element.prototype.closest) {
   //兼容性添加。
-  Object.defineProperty(Element.prototype, "popTip", {
-    value: function (selector) {
+  Object.defineProperty(Element.prototype, "closest", {
+    value(selector) {
       var el = this;
       var matchesSelector = el.matches || el.webkitMatchesSelector || el.mozMatchesSelector || el.msMatchesSelector;
 
@@ -100,7 +103,7 @@ if (!Element.prototype.closest) {
 
 //冒泡提示
 Object.defineProperty(HTMLElement.prototype, "popTip", {
-  value: function (msg) {
+  value(msg) {
     var tip = Array.from(this.children).filter(it => {
       return it.className.split(" ").indexOf("chk-tip") >= 0;
     })[0];
@@ -127,7 +130,7 @@ Object.defineProperty(HTMLElement.prototype, "popTip", {
 
 
 Object.defineProperty(Date.prototype, "toDateString", {
-  value: function (format) {
+  value(format) {
     return this.valueOf().toDateString(format);
   }, enumerable: false
 });
@@ -529,11 +532,11 @@ document.cookieMap = (function () {
   });
 
   return {
-    get: function (key) {
+    get(key) {
       if (!key) return db;
       return db[key];
     }
-    , set: function (key, value, cacheTime) {
+    , set(key, value, cacheTime) {
       key = key.trim();
       value = encodeURIComponent(value.trim() || "");
       db[key] = value;
@@ -546,7 +549,7 @@ document.cookieMap = (function () {
       }
       document.cookie = key + "=" + value + ";path=/" + expires;
     }
-    , remove: function (key) {
+    , remove(key) {
       this.set(key, "", -1);
     }
   };

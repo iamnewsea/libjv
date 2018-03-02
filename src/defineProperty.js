@@ -60,8 +60,40 @@ if (!Node.prototype.addEventListener && Node.prototype.attachEvent) {
 // }
 //
 
-//触发无素事件.value附加到event上.返回event
+//获取距离父dom的 x,y 距离.
+Object.defineProperty(Node.prototype, "offset_pdom", {
+  value(pdom) {
+    if (this == pdom) return {x: 0, y: 0};
 
+    var x = 0, y = 0;
+    var ppdom = pdom.offsetParent;
+
+    var getP = function (dom) {
+      if(!dom) return ;
+      x += dom.offsetLeft;
+      y += dom.offsetTop;
+
+      if (dom == pdom) {
+        return true;
+      }
+      else if (dom == ppdom) {
+        x -= pdom.offsetLeft;
+        y -= pdom.offsetTop;
+
+        return true;
+      }
+
+      return getP(dom.offsetParent);
+    }
+
+    if (getP(this)) {
+      return {x: x, y: y};
+    }
+    return {};
+  }
+  , enumerable: false
+});
+//触发无素事件.value附加到event上.返回event
 Object.defineProperty(Node.prototype, "trigger", {
   value(event, value) {
     if (Node.prototype.dispatchEvent) {
@@ -77,6 +109,7 @@ Object.defineProperty(Node.prototype, "trigger", {
     }
   }, enumerable: false
 });
+
 
 // if( !Node.dispatchEvent  && HTMLElement.fireEvent){
 //   Node.dispatchEvent = function(){

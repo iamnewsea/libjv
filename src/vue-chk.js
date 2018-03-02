@@ -8,7 +8,18 @@ import jv from "./vue-init"
 jv.chk_show = function (chk_msg, inputDom, dom) {
   var tip = dom.popTip(chk_msg);
   if (chk_msg) {
-    tip.style.marginLeft = (dom.offsetWidth - inputDom.offsetWidth) + "px";
+    var chkMsgOffset = dom.dataset.chkMsgOffset || dom.getAttribute("chk-msg-offset");
+    if (chkMsgOffset) {
+      chkMsgOffset = inputDom.cloest(chkMsgOffset)
+
+      if (!chkMsgOffset) {
+        chkMsgOffset = inputDom;
+      }
+    }
+    else {
+      chkMsgOffset = inputDom;
+    }
+    tip.style.marginLeft = (chkMsgOffset.offset_pdom(dom).x || 0) + "px";
   }
 };
 
@@ -90,7 +101,10 @@ jv.chk_types = {
   },
   //*号必填
   "*": function (chk_body, value, inputDom) {
-    return !!value.length;
+    if (!value.length) {
+      return "必填";
+    }
+    return true;
   },
   //?号表示,可空,但是非空,要验证
   "?": function (chk_body, value, inputDom) {
@@ -157,24 +171,34 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
       return getInputDom(domInput);
     }
 
-    //查找dom下第一个绑定 v-model 的值.如果找不到,则查找 inputDom 的值.
-    var getVModelValue = function (dom) {
-      var ret;
-      if (dom.tagName && !dom.__vue__) {
-        for (var item of dom.children) {
-          ret = getVModelValue(item);
-          if (ret) {
-            return ret;
-          }
-        }
-        return;
+    var getInputValue = function (dom) {
+      if (!dom.tagName) {
+        return null;
       }
 
-      var component = dom.tagName ? dom.__vue__ : dom,
-          vdata = component.$vnode.data;
-      ret = vdata && vdata.model && vdata.model.expression
-      if (ret) {
-        return vdata.model;
+      if (dom.tagName == "INPUT" || dom.tagName == "TEXTAREA") {
+        return dom.value;
+      }
+
+      var ret;
+      for (var item of dom.children) {
+        ret = getInputValue(item);
+        if (ret) {
+          return ret;
+        }
+      }
+      return null;
+    }
+
+    //查找dom下第一个绑定 v-model 的值.如果找不到,则查找 inputDom 的值.
+    var getVModelValue = function (component) {
+      var vdata = component.$vnode.data, ret;
+      if (vdata && vdata.model && vdata.model.expression) {
+        //对于 el-input 它的值在 component._data.currentValue,对于其它 v-model 它的值在  vdata.model.value
+        ret = jv.evalExpression(component.$vnode.context._data, vdata.model.expression);
+        if (ret.ok) {
+          return ret.value;
+        }
       }
 
       for (var it of component.$children) {
@@ -234,18 +258,11 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
       }
 
 
-      var value = getVModelValue(chk_dom);
-      if (value) {
-        //返回 { expression : , value:}
-        value = value.value;
+      var value = getVModelValue(chk_dom.__vue__);
+      if (value !== null) {
       }
-      else if (inputDom) {
-        if (inputDom.tagName == "INPUT" || inputDom.tagName == "TEXTAREA") {
-          value = inputDom.value;
-        }
-        else {
-          value = null;
-        }
+      else {
+        value = getInputValue(chk_dom);
       }
 
       if (value === null) {
@@ -257,7 +274,6 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
       }
 
       if (chk_msg) {
-
       }
       else if (chk_type == ":") {
         chk_msg = eval("(value,dom) => {" + chk_body + "}")(value, inputDom)
@@ -267,7 +283,7 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
         var reg;
         try {
           reg = eval(chk_body);
-          chk_msg = reg.test(value) ? "" : chk_define_msg;
+          chk_msg = reg.test(value) ? "" : "不符合正则表达式规则";
         }
         catch (e) {
           chk_msg = "正则表达式不正确";
@@ -275,28 +291,28 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
       }
       else {
         //如果定义了 * 号,表示必填.
-        if (chk_type && !(chk_type in jv.chk_types)) {
-          chk_type = Object.keys(jv.chk_types).find(it => chk.startsWith(it)) || "";
-          if (chk_type) {
-            chk_body = chk.slice(chk_type.length).trim();
-          }
+        var chk_type2 = Object.keys(jv.chk_types).find(it => chk.startsWith(it)) || "";
+        if (chk_type2) {
+          chk_type = chk_type2;
+          chk_body = chk.slice(chk_type.length + 1).trim();
         }
 
-
-        if (jv.chk_types[chk_type]) {
+        if (chk_type in jv.chk_types) {
           var chk_type_ret = jv.chk_types[chk_type](chk_body, value, inputDom, chk_dom);
 
           if (chk_type_ret === false) {
-            chk_msg = chk_define_msg || "不符合 " + chk_type + " 规范";
+            chk_msg = "不符合 " + chk_type + " 规范";
           }
-          else if (chk_type_ret && (chk_type_ret.Type == "function")) {
+          else if (chk_type_ret && ( chk_type_ret.Type == "function")) {
             chk_msg = chk_type_ret(chk_type, chk_body, value);
           }
-          else {
-            if (chk_body) {
-              // chk_body.split("&")
-              chk_msg = jv.chk_range(chk_type, chk_body, value);
-            }
+          else if (chk_type_ret) {
+            chk_msg = chk_type_ret;
+          }
+
+          if (!chk_msg && chk_body) {
+            // chk_body.split("&")
+            chk_msg = jv.chk_range(chk_type, chk_body, value);
           }
 
 
@@ -304,12 +320,16 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
             chk_msg = "";
           }
           else if (chk_msg === false) {
-            chk_msg = chk_define_msg;
+            chk_msg = "验证失败 " + chk_type;
           }
         }
         else {
           chk_msg = "[Error]不识别的类型" + chk_type;
         }
+      }
+
+      if (chk_msg) {
+        chk_msg = chk_define_msg || chk_msg;
       }
 
       e.chk_msg = chk_msg;

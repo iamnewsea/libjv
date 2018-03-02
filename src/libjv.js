@@ -209,12 +209,21 @@ jv.param = function (obj) {
   }).join("&");
 }
 
-//用法： jv.pointObjectValue({a:{b:{c:1}}} , "a.b.c") === 1
-jv.pointObjectValue = function (obj, path) {
+//用法： jv.evalExpression({a:{b:[{c:1}]}} , "a.b[0].c")
+//返回: {value: 1 , ok: true }
+jv.evalExpression = function (obj, path) {
   if (!path) return obj;
-  jv._pointObject_ = obj;
-  var ret = eval("jv._pointObject_." + path);
-  delete jv._pointObject_;
+  var random = "_eval_expression_" + jv.random();
+  jv[random] = obj;
+  var ret = {};
+  try {
+    ret.value = eval("jv['" + random + "']." + path);
+    ret.ok = true;
+  }
+  catch (e) {
+    ret.ok = false;
+  }
+  delete jv[random];
   return ret;
 }
 

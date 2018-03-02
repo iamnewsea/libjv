@@ -86,8 +86,9 @@ jv.getPermissions = function () {
   return ret;
 }
 
-jv.initApp = function (vueProtype) {
-  jv.Vue_Prototype = vueProtype;
+jv.initApp = function (vue) {
+  jv.Vue = vue;
+  var vueProtype = vue.prototype;
   vueProtype.Base_Url = window.Base_Url;
   vueProtype.Upload_Url = window.Base_Url + "/sys/fileUpload";
 
@@ -98,13 +99,13 @@ jv.initApp = function (vueProtype) {
   // });
 
   Object.defineProperty(vueProtype, "chk", {
-    value (chk_show) {
-       return this.$el.chk(chk_show);
+    value(chk_show) {
+      return this.$el.chk(chk_show);
     }, enumerable: false
   });
 
   Object.defineProperty(vueProtype, "$Find", {
-    value () {
+    value() {
       if (this.$el == ele) {
         return this;
       }
@@ -119,7 +120,7 @@ jv.initApp = function (vueProtype) {
 
   //向上找元素.
   Object.defineProperty(vueProtype, "closest", {
-    value (ele) {
+    value(ele) {
       let cur = this;
       while (cur) {
         if (cur.$el == ele) {

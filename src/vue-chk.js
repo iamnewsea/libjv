@@ -369,4 +369,12 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
   }, enumerable: false
 });
 
+
+//注册样式. 把 chk有值,且里面没有问号的元素,添加属性 chk-require ,供样式表显示必填样式.
+// jv.Vue.mixin({
+//   created(){
+//
+//   }
+// })
+
 export default jv;

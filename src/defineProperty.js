@@ -70,13 +70,14 @@ Object.defineProperty(Node.prototype, "offset_pdom", {
 
     var getP = function (dom) {
       if(!dom) return ;
-      x += dom.offsetLeft;
-      y += dom.offsetTop;
-
       if (dom == pdom) {
         return true;
       }
-      else if (dom == ppdom) {
+
+      x += dom.offsetLeft;
+      y += dom.offsetTop;
+
+      if (dom == ppdom) {
         x -= pdom.offsetLeft;
         y -= pdom.offsetTop;
 

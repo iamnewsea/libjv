@@ -10,7 +10,7 @@ jv.chk_show = function (chk_msg, inputDom, dom) {
   if (chk_msg) {
     var chkMsgOffset = dom.dataset.chkMsgOffset || dom.getAttribute("chk-msg-offset");
     if (chkMsgOffset) {
-      chkMsgOffset = inputDom.cloest(chkMsgOffset)
+      chkMsgOffset = inputDom.closest(chkMsgOffset)
 
       if (!chkMsgOffset) {
         chkMsgOffset = inputDom;
@@ -103,15 +103,6 @@ jv.chk_types = {
   "*": function (chk_body, value, inputDom) {
     if (!value.length) {
       return "必填";
-    }
-    return true;
-  },
-  //?号表示,可空,但是非空,要验证
-  "?": function (chk_body, value, inputDom) {
-    if (!value.length) {
-      return function () {
-        return true;
-      };
     }
     return true;
   },
@@ -269,6 +260,16 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
         chk_msg = "找不到输入框"
       }
 
+      //如果是类型带着?表示可空.
+      if (chk_body[0] == '?') {
+        chk_body = chk_body.slice(1);
+        if (!value) {
+          chk = "";
+          chk_type = "";
+          chk_body = "";
+        }
+      }
+
       if (chk_type != ":") {
         chk_define_msg = chk_dom.dataset.chkMsg || chk_dom.getAttribute("chk-msg") || "";
       }
@@ -289,7 +290,7 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
           chk_msg = "正则表达式不正确";
         }
       }
-      else {
+      else if (chk) {
         //如果定义了 * 号,表示必填.
         var chk_type2 = Object.keys(jv.chk_types).find(it => chk.startsWith(it)) || "";
         if (chk_type2) {
@@ -303,10 +304,10 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
           if (chk_type_ret === false) {
             chk_msg = "不符合 " + chk_type + " 规范";
           }
-          else if (chk_type_ret && ( chk_type_ret.Type == "function")) {
-            chk_msg = chk_type_ret(chk_type, chk_body, value);
+          else if (chk_type_ret === true) {
+            chk_msg = "";
           }
-          else if (chk_type_ret) {
+          else {
             chk_msg = chk_type_ret;
           }
 

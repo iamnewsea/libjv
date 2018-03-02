@@ -13,7 +13,7 @@ jv.chk_show = function (chk_msg, inputDom, dom) {
 };
 
 //如果返回字符串，则为验证消息， 另外返回布尔值，表示是否通过验证。
-jv.chk_range = function (chk_type, chk_body, value, prevResult) {
+jv.chk_range = function (chk_type, chk_body, value) {
   chk_body = chk_body.trim();
 
   var getNextCharIndex = function (exp, char, startIndex) {
@@ -95,11 +95,11 @@ jv.chk_types = {
   //?号表示,可空,但是非空,要验证
   "?": function (chk_body, value, inputDom) {
     if (!value.length) {
-      return true;
+      return function () {
+        return true;
+      };
     }
-    return new Promise((resolve, reject) => {
-        return !!value.length
-    });
+    return true;
   },
   //文本类型，返回 true,可空.
   "": function () {
@@ -284,21 +284,27 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
 
 
         if (jv.chk_types[chk_type]) {
-          if (jv.chk_types[chk_type](chk_body, value, inputDom, chk_dom) === false) {
+          var chk_type_ret = jv.chk_types[chk_type](chk_body, value, inputDom, chk_dom);
+
+          if (chk_type_ret === false) {
             chk_msg = chk_define_msg || "不符合 " + chk_type + " 规范";
+          }
+          else if (chk_type_ret && (chk_type_ret.Type == "function")) {
+            chk_msg = chk_type_ret(chk_type, chk_body, value);
           }
           else {
             if (chk_body) {
               // chk_body.split("&")
               chk_msg = jv.chk_range(chk_type, chk_body, value);
-
-              if (chk_msg === true) {
-                chk_msg = "";
-              }
-              else if (chk_msg === false) {
-                chk_msg = chk_define_msg;
-              }
             }
+          }
+
+
+          if (chk_msg === true) {
+            chk_msg = "";
+          }
+          else if (chk_msg === false) {
+            chk_msg = chk_define_msg;
           }
         }
         else {

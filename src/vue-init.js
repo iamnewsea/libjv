@@ -97,6 +97,12 @@ jv.initApp = function (vueProtype) {
   //   }, enumerable: false
   // });
 
+  Object.defineProperty(vueProtype, "chk", {
+    value (chk_show) {
+       return this.$el.chk(chk_show);
+    }, enumerable: false
+  });
+
   Object.defineProperty(vueProtype, "$Find", {
     value () {
       if (this.$el == ele) {

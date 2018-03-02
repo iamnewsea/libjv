@@ -64,8 +64,8 @@ if (!Node.prototype.addEventListener && Node.prototype.attachEvent) {
 
 Object.defineProperty(Node.prototype, "trigger", {
   value(event, value) {
-    if (Node.dispatchEvent) {
-      document.createEvent("HTMLEvents");
+    if (Node.prototype.dispatchEvent) {
+      var ev = document.createEvent("HTMLEvents");
       ev.initEvent(event, true, true);
       this.dispatchEvent(ev);
       return ev;

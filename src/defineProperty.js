@@ -69,7 +69,7 @@ Object.defineProperty(Node.prototype, "offset_pdom", {
     var ppdom = pdom.offsetParent;
 
     var getP = function (dom) {
-      if(!dom) return ;
+      if (!dom) return;
       if (dom == pdom) {
         return true;
       }
@@ -407,24 +407,32 @@ Object.defineProperty(Object.prototype, "Enumer", {
 Object.defineProperty(Array.prototype, "last", {
   value(filter) {
     if (!this.length) return null;
-    if (filter) {
-      for (var i = this.length - 1; i > -1; i--) {
-        if (filter(this[i])) return this[i];
+    if (!filter) {
+      filter = function () {
+        return true;
       }
-      return null;
     }
-    return this[this.length - 1];
+
+    for (var i = this.length - 1; i > -1; i--) {
+      var item = this[i];
+      if (filter(item)) return item;
+    }
+    return null;
   }, enumerable: false
 });
 
+/**
+ * eqFunc = function(a,b){ a == b } ;
+ */
 Object.defineProperty(Array.prototype, "putDistinct", {
-  value(val, filterFunc) {
-    if (filterFunc) {
-      if (this.filter(val, filterFunc)) {
-        return;
-      }
+  value(val, eqFunc) {
+    if (!eqFunc) {
+      eqFunc = function (a, b) {
+        return a == b
+      };
     }
-    else if (this.indexOf(val) >= 0) {
+
+    if (this.findIndex(it => eqFunc(it, val)) >= 0) {
       return;
     }
 
@@ -432,15 +440,21 @@ Object.defineProperty(Array.prototype, "putDistinct", {
   }, enumerable: false
 });
 
+/**
+ * eqFunc = function(a,b){ return a == b }
+ */
 Object.defineProperty(Array.prototype, "distinct", {
-  value(idFunc) {
-    var ret = {};
+  value(eqFunc) {
+    var ret = [];
+    if( !eqFunc){
+      eqFunc = function(a,b){ return a == b }
+    }
 
     this.forEach(it => {
-      ret[idFunc ? idFunc(it) : JSON.stringify(it)] = it;
+      ret.putDistinct(it,eqFunc);
     })
 
-    return Object.values(ret);
+    return ret;
   }, enumerable: false
 });
 
@@ -488,6 +502,29 @@ Object.defineProperty(Array.prototype, "recursion", {
       }
     }
     return true;
+  }, enumerable: false
+});
+
+/**
+ * 获取两个数组交集,返回 Set 类型
+ */
+Object.defineProperty(Array.prototype, "intersect", {
+  value(other, eqFunc) {
+    var ret = []
+    if (!eqFunc) {
+      eqFunc = function (a, b) {
+        return a == b
+      };
+    }
+    if (!other) return ret;
+    other = Array.from(other);
+    for (var i = 0, len = this.length; i < len; i++) {
+      var item = this[i];
+      if (other.findIndex(it => eqFunc(item, it)) >= 0) {
+        ret.putDistinct(item, eqFunc);
+      }
+    }
+    return ret;
   }, enumerable: false
 });
 

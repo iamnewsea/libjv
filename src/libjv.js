@@ -3,7 +3,10 @@ import "./defineProperty"
 //---------------------------------------------
 var jv = {};
 
-//定义枚举
+/*
+定义枚举, 生成 jv.枚举 = {}
+使用 对象.Enumer(键,jv.枚举)  对对象的key进行枚举化。
+ */
 jv.defEnum = function (typeName, json, sep) {
   var ret = {type: typeName};
   var i = -1;

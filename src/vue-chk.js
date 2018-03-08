@@ -185,10 +185,17 @@ Object.defineProperty(HTMLElement.prototype, "chk", {
     var getVModelValue = function (component) {
       var vdata = component.$vnode.data, ret;
       if (vdata && vdata.model && vdata.model.expression) {
+        if( "value" in vdata.model){
+          return vdata.model.value || "";
+        }
+
         //对于 el-input 它的值在 component._data.currentValue,对于其它 v-model 它的值在  vdata.model.value
         ret = jv.evalExpression(component.$vnode.context._data, vdata.model.expression);
         if (ret.ok) {
           return ret.value;
+        }
+        else{
+          ret = "";
         }
       }
 

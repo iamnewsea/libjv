@@ -1,7 +1,63 @@
 import "./defineProperty"
 
+//单例.
+var jv;
+var JvObject = (function() {
+  //私有字段。
+  // var db = Symbol("db");
+
+  class JvObject {
+    constructor() {
+      if( !jv){
+        jv = this;
+      }
+
+      // this[db] = {id:1};
+      return jv;
+    }
+
+    // get db(){
+    //   return this[db];
+    // }
+  }
+
+  return JvObject;
+})();
+
+jv = new JvObject();
 //---------------------------------------------
-var jv = {};
+
+//提供 基于 localStorage的缓存数据.
+//距离 2000 年的秒数。
+jv.db = {
+  get(key) {
+    if (!key) return null;
+    key = "jv.db." + key;
+    var ret = localStorage.getItem(key);
+    if (!ret) return null;
+    ret = JSON.parse(localStorage.getItem(key));
+    if (!ret) return null;
+    if (ret.expireAt < (new Date()).totalSeconds) {
+      localStorage.removeItem(key);
+      return null;
+    }
+
+    return ret.value;
+  },
+  set(key, value, cacheSeconds) {
+    key = "jv.db." + key;
+
+    if (value === null) {
+      return localStorage.removeItem(key);
+    }
+
+    cacheSeconds = cacheSeconds || 600; //默认10分钟。
+
+    if( cacheSeconds < 0) return ;
+
+    localStorage.setItem(key, JSON.stringify({value: value, expireAt: (new Date()).totalSeconds + cacheSeconds}));
+  }
+};
 
 /*
 定义枚举, 生成 jv.枚举 = {}
@@ -137,11 +193,11 @@ jv.param_jmap = function (obj) {
       var isMapValue = mapObject.toString() == "Map";
       if (!isMapValue) {
         if (Object.keys(mapObject).findIndex(it => {
-              var code = it.charCodeAt();
-              if (code >= 65 && code <= 90) return true;
-              if (code >= 97 && code <= 122) return true;
-              return false;
-            }) < 0) {
+            var code = it.charCodeAt();
+            if (code >= 65 && code <= 90) return true;
+            if (code >= 97 && code <= 122) return true;
+            return false;
+          }) < 0) {
           isMapValue = true;
         }
       }

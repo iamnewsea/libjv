@@ -162,6 +162,12 @@ Object.defineProperty(HTMLElement.prototype, "popTip", {
   }, enumerable: false
 });
 
+//获取总秒数。
+Object.defineProperty(Date.prototype, "totalSeconds", {
+  get(format) {
+    return parseInt( this.valueOf()/1000 );
+  }, enumerable: false
+});
 
 Object.defineProperty(Date.prototype, "toDateString", {
   value(format) {

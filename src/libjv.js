@@ -2,13 +2,13 @@ import "./defineProperty"
 
 //单例.
 var jv;
-var JvObject = (function() {
+var JvObject = (function () {
   //私有字段。
   // var db = Symbol("db");
 
   class JvObject {
     constructor() {
-      if( !jv){
+      if (!jv) {
         jv = this;
       }
 
@@ -53,9 +53,28 @@ jv.db = {
 
     cacheSeconds = cacheSeconds || 600; //默认10分钟。
 
-    if( cacheSeconds < 0) return ;
+    if (cacheSeconds < 0) return;
 
     localStorage.setItem(key, JSON.stringify({value: value, expireAt: (new Date()).totalSeconds + cacheSeconds}));
+  }
+};
+
+jv.cache_db = {};
+
+jv.cache = {
+  get(key) {
+    if (!key) return null;
+    key = "jv.cache." + key;
+    return jv.cache_db[key];
+  },
+  set(key, value) {
+    key = "jv.cache." + key;
+
+    if (value === null) {
+      return delete jv.cache_db[key];
+    }
+    jv.cache_db[key] = value;
+    return value;
   }
 };
 
@@ -193,11 +212,11 @@ jv.param_jmap = function (obj) {
       var isMapValue = mapObject.toString() == "Map";
       if (!isMapValue) {
         if (Object.keys(mapObject).findIndex(it => {
-            var code = it.charCodeAt();
-            if (code >= 65 && code <= 90) return true;
-            if (code >= 97 && code <= 122) return true;
-            return false;
-          }) < 0) {
+              var code = it.charCodeAt();
+              if (code >= 65 && code <= 90) return true;
+              if (code >= 97 && code <= 122) return true;
+              return false;
+            }) < 0) {
           isMapValue = true;
         }
       }

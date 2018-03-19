@@ -158,7 +158,7 @@ jv.initAxios = function (axios) {
     // }
     // Do something before request is sent
     //config.headers["cookie"]="";
-    console.log((new Date()).valueOf().toDateString() + " [" + config.method + "] " + config.url)
+    console.log((new Date()).valueOf().toDateString() + " [" + config.method + "] " + config.baseURL + config.url)
     return config;
   }, function (error) {
     // Do something with request error

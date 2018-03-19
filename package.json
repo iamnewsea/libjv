@@ -1,11 +1,10 @@
 {
   "name": "libjv",
-  "version": "0.6.4",
+  "version": "0.6.5",
   "description": "Es6的单页应用常用扩展",
   "main": "index.js",
   "scripts": {
-    "compile": "babel -d lib/ src/",
-    "compile": "babel -d lib/ src/",
+    "compile": "babel -d lib/ src/ && babel -d lib/prototype src/prototype",
     "prepublishOnly": "npm run compile"
   },
   "author": "于新海 <13466396863@163.com>",

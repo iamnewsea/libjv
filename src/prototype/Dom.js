@@ -210,7 +210,8 @@ Object.defineProperty(Element.prototype, "nonEdit", {
       }
 
       viewDom.innerHTML = item.value;
-      viewDom.classList.add("nonEdit nonEdit_" + window.getComputedStyle(item).display)
+      viewDom.classList.add("nonEdit");
+      viewDom.classList.add("nonEdit_" + window.getComputedStyle(item).display)
 
       item.after(viewDom);
       p.removeChild(item);

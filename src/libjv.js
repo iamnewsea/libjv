@@ -1,31 +1,30 @@
 import "./defineProperty"
 
 //单例.
-var jv = {};
-// var JvObject = (function () {
-//   //私有字段。
-//   // var db = Symbol("db");
-//
-//   class JvObject {
-//     constructor() {
-//       if (!jv) {
-//         jv = this;
-//       }
-//
-//       // this[db] = {id:1};
-//       return jv;
-//     }
-//
-//     // get db(){
-//     //   return this[db];
-//     // }
-//   }
-//
-//   return JvObject;
-// })();
-//
-// console.log("重新定义了Jv")
-// jv = new JvObject();
+var jv;
+var JvObject = (function () {
+  //私有字段。
+  // var db = Symbol("db");
+
+  class JvObject {
+    constructor() {
+      if (!jv) {
+        jv = this;
+      }
+
+      // this[db] = {id:1};
+      return jv;
+    }
+
+    // get db(){
+    //   return this[db];
+    // }
+  }
+
+  return JvObject;
+})();
+
+jv = new JvObject();
 //---------------------------------------------
 
 //提供 基于 localStorage的缓存数据.

@@ -31,7 +31,6 @@ Object.defineProperty(Object.prototype, "Type", {
 });
 
 
-
 /*
  obj.Enumer("sex",jv.SexEnum)
  data.sex_res == "男"
@@ -39,6 +38,9 @@ Object.defineProperty(Object.prototype, "Type", {
 Object.defineProperty(Object.prototype, "Enumer", {
   value(key, enumDef, override) {
     var obj = this;
+    if (key in obj == false) {
+      throw new Error("找不到 " + key + " 属性(" + enumDef.type + ")")
+    }
     var p = obj[key];
     var v = enumDef.getData(p.toString());
     if (!v) {

@@ -214,7 +214,7 @@ Object.defineProperty(Element.prototype, "nonEdit", {
       viewDom.classList.add("nonEdit_" + window.getComputedStyle(item).display)
 
       item.after(viewDom);
-      p.removeChild(item);
+      item.style.display="none";
     }
 
   }, enumerable: false

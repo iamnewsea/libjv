@@ -22,7 +22,7 @@ if __name__=='__main__':
     os.system('''cp lib ../app.shop.html/admin/node_modules/libjv -R''')
 
 
-    os.system('''cp index.js ../app.shop.html/admin/node_modules/libjv/ ''')
+    os.system('''cp index.js ../app.shop.html/corp/node_modules/libjv/ ''')
     os.system('''cp index.js ../app.shop.html/admin/node_modules/libjv/ ''')
 
     print("完成")

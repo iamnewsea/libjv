@@ -7,8 +7,8 @@ import shutil
 
 base_path =  os.path.abspath( os.path.join( __file__ ,"../" ) ) +"/"
 
-print(base_path);
 os.chdir( base_path )
+print("当前文件夹" + base_path);
 
 def rm(path):
     if  os.path.exists( base_path + path) :
@@ -18,12 +18,17 @@ def rm(path):
 if __name__=='__main__':
     os.system('''npm run compile''')
     print("-----------------------------------")
-    os.system('''cp lib ../app.shop.html/corp/node_modules/libjv -R''')
-    os.system('''cp lib ../app.shop.html/admin/node_modules/libjv -R''')
+    if os.path.exists("../app.shop.html/corp/node_modules/libjv/lib") :
+        shutil.rmtree("../app.shop.html/corp/node_modules/libjv/lib")
 
+    if os.path.exists("../app.shop.html/admin/node_modules/libjv/lib") :
+        shutil.rmtree("../app.shop.html/admin/node_modules/libjv/lib")
 
-    os.system('''cp index.js ../app.shop.html/corp/node_modules/libjv/ ''')
-    os.system('''cp index.js ../app.shop.html/admin/node_modules/libjv/ ''')
+    shutil.copytree("lib","../app.shop.html/corp/node_modules/libjv/lib")
+    shutil.copytree("lib","../app.shop.html/admin/node_modules/libjv/lib")
+
+    shutil.copy("index.js", "../app.shop.html/corp/node_modules/libjv/index.js")
+    shutil.copy("index.js","../app.shop.html/admin/node_modules/libjv/index.js")
 
     print("完成")
 

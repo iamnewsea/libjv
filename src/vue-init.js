@@ -153,11 +153,6 @@ jv.initAxios = function (axios) {
 
 // Add a request interceptor
   axios.interceptors.request.use(function (config) {
-    // if (window.debugger) {
-    //   eval("debugger;");
-    // }
-    // Do something before request is sent
-    //config.headers["cookie"]="";
     console.log((new Date()).valueOf().toDateString() + " [" + config.method + "] " + config.baseURL + config.url)
     return config;
   }, function (error) {

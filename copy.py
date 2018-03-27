@@ -15,15 +15,21 @@ def rm(path):
             print(base_path + path)
             shutil.rmtree(base_path + path )
 
+def cp(fromPath,toPath):
+  if os.path.exists(toPath) :
+        shutil.rmtree(toPath)
+
+  shutil.copytree(fromPath,toPath)
+
 if __name__=='__main__':
     os.system('''npm run compile''')
     print("-----------------------------------")
-    os.system('''cp lib ../app.shop.html/corp/node_modules/libjv -R''')
-    os.system('''cp lib ../app.shop.html/admin/node_modules/libjv -R''')
 
+    cp("lib","../app.shop.html/corp/node_modules/libjv/lib")
+    cp("lib","../app.shop.html/admin/node_modules/libjv/lib")
 
-    os.system('''cp index.js ../app.shop.html/corp/node_modules/libjv/ ''')
-    os.system('''cp index.js ../app.shop.html/admin/node_modules/libjv/ ''')
+    shutil.copyfile("index.js","../app.shop.html/corp/node_modules/libjv/index.js")
+    shutil.copyfile("index.js","../app.shop.html/admin/node_modules/libjv/index.js")
 
     print("完成")
 

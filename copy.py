@@ -7,8 +7,8 @@ import shutil
 
 base_path =  os.path.abspath( os.path.join( __file__ ,"../" ) ) +"/"
 
-print(base_path);
 os.chdir( base_path )
+print("当前文件夹" + base_path);
 
 def rm(path):
     if  os.path.exists( base_path + path) :

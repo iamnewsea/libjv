@@ -117,6 +117,9 @@ jv.defEnum = function (typeName, json, sep) {
 jv.refDataEquals = function (a, b, equalFunc) {
   if (!equalFunc) {
     equalFunc = function (_a, _b) {
+      if("id" in _a && "id" in _b){
+        return _a.id == _b.id;
+      }
       return _a == _b;
     }
   }

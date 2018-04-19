@@ -93,6 +93,10 @@ jv.checkUpload = function (setting) {
   var fileType = setting.fileType || "img";
   var maxSize = jv.toByteUnit(setting.maxSize || "1M");  //KB
 
+  var getImageContextTypeByExtName = function (fileNameExt) {
+    return 'image/' + (fileNameExt.match(/png|jpeg|bmp|gif/)[0] || "jpeg");
+  };
+
   var checkFileType = function (fileName, fileType) {
     var dotIndex = fileName.lastIndexOf('.');
     if (dotIndex < 0) return false;
@@ -184,7 +188,7 @@ jv.checkUpload = function (setting) {
     }
 
     //5. 真正的处理：压缩，Md5
-    var compressImg = function (imgDataBase64) {
+    var compressImg = function (imgDataBase64, fileName) {
 
       if (fileType != "img") {
         doUpload(imgDataBase64);
@@ -195,7 +199,7 @@ jv.checkUpload = function (setting) {
 
       image.onload = function () {
         if (!image.naturalWidth) {
-          console.log("未能加载图片：" + rawFile.name)
+          console.log("未能加载图片：" + fileName)
           return;
         }
         //5.1 分支流程:如果图片宽度大于设置的最大宽度，则进行压缩，Md5,上传
@@ -211,7 +215,8 @@ jv.checkUpload = function (setting) {
           ctx.drawImage(image, 0, 0, srcWidth, srcHeight, 0, 0, canvas.width, canvas.height);
 
           //6.检查Md5,上传
-          doUpload(canvas.toDataURL("image/jpeg", 0.7));
+          var ext = fileName.split('.').slice(1).last();
+          doUpload(canvas.toDataURL(getImageContextTypeByExtName(ext), 0.7));
           image = null;
         }
         //5.2 分支流程：如果是小图，则进行Md5,再上传
@@ -228,7 +233,7 @@ jv.checkUpload = function (setting) {
       //2. 预览本地
       //if (setImgFunc) setImgFunc(reader.result);
 
-      compressImg(reader.result);
+      compressImg(reader.result, rawFile.name);
     };
     //readAsDataURL这个方法来读取数据，取出数据的url作为FileReader的result
     reader.readAsDataURL(rawFile);

@@ -89,13 +89,15 @@ jv.toByteUnit = function (value) {
 jv.compressImage = function (op) {
   var imgDataBase64 = op.imageData,
       maxWidth = op.maxWidth,
-      fileName = op.fileName ,
-      func = op.func || function(){return true;} , //是否压缩的回调
+      fileName = op.fileName,
+      func = op.func || function () {
+        return true;
+      }, //是否压缩的回调
       quality = op.quality || 0.7;
 
 
   var getImageContextTypeByExtName = function (fileNameExt) {
-    return 'image/' + (fileNameExt.match(/png|jpeg|bmp|gif/)[0] || "jpeg");
+    return 'image/' + ((fileNameExt.match(/png|jpeg|bmp|gif/) || []) [0] || "jpeg");
   };
 
   return new Promise((resolve, reject) => {
@@ -112,7 +114,7 @@ jv.compressImage = function (op) {
         return;
       }
 
-      if( func(image) === false){
+      if (func(image) === false) {
         resolve(imgDataBase64);
         return;
       }

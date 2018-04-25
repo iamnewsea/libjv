@@ -62,10 +62,29 @@ jv.db = {
 jv.cache_db = {};
 
 jv.cache = {
-  get(key) {
+  get(key, setFunc) {
     if (!key) return null;
     key = "jv.cache." + key;
-    return jv.cache_db[key];
+    var ret = jv.cache_db[key];
+    if (ret) {
+      return ret;
+    }
+    if (setFunc) {
+      ret = setFunc();
+      if (ret) {
+        if (ret.then) {
+          ret = ret.then();
+        }
+
+        if (ret) {
+          jv.cache.set(key, ret);
+        }
+
+        return ret;
+      }
+    }
+
+    return null;
   },
   set(key, value) {
     key = "jv.cache." + key;
@@ -117,7 +136,7 @@ jv.defEnum = function (typeName, json, sep) {
 jv.refDataEquals = function (a, b, equalFunc) {
   if (!equalFunc) {
     equalFunc = function (_a, _b) {
-      if("id" in _a && "id" in _b){
+      if ("id" in _a && "id" in _b) {
         return _a.id == _b.id;
       }
       return _a == _b;
@@ -125,7 +144,7 @@ jv.refDataEquals = function (a, b, equalFunc) {
   }
 
   var a_is_array = a instanceof Array,
-      b_is_array = b instanceof Array;
+    b_is_array = b instanceof Array;
 
   if (a_is_array) {
     a = a.distinct();
@@ -266,11 +285,11 @@ jv.param_jmap = function (obj) {
       var isMapValue = mapObject.toString() == "Map";
       if (!isMapValue) {
         if (Object.keys(mapObject).findIndex(it => {
-              var code = it.charCodeAt();
-              if (code >= 65 && code <= 90) return true;
-              if (code >= 97 && code <= 122) return true;
-              return false;
-            }) < 0) {
+            var code = it.charCodeAt();
+            if (code >= 65 && code <= 90) return true;
+            if (code >= 97 && code <= 122) return true;
+            return false;
+          }) < 0) {
           isMapValue = true;
         }
       }

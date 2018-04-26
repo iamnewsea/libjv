@@ -133,6 +133,14 @@ jv.initApp = function (vue) {
 }
 
 jv.initAxios = function (axios) {
+
+  var getCacheKey = function (config) {
+    if (config.cache && config.url) {
+      return JSON.stringify({m: config.method, u: config.url, d: config.data});
+    }
+    return "";
+  }
+
   jv.ajax = axios;
   axios.defaults.baseURL = window.Base_Url;
   axios.defaults.withCredentials = true;
@@ -173,6 +181,11 @@ jv.initAxios = function (axios) {
       jv.error(response.data.msg);
       return Promise.reject(response);
     }
+
+    var cacheKey = getCacheKey(response.config);
+    if (cacheKey) {
+      jv.cache_db[cacheKey] = JSON.stringify(response.data);
+    }
     return response;
   }, (error) => {
     if (!error.response) {
@@ -202,6 +215,19 @@ jv.initAxios = function (axios) {
     return Promise.reject(error);
   });
 
-}
+
+  var ori_post = axios.post;
+  axios.post = function (url, data, config) {
+    var cacheKey = getCacheKey(Object.assign({}, config, {
+      method: "post",
+      url: jv.ajax.defaults.baseURL + url,
+      data: jv.ajax.defaults.transformRequest(data)
+    }));
+    if (cacheKey in jv.cache_db) {
+      return Promise.resolve({data: JSON.parse(jv.cache_db[cacheKey])});
+    }
+    return ori_post(url, data, config);
+  }
+};
 
 export default jv;

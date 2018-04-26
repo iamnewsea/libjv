@@ -132,13 +132,23 @@ jv.initApp = function (vue) {
   });
 }
 
-jv.initAxios = function (axios) {
-  var getCacheKey = function (config) {
-    if (config.cache && config.url) {
-      return JSON.stringify({m: config.method, u: config.url, d: config.data});
-    }
+jv.getAjaxCacheKey = function (config) {
+  if (!config || !config.cache || !config.url) {
     return "";
   }
+
+  var type = (config.data || {}).Type;
+  if (type == "formData") {
+    return "";
+  }
+
+  var data_string = config.data;
+  if (type != "string") {
+    data_string = JSON.stringify(config.data);
+  }
+  return config.method + ":" + config.url + "!" + data_string;
+}
+jv.initAxios = function (axios) {
 
   jv.ajax = axios;
   axios.defaults.baseURL = window.Base_Url;
@@ -181,7 +191,7 @@ jv.initAxios = function (axios) {
       return Promise.reject(response);
     }
 
-    var cacheKey = getCacheKey(response.config);
+    var cacheKey = jv.getAjaxCacheKey(response.config);
     if (cacheKey && json.data) {
       jv.cache_db[cacheKey] = {data: JSON.stringify(json), cacheAt: (new Date()).totalSeconds};
     }
@@ -217,14 +227,17 @@ jv.initAxios = function (axios) {
 
   var ori_post = axios.post;
   axios.post = function (url, data, config) {
-    var cacheKey = getCacheKey(Object.assign({}, config, {
+    if (config && config.cache && config.cache.Type == "function") {
+      config.cache = config.cache(config.data);
+    }
+
+    var cacheKey = jv.getAjaxCacheKey(Object.assign({}, config, {
       method: "post",
       url: jv.ajax.defaults.baseURL + url,
       data: jv.ajax.defaults.transformRequest(data)
     }));
     if (cacheKey in jv.cache_db) {
       var cacheData = jv.cache_db[cacheKey];
-
 
       if (config.cache === +config.cache) {
         if (( new Date()).totalSeconds - cacheData.cacheAt < config.cache) {

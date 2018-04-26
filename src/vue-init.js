@@ -133,7 +133,6 @@ jv.initApp = function (vue) {
 }
 
 jv.initAxios = function (axios) {
-
   var getCacheKey = function (config) {
     if (config.cache && config.url) {
       return JSON.stringify({m: config.method, u: config.url, d: config.data});
@@ -176,15 +175,15 @@ jv.initAxios = function (axios) {
 
   axios.interceptors.response.use((response) => {
     // Do something with response data
-    response.body = response.data;
-    if (response.data && response.data.msg) {
-      jv.error(response.data.msg);
+    var json = response.body = response.data;
+    if (json && json.msg) {
+      jv.error(json.msg);
       return Promise.reject(response);
     }
 
     var cacheKey = getCacheKey(response.config);
-    if (cacheKey) {
-      jv.cache_db[cacheKey] = JSON.stringify(response.data);
+    if (cacheKey && json.data) {
+      jv.cache_db[cacheKey] = {data: JSON.stringify(json), cacheAt: (new Date()).totalSeconds};
     }
     return response;
   }, (error) => {
@@ -224,7 +223,17 @@ jv.initAxios = function (axios) {
       data: jv.ajax.defaults.transformRequest(data)
     }));
     if (cacheKey in jv.cache_db) {
-      return Promise.resolve({data: JSON.parse(jv.cache_db[cacheKey])});
+      var cacheData = jv.cache_db[cacheKey];
+
+
+      if (config.cache === +config.cache) {
+        if (( new Date()).totalSeconds - cacheData.cacheAt < config.cache) {
+          return Promise.resolve({data: JSON.parse(cacheData.data)});
+        }
+      }
+      else {
+        return Promise.resolve({data: JSON.parse(cacheData.data)});
+      }
     }
     return ori_post(url, data, config);
   }

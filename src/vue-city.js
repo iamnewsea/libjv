@@ -123,8 +123,8 @@ jv.citys.findByCode = function (code) {
   return findSubOne(jv.citys, code, iszhi ? 2 : 1, level);
 }
 
-jv.citys.url = "/open/getChildCitys" ;
-jv.citys.loadChildCitys = function (code, ajax, loaded) {
+jv.citys.url = "@/open/getChildCitys";
+jv.citys.loadChildCitys = function (code, loaded) {
   code = parseInt(code);
   if (code % 100) return;
   var city = jv.citys.findByCode(code);
@@ -132,7 +132,7 @@ jv.citys.loadChildCitys = function (code, ajax, loaded) {
     return;
   }
 
-  ajax.post(jv.citys.url, {code: code})
+  jv.ajax.post(jv.citys.url, {code: code})
       .then(res => {
         var json = res.data.data;
 
@@ -150,16 +150,18 @@ jv.citys.loadChildCitys = function (code, ajax, loaded) {
       });
 };
 
-jv.citys.confirm = function (code, ajax, loaded) {
+//在页面加载的时候,根据 code ,加载出层级数据.
+//如: code=101122 .加载出 第一级,10的第二级,及 11的第三级.
+jv.citys.confirm = function (code, loaded) {
   if (!code) return;
   code = parseInt(code);
   var city = jv.citys.findByCode(code);
   if (city) return loaded(city);
   var level = jv.citys.getLevel(code);
   if (level >= 2) {
-    jv.citys.loadChildCitys(parseInt(code / 10000) * 10000, ajax, it => {
+    jv.citys.loadChildCitys(parseInt(code / 10000) * 10000, it => {
       if (level == 3) {
-        jv.citys.loadChildCitys(parseInt(code / 100) * 100, ajax, loaded);
+        jv.citys.loadChildCitys(parseInt(code / 100) * 100, loaded);
       }
     });
   }

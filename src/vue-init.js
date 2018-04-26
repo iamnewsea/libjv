@@ -133,6 +133,7 @@ jv.initApp = function (vue) {
 }
 
 jv.initAxios = function (axios) {
+  jv.ajax = axios;
   axios.defaults.baseURL = window.Base_Url;
   axios.defaults.withCredentials = true;
   // axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';

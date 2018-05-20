@@ -190,7 +190,7 @@ jv.initAxios = function (axios) {
     var dtValue, valueType = value.Type;
 
     if (valueType == "array") {
-      for (var i = json.length - 1; i >= 0; i--) {
+      for (var i = value.length - 1; i >= 0; i--) {
         dtValue = translateDate(value[i]);
         if (dtValue) {
           value[i] = dtValue;

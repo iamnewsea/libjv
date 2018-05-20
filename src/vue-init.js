@@ -183,6 +183,37 @@ jv.initAxios = function (axios) {
     console.error('Catch in process', e);
   });
 
+  var dateTimeRegex = /^\d{4}-[0-1]?\d-[0-3]?\d( [0-2]?\d:[0-5]?\d:[0-5]?\d)?$/
+
+  var translateDate = function (value, callback) {
+    if (!value) return;
+    var dtValue;
+
+    if (value.Type == "array") {
+      for (var i = json.length - 1; i >= 0; i--) {
+        dtValue = translateDate(value[i]);
+        if (dtValue) {
+          value[i] = dtValue;
+        }
+      }
+    }
+    else if (value.Type == "object") {
+      let keys = Object.keys(value);
+      for (var i = keys.length - 1; i >= 0; i--) {
+        var key = keys[i];
+        dtValue = translateDate(value[key]);
+        if (dtValue) {
+          value[key] = dtValue;
+        }
+      }
+    }
+    else if (value.Type == "string") {
+      if (dateTimeRegex.test(value)) {
+        return new Date(value);
+      }
+    }
+  };
+
   axios.interceptors.response.use((response) => {
     // Do something with response data
     var json = response.body = response.data;
@@ -191,8 +222,12 @@ jv.initAxios = function (axios) {
       return Promise.reject(response);
     }
 
+    //自动转换 Date 类型
+    translateDate(json);
+
     var cacheKey = jv.getAjaxCacheKey(response.config);
-    if (cacheKey && json.data) {
+    //最多保存500个缓存记录
+    if (cacheKey && json.data && (jv.cache_db.length < 500)) {
       jv.cache_db[cacheKey] = {data: JSON.stringify(json), cacheAt: (new Date()).totalSeconds};
     }
     return response;

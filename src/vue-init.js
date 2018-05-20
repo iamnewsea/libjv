@@ -187,9 +187,9 @@ jv.initAxios = function (axios) {
 
   var translateDate = function (value, callback) {
     if (!value) return;
-    var dtValue;
+    var dtValue, valueType = value.Type;
 
-    if (value.Type == "array") {
+    if (valueType == "array") {
       for (var i = json.length - 1; i >= 0; i--) {
         dtValue = translateDate(value[i]);
         if (dtValue) {
@@ -197,7 +197,7 @@ jv.initAxios = function (axios) {
         }
       }
     }
-    else if (value.Type == "object") {
+    else if (valueType == "object") {
       let keys = Object.keys(value);
       for (var i = keys.length - 1; i >= 0; i--) {
         var key = keys[i];
@@ -207,7 +207,7 @@ jv.initAxios = function (axios) {
         }
       }
     }
-    else if (value.Type == "string") {
+    else if (valueType == "string") {
       if (dateTimeRegex.test(value)) {
         return new Date(value);
       }

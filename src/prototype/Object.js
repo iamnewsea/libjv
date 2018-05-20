@@ -2,10 +2,6 @@
 //返回 function ,string 等实际类名。
 Object.defineProperty(Object.prototype, "Type", {
   get() {
-    if( this.__type__){
-      return this.__type__;
-    }
-
     var ret = this.constructor.name || typeof(this);
     //把第一个非大写字母前面的全部变成小写字母。
 
@@ -28,9 +24,6 @@ Object.defineProperty(Object.prototype, "Type", {
         ret = ret.slice(0, index).toLocaleLowerCase() + ret.slice(index);
       }
     }
-
-    this.__type__ = ret;
-
     return ret;
   }, enumerable: false
 });

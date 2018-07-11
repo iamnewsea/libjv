@@ -1,3 +1,62 @@
+
+document.cookieJson = (function () {
+    // http://blog.csdn.net/lvjin110/article/details/37663067
+    var language = navigator.language || navigator.browserLanguage;
+    navigator.languageCode = "cn";
+
+    if (language.indexOf("zh") < 0) {
+        navigator.languageCode = "en";
+    }
+
+    var db = {};
+
+    (document.cookie || "").split(";").forEach(it => {
+        var sect = it.split("=");
+        db[sect[0].trim()] = decodeURIComponent((sect[1] || "").trim());
+    });
+
+    return {
+        get(key) {
+            if (!key) return db;
+            return db[key];
+        }
+        , set(key, value, cacheTime) {
+            key = key.trim();
+            value = encodeURIComponent(value.trim() || "");
+            db[key] = value;
+
+            var expires = "";
+            if (cacheTime) {
+                var exp = new Date();
+                exp.setTime(exp.getTime() + cacheTime * 1000);
+                expires = ";expires=" + exp.toGMTString()
+            }
+            document.cookie = key + "=" + value + ";path=/" + expires;
+        }
+        , remove(key) {
+            this.set(key, "", -1);
+        }
+    };
+})();
+
+location.json = function () {
+    // http://blog.csdn.net/lvjin110/article/details/37663067
+
+    var ret = {};
+    location.search.slice(1).split("&").forEach(function (it) {
+        var sects = it.split("=");
+        ret[sects[0]] = sects[1];
+    });
+    return ret;
+}();
+
+location.json2href = function(){
+    return location.protocol + "//" + location.host + location.pathname + "?" + Object.keys(location.json).map(it=> it + "=" + location.json[it]) .join("&")
+}
+
+//-----------------------------------------------------------------
+
+
 if (!Node.prototype.addEventListener && Node.prototype.attachEvent) {
   //兼容性添加。
   Object.defineProperty(Node.prototype, "addEventListener", {
@@ -12,7 +71,6 @@ if (!Node.prototype.addEventListener && Node.prototype.attachEvent) {
     }, enumerable: false
   });
 }
-
 
 //获取距离父dom的 x,y 距离.
 Object.defineProperty(Node.prototype, "offset_pdom", {
@@ -48,6 +106,7 @@ Object.defineProperty(Node.prototype, "offset_pdom", {
   }
   , enumerable: false
 });
+
 //触发无素事件.value附加到event上.返回event
 Object.defineProperty(Node.prototype, "trigger", {
   value(event, value) {
@@ -110,58 +169,6 @@ Object.defineProperty(HTMLElement.prototype, "popTip", {
     return tip
   }, enumerable: false
 });
-
-
-document.cookieMap = (function () {
-  // http://blog.csdn.net/lvjin110/article/details/37663067
-  var language = navigator.language || navigator.browserLanguage;
-  navigator.languageCode = "cn";
-
-  if (language.indexOf("zh") < 0) {
-    navigator.languageCode = "en";
-  }
-
-  var db = {};
-
-  (document.cookie || "").split(";").forEach(it => {
-    var sect = it.split("=");
-    db[sect[0].trim()] = decodeURIComponent((sect[1] || "").trim());
-  });
-
-  return {
-    get(key) {
-      if (!key) return db;
-      return db[key];
-    }
-    , set(key, value, cacheTime) {
-      key = key.trim();
-      value = encodeURIComponent(value.trim() || "");
-      db[key] = value;
-
-      var expires = "";
-      if (cacheTime) {
-        var exp = new Date();
-        exp.setTime(exp.getTime() + cacheTime * 1000);
-        expires = ";expires=" + exp.toGMTString()
-      }
-      document.cookie = key + "=" + value + ";path=/" + expires;
-    }
-    , remove(key) {
-      this.set(key, "", -1);
-    }
-  };
-})();
-
-document.location.json = (function () {
-  // http://blog.csdn.net/lvjin110/article/details/37663067
-
-  let ret = {};
-  location.search.slice(1).split("&").forEach(it => {
-    var sects = it.split("=");
-    ret[sects[0]] = sects[1];
-  });
-  return ret;
-})();
 
 //在父项的索引
 Object.defineProperty(Element.prototype, "indexOfParent", {

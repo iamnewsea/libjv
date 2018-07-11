@@ -155,9 +155,9 @@ jv.initAxios = function (axios) {
   axios.defaults.withCredentials = true;
   // axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
   axios.defaults.headers['Content-Type'] = 'application/json; charset=UTF-8';
-  var lang = document.cookieMap.get("lang");
+  var lang = document.cookieJson.get("lang");
   if (!lang) {
-    document.cookieMap.set("lang", navigator.languageCode)
+    document.cookieJson.set("lang", navigator.languageCode)
   }
 
   axios.defaults.transformRequest = function (data) {

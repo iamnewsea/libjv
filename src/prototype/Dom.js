@@ -50,7 +50,7 @@ location.json = function () {
 }();
 
 location.json2href = function () {
-    return location.protocol + "//" + location.host + location.pathname + "?" + Object.keys(location.json).map(it => it + "=" + location.json[it]).join("&")
+    return location.protocol + "//" + location.host + location.pathname + "?" + Object.keys(location.json).map(it => it + "=" + encodeURIComponent(location.json[it])).join("&")
 }
 
 //-----------------------------------------------------------------

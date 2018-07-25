@@ -89,7 +89,7 @@ jv.getPermissions = function () {
 jv.initApp = function (vue) {
   jv.Vue = vue;
   //关闭环境给出的提示.
-  vue.config.productionTip = false;
+  // vue.config.productionTip = false;
   var vueProtype = vue.prototype;
   vueProtype.Base_Url = window.Base_Url;
   vueProtype.Upload_Url = window.Base_Url + "/sys/fileUpload";

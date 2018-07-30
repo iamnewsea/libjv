@@ -75,6 +75,28 @@
     window.removeEventListener("hashchange", loadHasjJson);
     window.addEventListener("hashchange", loadHasjJson);
 
+    //vue 使用了 pushState
+    let pushState_ori = history.pushState
+    history.pushState = function () {
+        location.hashJson = {};
+        let url = arguments[2];
+        //找 #
+        let index = url.indexOf("#");
+        if (index < 0) {
+            return pushState_ori.apply(null, arguments);
+
+        }
+
+        url = url.slice(index + 1);
+        index = url.indexOf("?");
+        if (index < 0) {
+            return pushState_ori.apply(null, arguments);
+        }
+
+        location.hashJson = query2Json(url.slice(index + 1));
+        return pushState_ori.apply(null, arguments);
+    };
+
     location.json2href = function () {
         return location.protocol + "//" + location.host + location.pathname + "?" + Object.keys(location.json).map(it => it + "=" + encodeURIComponent(location.json[it])).join("&")
     };

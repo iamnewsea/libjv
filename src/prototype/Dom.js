@@ -2,6 +2,9 @@
     //如果不是浏览器环境,则退出
     if (typeof(document) === "undefined") return;
 
+    //避免多次执行
+    if (location.json) return;
+
     document.cookieJson = (function () {
         // http://blog.csdn.net/lvjin110/article/details/37663067
         let language = navigator.language || navigator.browserLanguage;

@@ -4,14 +4,14 @@
 
     document.cookieJson = (function () {
         // http://blog.csdn.net/lvjin110/article/details/37663067
-        var language = navigator.language || navigator.browserLanguage;
+        let language = navigator.language || navigator.browserLanguage;
         navigator.languageCode = "cn";
 
         if (language.indexOf("zh") < 0) {
             navigator.languageCode = "en";
         }
 
-        var db = {};
+        let db = {};
 
         (document.cookie || "").split(";").forEach(it => {
             var sect = it.split("=");
@@ -42,22 +42,39 @@
         };
     })();
 
-    location.json = function () {
-        // http://blog.csdn.net/lvjin110/article/details/37663067
-
-        var ret = {};
-        location.search.slice(1).split("&").forEach(function (it) {
+    let query2Json = function (query) {
+        let ret = {};
+        query.split("&").forEach(function (it) {
             var sects = it.split("=");
             if (sects.length == 2) {
                 ret[sects[0]] = decodeURIComponent(sects[1]);
             }
         });
         return ret;
+    };
+
+    location.json = function () {
+        // http://blog.csdn.net/lvjin110/article/details/37663067
+
+        return query2Json(location.search.slice(1));
     }();
+
+    let loadHasjJson = function () {
+        // http://blog.csdn.net/lvjin110/article/details/37663067
+
+        let index = location.hash.indexOf("?");
+        if (index < 0) return {};
+
+        location.hashJson = query2Json(location.hash.slice(index + 1));
+    };
+
+    loadHasjJson();
+    window.removeEventListener("hashchange", loadHasjJson);
+    window.addEventListener("hashchange", loadHasjJson);
 
     location.json2href = function () {
         return location.protocol + "//" + location.host + location.pathname + "?" + Object.keys(location.json).map(it => it + "=" + encodeURIComponent(location.json[it])).join("&")
-    }
+    };
 
 //-----------------------------------------------------------------
 

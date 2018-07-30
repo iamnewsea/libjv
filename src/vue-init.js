@@ -149,7 +149,7 @@ jv.getAjaxCacheKey = function (config) {
         data_string = JSON.stringify(config.data);
     }
     return config.method + ":" + config.url + "!" + data_string;
-}
+};
 jv.initAxios = function (axios) {
 
     jv.ajax = axios;

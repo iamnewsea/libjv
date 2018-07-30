@@ -48,7 +48,9 @@
         var ret = {};
         location.search.slice(1).split("&").forEach(function (it) {
             var sects = it.split("=");
-            ret[sects[0]] = decodeURIComponent(sects[1]);
+            if (sects.length == 2) {
+                ret[sects[0]] = decodeURIComponent(sects[1]);
+            }
         });
         return ret;
     }();

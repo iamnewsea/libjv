@@ -92,7 +92,7 @@ jv.initApp = function (vue) {
     // vue.config.productionTip = false;
     var vueProtype = vue.prototype;
     vueProtype.Base_Url = window.Base_Url;
-    vueProtype.Upload_Url = window.Base_Url + "/sys/fileUpload";
+    // vueProtype.Upload_Url = window.Base_Url + "/sys/upload";
 
     // Object.defineProperty(vueProtype, "$resetData", {
     //   value () {

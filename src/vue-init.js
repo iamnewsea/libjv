@@ -181,9 +181,9 @@ jv.initAxios = function (axios) {
     });
 // Add a response interceptor
 
-    process.on('uncaughtException', function (e) {
-        console.error('Catch in process', e);
-    });
+    // process.on('uncaughtException', function (e) {
+    //     console.error('Catch in process', e);
+    // });
 
     var dateTimeRegex = /^\d{4}-[0-1]?\d-[0-3]?\d( [0-2]?\d:[0-5]?\d:[0-5]?\d)?$/
 

@@ -91,8 +91,8 @@ jv.initApp = function (vue) {
     //关闭环境给出的提示.
     // vue.config.productionTip = false;
     var vueProtype = vue.prototype;
-    vueProtype.Base_Url = window.Base_Url;
-    // vueProtype.Upload_Url = window.Base_Url + "/sys/upload";
+    vueProtype.Server_Host = window.Server_Host;
+    // vueProtype.Upload_Url = window.Server_Host + "/sys/upload";
 
     // Object.defineProperty(vueProtype, "$resetData", {
     //   value () {
@@ -153,7 +153,7 @@ jv.getAjaxCacheKey = function (config) {
 jv.initAxios = function (axios) {
 
     jv.ajax = axios;
-    axios.defaults.baseURL = window.Base_Url;
+    axios.defaults.baseURL = window.Server_Host;
     axios.defaults.withCredentials = true;
     // axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
     axios.defaults.headers['Content-Type'] = 'application/json; charset=UTF-8';

@@ -5,7 +5,7 @@ Object.defineProperty(Number.prototype, "toDateString", {
         var time = this;
         var t = new Date(time);
         if (!format) {
-            if (!t.getHours() && !t.getMinutes() && !t.getSeconds()) {
+            if (t.valueOf() > 86400000 && !t.getHours() && !t.getMinutes() && !t.getSeconds()) {
                 format = "yyyy-MM-dd";
             }
             else {

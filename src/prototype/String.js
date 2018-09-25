@@ -43,7 +43,10 @@ Object.defineProperty(String.prototype, 'trim', {
 //把输入的 2018-09-20 转换为北京本地时间，即： 2018-09-20 GMT+0800
 Object.defineProperty(String.prototype, 'AsLocalDate', {
     value() {
-         return new Date(this +" GMT+0800")
+        if (this == "") {
+            return new Date(691200000);
+        }
+        return new Date(this + " GMT+0800")
     }, enumerable: false
 });
 
@@ -63,7 +66,6 @@ Object.defineProperty(String.prototype, 'findIndex', {
         return -1;
     }, enumerable: false
 });
-
 
 
 //参数是 Json 的 format。参数： json , 样式: {} , ${}, @ 仅有这三种.

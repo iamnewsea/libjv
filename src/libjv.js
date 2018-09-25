@@ -3,25 +3,25 @@ import "./defineProperty"
 //单例.
 var jv;
 var JvObject = (function () {
-  //私有字段。
-  // var db = Symbol("db");
+    //私有字段。
+    // var db = Symbol("db");
 
-  class JvObject {
-    constructor() {
-      if (!jv) {
-        jv = this;
-      }
+    class JvObject {
+        constructor() {
+            if (!jv) {
+                jv = this;
+            }
 
-      // this[db] = {id:1};
-      return jv;
+            // this[db] = {id:1};
+            return jv;
+        }
+
+        // get db(){
+        //   return this[db];
+        // }
     }
 
-    // get db(){
-    //   return this[db];
-    // }
-  }
-
-  return JvObject;
+    return JvObject;
 })();
 
 jv = new JvObject();
@@ -30,33 +30,33 @@ jv = new JvObject();
 //提供 基于 localStorage的缓存数据.
 //距离 2000 年的秒数。
 jv.db = {
-  get(key) {
-    if (!key) return null;
-    key = "jv.db." + key;
-    var ret = localStorage.getItem(key);
-    if (!ret) return null;
-    ret = JSON.parse(localStorage.getItem(key));
-    if (!ret) return null;
-    if (ret.expireAt < (new Date()).totalSeconds) {
-      localStorage.removeItem(key);
-      return null;
+    get(key) {
+        if (!key) return null;
+        key = "jv.db." + key;
+        var ret = localStorage.getItem(key);
+        if (!ret) return null;
+        ret = JSON.parse(localStorage.getItem(key));
+        if (!ret) return null;
+        if (ret.expireAt < (new Date()).totalSeconds) {
+            localStorage.removeItem(key);
+            return null;
+        }
+
+        return ret.value;
+    },
+    set(key, value, cacheSeconds) {
+        key = "jv.db." + key;
+
+        if (value === null) {
+            return localStorage.removeItem(key);
+        }
+
+        cacheSeconds = cacheSeconds || 600; //默认10分钟。
+
+        if (cacheSeconds < 0) return;
+
+        localStorage.setItem(key, JSON.stringify({value: value, expireAt: (new Date()).totalSeconds + cacheSeconds}));
     }
-
-    return ret.value;
-  },
-  set(key, value, cacheSeconds) {
-    key = "jv.db." + key;
-
-    if (value === null) {
-      return localStorage.removeItem(key);
-    }
-
-    cacheSeconds = cacheSeconds || 600; //默认10分钟。
-
-    if (cacheSeconds < 0) return;
-
-    localStorage.setItem(key, JSON.stringify({value: value, expireAt: (new Date()).totalSeconds + cacheSeconds}));
-  }
 };
 
 jv.cache_db = {};
@@ -97,109 +97,169 @@ jv.cache_db = {};
 使用 对象.Enumer(键,jv.枚举)  对对象的key进行枚举化。
  */
 jv.defEnum = function (typeName, json, sep) {
-  var ret = {type: typeName};
-  var i = -1;
-  Object.keys(json).forEach(it => {
-    var value = json[it];
-    i++;
-    if (!value.value && (value.value !== 0)) {
-      if (sep) {
-        var sepIndex = value.indexOf(sep);
-        json[it] = {value: parseInt(value.substr(0, sepIndex)), remark: value.substr(sepIndex + 1)};
-      }
-      else {
-        json[it] = {name: it, value: i, remark: json[it]};
-      }
-    }
-  })
+    var ret = {type: typeName};
+    var i = -1;
+    Object.keys(json).forEach(it => {
+        var value = json[it];
+        i++;
+        if (!value.value && (value.value !== 0)) {
+            if (sep) {
+                var sepIndex = value.indexOf(sep);
+                json[it] = {value: parseInt(value.substr(0, sepIndex)), remark: value.substr(sepIndex + 1)};
+            }
+            else {
+                json[it] = {name: it, value: i, remark: json[it]};
+            }
+        }
+    })
 
-  ret.getData = function (key) {
+    ret.getData = function (key) {
+        if (key) {
+            return json[key];
+        }
+        return Object.keys(json).map(it => {
+            return json[it];
+        });
+    }
+
+    jv[typeName] = ret;
+    return ret;
+}
+
+
+/*
+ obj.Enumer("sex",jv.SexEnum)
+ data.sex_res == "男"
+ */
+jv.Enumer = function (obj, key, enumType) {
+    if (key in obj == false) {
+        return;
+    }
+    var p = obj[key];
+    var v = enumType.getData(p.toString());
+    if (!v) {
+        return;
+    }
+
+    obj[key + "_res"] = v.remark || "";
+}
+
+//时间，布尔 的资源化
+jv.res = function (obj, key, args) {
+    var res1 = function (key1, args1) {
+        if (key1 in obj == false) return;
+        args1 = args1 || "";
+        var value = obj[key1];
+        var stringValue = "";
+        if (value) {
+            if (value === true) {
+                stringValue = args1.split(",")[0] || "是"
+            }
+            else if (value === false) {
+                stringValue = args1.split(",")[0] || "否"
+            }
+            else if (value.toString().IsDateFormat()) {
+                stringValue = value.toString().AsLocalDate().toDateString(args1);
+            }
+        }
+
+        obj[key1 + "_res"] = stringValue || "";
+    }
+
     if (key) {
-      return json[key];
+        res1(key, args);
     }
-    return Object.keys(json).map(it => {
-      return json[it];
-    });
-  }
+    else {
+        Object.keys(obj).forEach(key => {
+            var value = obj[key];
+            if (!value && value !== false) {
+                return;
+            }
 
-  jv[typeName] = ret;
-  return ret;
+            if (value.Type == "string" && value.IsDateFormat()) {
+                res1(key)
+            }
+            else if (value.Type == "boolean") {
+                res1(key);
+            }
+        })
+    }
 }
 
 //如果两个对象是数组, 比较内容, 不比较顺序.
 //如果一个是数组且只有一个对象,另一个是对象. 则比较对象.
 jv.refDataEquals = function (a, b, equalFunc) {
-  if (!equalFunc) {
-    equalFunc = function (_a, _b) {
-      if ("id" in _a && "id" in _b) {
-        return _a.id == _b.id;
-      }
-      return _a == _b;
-    }
-  }
-
-  var a_is_array = a instanceof Array,
-    b_is_array = b instanceof Array;
-
-  if (a_is_array) {
-    a = a.distinct();
-    if (a.length == 1) {
-      a = a[0];
-      a_is_array = false;
-    }
-  }
-
-  if (b_is_array) {
-    b = b.distinct();
-    if (b.length == 1) {
-      b = b[0];
-      b_is_array = false;
-    }
-  }
-
-  if (a_is_array ^ b_is_array) {
-    return false;
-  }
-
-  if (a_is_array && b_is_array) {
-    var a_length = a.length;
-    var b_length = b.length;
-    if (a_length != b_length) {
-      return false;
+    if (!equalFunc) {
+        equalFunc = function (_a, _b) {
+            if ("id" in _a && "id" in _b) {
+                return _a.id == _b.id;
+            }
+            return _a == _b;
+        }
     }
 
-    if (a.intersect(b, equalFunc).length != a_length) {
-      return false;
-    }
-  }
-  //都不是数组.
-  else {
-    return equalFunc(a, b);
-  }
+    var a_is_array = a instanceof Array,
+        b_is_array = b instanceof Array;
 
-  return true;
+    if (a_is_array) {
+        a = a.distinct();
+        if (a.length == 1) {
+            a = a[0];
+            a_is_array = false;
+        }
+    }
+
+    if (b_is_array) {
+        b = b.distinct();
+        if (b.length == 1) {
+            b = b[0];
+            b_is_array = false;
+        }
+    }
+
+    if (a_is_array ^ b_is_array) {
+        return false;
+    }
+
+    if (a_is_array && b_is_array) {
+        var a_length = a.length;
+        var b_length = b.length;
+        if (a_length != b_length) {
+            return false;
+        }
+
+        if (a.intersect(b, equalFunc).length != a_length) {
+            return false;
+        }
+    }
+    //都不是数组.
+    else {
+        return equalFunc(a, b);
+    }
+
+    return true;
 }
 
 jv.isPlainObject = function (obj) {
-  // Detect obvious negatives
-  // Use toString instead of jQuery.type to catch host objects
-  if (!obj || ({}).toString.call(obj) !== "[object Object]") {
-    return false;
-  }
-  return true;
+    // Detect obvious negatives
+    // Use toString instead of jQuery.type to catch host objects
+    if (!obj || ({}).toString.call(obj) !== "[object Object]") {
+        return false;
+    }
+    return true;
 }
 
 jv.random = function (min, max) {
-  if (!min && !max) {
-    return "r" + Math.random().toString(36).slice(3);
-  }
+    if (!min && !max) {
+        return "r" + Math.random().toString(36).slice(3);
+    }
 
-  if (!max) {
-    max = min;
-    min = 0;
-  }
+    if (!max) {
+        max = min;
+        min = 0;
+    }
 
-  return min + parseInt(Math.random() * (max - min));
+    return min + parseInt(Math.random() * (max - min));
 };
 /**
  *
@@ -209,16 +269,16 @@ jv.random = function (min, max) {
  * @returns {*}
  */
 jv.await = function (delayTime, times, action) {
-  times = times || 0
-  if (!times) {
-    return;
-  }
+    times = times || 0
+    if (!times) {
+        return;
+    }
 
-  if (action() !== false) {
-    return setTimeout(() => {
-      jv.await(delayTime, times - 1, action);
-    }, delayTime);
-  }
+    if (action() !== false) {
+        return setTimeout(() => {
+            jv.await(delayTime, times - 1, action);
+        }, delayTime);
+    }
 }
 
 
@@ -258,119 +318,119 @@ jv.await = function (delayTime, times, action) {
  */
 
 jv.param_jmap = function (obj) {
-  // var objType = typeof(obj);
-  // if (objType == "string") {
-  //   return obj;
-  // }
+    // var objType = typeof(obj);
+    // if (objType == "string") {
+    //   return obj;
+    // }
 
-  var ret = {};
-  Object.keys(obj).forEach(key => {
-    if (!key) return;
-    if (key.endsWith("_res")) {
-      return;
-    }
-
-    if (key[0] == "_") return;
-
-    var value = obj[key];
-    if (value === undefined) return;
-    if (value === null) return;
-
-    var isMap = function (mapObject) {
-      var isMapValue = mapObject.toString() == "Map";
-      if (!isMapValue) {
-        if (Object.keys(mapObject).findIndex(it => {
-            var code = it.charCodeAt();
-            if (code >= 65 && code <= 90) return true;
-            if (code >= 97 && code <= 122) return true;
-            return false;
-          }) < 0) {
-          isMapValue = true;
+    var ret = {};
+    Object.keys(obj).forEach(key => {
+        if (!key) return;
+        if (key.endsWith("_res")) {
+            return;
         }
-      }
-      return isMapValue;
-    };
 
-    if (Array.isArray(value)) {
+        if (key[0] == "_") return;
 
-      value = value.filter(it => it != undefined && it != null);
+        var value = obj[key];
+        if (value === undefined) return;
+        if (value === null) return;
 
-      if (value.length == 0) {
-        ret[key] = "";
-        return;
-      }
+        var isMap = function (mapObject) {
+            var isMapValue = mapObject.toString() == "Map";
+            if (!isMapValue) {
+                if (Object.keys(mapObject).findIndex(it => {
+                    var code = it.charCodeAt();
+                    if (code >= 65 && code <= 90) return true;
+                    if (code >= 97 && code <= 122) return true;
+                    return false;
+                }) < 0) {
+                    isMapValue = true;
+                }
+            }
+            return isMapValue;
+        };
 
-      var firstType = typeof(value[0]);
-      if (firstType == "string" || firstType == "number") {
-        ret[key] = value.join(",");
-      }
+        if (Array.isArray(value)) {
 
-      for (var i in value) {
-        var item = value[i];
-        if (jv.isPlainObject(item)) {
-          var m = jv.param_jmap(item);
-          var keys = Object.keys(m);
+            value = value.filter(it => it != undefined && it != null);
 
-          if (isMap(item)) {
-            keys.forEach(sk => {
-              ret[key + "[" + i + "]['" + sk + "']"] = m[sk];
-            })
-          } else {
-            keys.forEach(sk => {
-              ret[key + "[" + i + "]." + sk] = m[sk];
-            })
-          }
+            if (value.length == 0) {
+                ret[key] = "";
+                return;
+            }
+
+            var firstType = typeof(value[0]);
+            if (firstType == "string" || firstType == "number") {
+                ret[key] = value.join(",");
+            }
+
+            for (var i in value) {
+                var item = value[i];
+                if (jv.isPlainObject(item)) {
+                    var m = jv.param_jmap(item);
+                    var keys = Object.keys(m);
+
+                    if (isMap(item)) {
+                        keys.forEach(sk => {
+                            ret[key + "[" + i + "]['" + sk + "']"] = m[sk];
+                        })
+                    } else {
+                        keys.forEach(sk => {
+                            ret[key + "[" + i + "]." + sk] = m[sk];
+                        })
+                    }
+                }
+            }
         }
-      }
-    }
-    else if (jv.isPlainObject(value)) {
-      var m = jv.param_jmap(value);
-      var keys = Object.keys(m);
+        else if (jv.isPlainObject(value)) {
+            var m = jv.param_jmap(value);
+            var keys = Object.keys(m);
 
-      if (isMap(value)) {
-        keys.forEach(sk => {
-          ret[key + "['" + sk + "']"] = m[sk];
-        })
-      }
-      else {
-        keys.forEach(sk => {
-          ret[key + "." + sk] = m[sk];
-        })
-      }
-    }
-    else if (value.Type == "date") {
-      ret[key] = value.toDateString();
-    }
-    else {
-      ret[key] = value;
-    }
-  })
+            if (isMap(value)) {
+                keys.forEach(sk => {
+                    ret[key + "['" + sk + "']"] = m[sk];
+                })
+            }
+            else {
+                keys.forEach(sk => {
+                    ret[key + "." + sk] = m[sk];
+                })
+            }
+        }
+        else if (value.Type == "date") {
+            ret[key] = value.toDateString();
+        }
+        else {
+            ret[key] = value;
+        }
+    })
 
-  return ret;
+    return ret;
 }
 jv.param = function (obj) {
-  var ret = jv.param_jmap(obj);
-  return Object.keys(ret).map(it => {
-    return encodeURIComponent(it) + "=" + encodeURIComponent(ret[it])
-  }).join("&");
+    var ret = jv.param_jmap(obj);
+    return Object.keys(ret).map(it => {
+        return encodeURIComponent(it) + "=" + encodeURIComponent(ret[it])
+    }).join("&");
 }
 
 //用法： jv.evalExpression({a:{b:[{c:1}]}} , "a.b[0].c")
 //返回: {value: 1 , ok: true }
 jv.evalExpression = function (obj, path) {
-  if (!path) return obj;
-  var random = "_eval_expression_" + jv.random();
-  jv[random] = obj;
-  var ret = {};
-  try {
-    ret.value = eval("jv['" + random + "']." + path);
-    ret.ok = true;
-  }
-  catch (e) {
-    ret.ok = false;
-  }
-  delete jv[random];
-  return ret;
+    if (!path) return obj;
+    var random = "_eval_expression_" + jv.random();
+    jv[random] = obj;
+    var ret = {};
+    try {
+        ret.value = eval("jv['" + random + "']." + path);
+        ret.ok = true;
+    }
+    catch (e) {
+        ret.ok = false;
+    }
+    delete jv[random];
+    return ret;
 }
 
 

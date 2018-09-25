@@ -185,36 +185,36 @@ jv.initAxios = function (axios) {
     //     console.error('Catch in process', e);
     // });
 
-    var dateTimeRegex = /^\d{4}-[0-1]?\d-[0-3]?\d( [0-2]?\d:[0-5]?\d:[0-5]?\d)?$/
-
-    var translateDate = function (value, callback) {
-        if (!value) return;
-        var dtValue, valueType = value.Type;
-
-        if (valueType == "array") {
-            for (var i = value.length - 1; i >= 0; i--) {
-                dtValue = translateDate(value[i]);
-                if (dtValue) {
-                    value[i] = dtValue;
-                }
-            }
-        }
-        else if (valueType == "object") {
-            let keys = Object.keys(value);
-            for (var i = keys.length - 1; i >= 0; i--) {
-                var key = keys[i];
-                dtValue = translateDate(value[key]);
-                if (dtValue) {
-                    value[key] = dtValue;
-                }
-            }
-        }
-        else if (valueType == "string") {
-            if (dateTimeRegex.test(value)) {
-                return new Date(value);
-            }
-        }
-    };
+    // var dateTimeRegex = /^\d{4}-[0-1]?\d-[0-3]?\d( [0-2]?\d:[0-5]?\d:[0-5]?\d)?$/
+    //
+    // var translateDate = function (value, callback) {
+    //     if (!value) return;
+    //     var dtValue, valueType = value.Type;
+    //
+    //     if (valueType == "array") {
+    //         for (var i = value.length - 1; i >= 0; i--) {
+    //             dtValue = translateDate(value[i]);
+    //             if (dtValue) {
+    //                 value[i] = dtValue;
+    //             }
+    //         }
+    //     }
+    //     else if (valueType == "object") {
+    //         let keys = Object.keys(value);
+    //         for (var i = keys.length - 1; i >= 0; i--) {
+    //             var key = keys[i];
+    //             dtValue = translateDate(value[key]);
+    //             if (dtValue) {
+    //                 value[key] = dtValue;
+    //             }
+    //         }
+    //     }
+    //     else if (valueType == "string") {
+    //         if (dateTimeRegex.test(value)) {
+    //             return new Date(value);
+    //         }
+    //     }
+    // };
 
     axios.interceptors.response.use((response) => {
         // Do something with response data
@@ -225,7 +225,7 @@ jv.initAxios = function (axios) {
         }
 
         //自动转换 Date 类型
-        translateDate(json);
+        // translateDate(json);
 
         var cacheKey = jv.getAjaxCacheKey(response.config);
         //最多保存500个缓存记录

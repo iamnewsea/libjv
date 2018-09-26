@@ -44,7 +44,7 @@ Object.defineProperty(String.prototype, 'trim', {
 Object.defineProperty(String.prototype, 'AsLocalDate', {
     value() {
         if (this == "") {
-            return new Date(691200000);
+            return new Date(-28800000);
         }
         return new Date(this + " GMT+0800")
     }, enumerable: false

@@ -101,10 +101,10 @@ Object.defineProperty(String.prototype, 'format', {
                 function (m, key) {
                     var value = m;
                     try {
-                        value = eval("(function(){with(this){ return  " + key + "; } })").call(json)
+                        value = eval("(function(){ return  this." + key + "; })").call(json)
                     }
                     catch (e) {
-                        console.log("String.format 执行出错, 变量: " + m + ", 数据: " + JSON.stringify(json));
+                        console.log("String.format 执行出错, " + e.message);
                         if (emptyFunc) {
                             value = emptyFunc(key)
                         }

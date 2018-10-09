@@ -92,38 +92,41 @@ jv.cache_db = {};
 //   }
 // };
 
+function JvEnum(typeName, json) {
+    this.typeName = typeName;
+
+    var index = 0;
+    this.json = Object.keys(json).map(key => {
+        return {name: key, index: index++, remark: json[key]}
+    });
+
+    this.fillRes = function (obj, key) {
+
+    }
+}
+
+// 判断是 null or defined
+jv.IsNull = function (value) {
+    var type = typeof( value)
+    if (type == "undefined") return true;
+    return value === null;
+}
+
+Object.defineProperty(JvEnum.prototype, "getData", {
+    value(key) {
+        if (!jv.IsNull(key)) {
+            return this.json[key] || {};
+        }
+        return this.json;
+    }, enumerable: false
+});
+
 /*
 定义枚举, 生成 jv.枚举 = {}
 使用 对象.Enumer(键,jv.枚举)  对对象的key进行枚举化。
  */
-jv.defEnum = function (typeName, json, sep) {
-    var ret = {type: typeName};
-    var i = -1;
-    Object.keys(json).forEach(it => {
-        var value = json[it];
-        i++;
-        if (!value.value && (value.value !== 0)) {
-            if (sep) {
-                var sepIndex = value.indexOf(sep);
-                json[it] = {value: parseInt(value.substr(0, sepIndex)), remark: value.substr(sepIndex + 1)};
-            }
-            else {
-                json[it] = {name: it, value: i, remark: json[it]};
-            }
-        }
-    })
-
-    ret.getData = function (key) {
-        if (key) {
-            return json[key] || {};
-        }
-        return Object.keys(json).map(it => {
-            return json[it];
-        });
-    }
-
-    jv[typeName] = ret;
-    return ret;
+jv.defEnum = function (typeName, json) {
+    jv[typeName] = new JvEnum(typeName, json);
 }
 
 
@@ -144,8 +147,21 @@ jv.Enumer = function (obj, key, enumType) {
     obj[key + "_res"] = v.remark || "";
 }
 
-//时间，布尔 的资源化
-jv.res = function (obj, key, args) {
+/**
+ * 时间，布尔 的资源化
+ * var obj = { id:1 , isPublished: true , isDownloaded: false, createAt: "2018-09-20".AsLocalDate(), updateAt: "2018-09-20".AsLocalDate() }
+ *
+ * jv.fillRes(obj, "isPublished", "已发布,未发布" )
+ * jv.fillRes(obj, "updateAt", "yyyy年MM月dd日hh时" )
+ * jv.fillRes(obj)
+ *
+ * obj => { id:1 , isPublished: true ,isDownloaded: false, createAt: "2018-09-20".AsLocalDate(), updateAt: "2018-09-20".AsLocalDate(),
+ * isPublished_res: "已发布" ,isDownloaded_res: "否", createAt_res: "2018-09-20" , updateAt: "2018年09月20日00时"}
+ * @param obj
+ * @param key
+ * @param args
+ */
+jv.fillRes = function (obj, key, args) {
     var res1 = function (key1, args1) {
         if (key1 in obj == false) return;
         args1 = args1 || "";
@@ -173,6 +189,10 @@ jv.res = function (obj, key, args) {
         Object.keys(obj).forEach(key => {
             var value = obj[key];
             if (!value && value !== false) {
+                return;
+            }
+
+            if ((key + "_res") in obj) {
                 return;
             }
 
@@ -340,11 +360,11 @@ jv.param_jmap = function (obj) {
             var isMapValue = mapObject.toString() == "Map";
             if (!isMapValue) {
                 if (Object.keys(mapObject).findIndex(it => {
-                    var code = it.charCodeAt();
-                    if (code >= 65 && code <= 90) return true;
-                    if (code >= 97 && code <= 122) return true;
-                    return false;
-                }) < 0) {
+                        var code = it.charCodeAt();
+                        if (code >= 65 && code <= 90) return true;
+                        if (code >= 97 && code <= 122) return true;
+                        return false;
+                    }) < 0) {
                     isMapValue = true;
                 }
             }

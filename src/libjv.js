@@ -96,28 +96,41 @@ function JvEnum(typeName, json) {
     this.typeName = typeName;
 
     var index = 0;
-    this.json = Object.keys(json).map(key => {
+    this.list = Object.keys(json).map(key => {
         return {name: key, index: index++, remark: json[key]}
     });
 
     this.fillRes = function (obj, key) {
+        if (key in obj == false) {
+            return;
+        }
+        var value = obj[key];
+        if (jv.IsNull(value)) {
+            return {};
+        }
 
+        var v = this.list.filter(it => it.name == key);
+        if (!v) {
+            return;
+        }
+
+        obj[key + "_res"] = v.remark || "";
     }
 }
 
 // 判断是 null or defined
 jv.IsNull = function (value) {
-    var type = typeof( value)
+    var type = typeof(value)
     if (type == "undefined") return true;
     return value === null;
-}
+};
 
 Object.defineProperty(JvEnum.prototype, "getData", {
     value(key) {
         if (!jv.IsNull(key)) {
-            return this.json[key] || {};
+            return this.list.filter(it => it.name == key) || {};
         }
-        return this.json;
+        return this.list;
     }, enumerable: false
 });
 
@@ -127,25 +140,8 @@ Object.defineProperty(JvEnum.prototype, "getData", {
  */
 jv.defEnum = function (typeName, json) {
     jv[typeName] = new JvEnum(typeName, json);
-}
+};
 
-
-/*
- obj.Enumer("sex",jv.SexEnum)
- data.sex_res == "男"
- */
-jv.Enumer = function (obj, key, enumType) {
-    if (key in obj == false) {
-        return;
-    }
-    var p = obj[key];
-    var v = enumType.getData(p.toString());
-    if (!v) {
-        return;
-    }
-
-    obj[key + "_res"] = v.remark || "";
-}
 
 /**
  * 时间，布尔 的资源化
@@ -360,11 +356,11 @@ jv.param_jmap = function (obj) {
             var isMapValue = mapObject.toString() == "Map";
             if (!isMapValue) {
                 if (Object.keys(mapObject).findIndex(it => {
-                        var code = it.charCodeAt();
-                        if (code >= 65 && code <= 90) return true;
-                        if (code >= 97 && code <= 122) return true;
-                        return false;
-                    }) < 0) {
+                    var code = it.charCodeAt();
+                    if (code >= 65 && code <= 90) return true;
+                    if (code >= 97 && code <= 122) return true;
+                    return false;
+                }) < 0) {
                     isMapValue = true;
                 }
             }

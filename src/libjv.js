@@ -106,10 +106,10 @@ function JvEnum(typeName, json) {
         }
         var value = obj[key];
         if (jv.IsNull(value)) {
-            return {};
+            return ;
         }
 
-        var v = this.list.filter(it => it.name == key);
+        var v = this.list.filter(it => it.name == value)[0];
         if (!v) {
             return;
         }

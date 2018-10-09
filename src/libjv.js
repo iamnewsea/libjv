@@ -115,7 +115,7 @@ jv.defEnum = function (typeName, json, sep) {
 
     ret.getData = function (key) {
         if (key) {
-            return json[key];
+            return json[key] || {};
         }
         return Object.keys(json).map(it => {
             return json[it];

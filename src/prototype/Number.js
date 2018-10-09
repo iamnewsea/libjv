@@ -8,13 +8,23 @@ Object.defineProperty(Number.prototype, "toDateString", {
             return "";
         }
         if (!format) {
-            if (t.valueOf() > 86400000 && !t.getHours() && !t.getMinutes() && !t.getSeconds()) {
-                format = "yyyy-MM-dd";
+            format = [];
+
+            if (t.valueOf() > 86400000) {
+                format.push("yyyy-MM-dd");
             }
-            else {
-                format = "yyyy-MM-dd HH:mm:ss";
+
+            if ((t.getHours() || t.getMinutes() ) && !t.getSeconds()) {
+                format.push("HH:mm");
             }
+            else if (t.getHours() || t.getMinutes() || t.getSeconds()) {
+                format.push("HH:mm:ss");
+            }
+
+
+            format = format.join(" ");
         }
+
         var tf = function (i) {
             return (i < 10 ? '0' : '') + i
         };

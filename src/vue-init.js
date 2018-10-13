@@ -91,6 +91,7 @@ jv.initApp = function (vue) {
     //关闭环境给出的提示.
     // vue.config.productionTip = false;
     var vueProtype = vue.prototype;
+    vueProtype.jv = jv;
     vueProtype.Server_Host = window.Server_Host;
     // vueProtype.Upload_Url = window.Server_Host + "/sys/upload";
 
@@ -227,12 +228,12 @@ jv.initAxios = function (axios) {
         //自动转换 Date 类型
         // translateDate(json);
 
-        var cacheKey = jv.getAjaxCacheKey(response.config);
-        //最多保存500个缓存记录
-        if (cacheKey && json.data && (jv.cache_db.length < 500)) {
-            jv.cache_db[cacheKey] = {data: JSON.stringify(json), cacheAt: (new Date()).totalSeconds};
-        }
-        return response;
+        // var cacheKey = jv.getAjaxCacheKey(response.config);
+        // //最多保存500个缓存记录
+        // if (cacheKey && json.data && (jv.cache_db.length < 500)) {
+        //     jv.cache_db[cacheKey] = {data: JSON.stringify(json), cacheAt: (new Date()).totalSeconds};
+        // }
+        // return response;
     }, (error) => {
         if (!error.response) {
             jv.error("系统错误");
@@ -262,46 +263,48 @@ jv.initAxios = function (axios) {
     });
 
 
-    var ori_post = axios.post;
-    axios.post = function (url, data, config) {
-        if (config && config.cache && config.cache.Type == "function") {
-            config.cache = config.cache(config.data);
-        }
-
-        var cacheKey = jv.getAjaxCacheKey(Object.assign({}, config, {
-            method: "post",
-            url: jv.ajax.defaults.baseURL + url,
-            data: jv.ajax.defaults.transformRequest(data)
-        }));
-        if (cacheKey in jv.cache_db) {
-            var cacheData = jv.cache_db[cacheKey];
-
-            if (config.cache === +config.cache) {
-                if ((new Date()).totalSeconds - cacheData.cacheAt < config.cache) {
-                    return Promise.resolve({data: JSON.parse(cacheData.data)});
-                }
-            }
-            else {
-                return Promise.resolve({data: JSON.parse(cacheData.data)});
-            }
-        }
-        return ori_post(url, data, config);
-    }
+    // var ori_post = axios.post;
+    // axios.post = function (url, data, config) {
+    //     if (config && config.cache && config.cache.Type == "function") {
+    //         config.cache = config.cache(config.data);
+    //     }
+    //
+    //     var cacheKey = jv.getAjaxCacheKey(Object.assign({}, config, {
+    //         method: "post",
+    //         url: jv.ajax.defaults.baseURL + url,
+    //         data: jv.ajax.defaults.transformRequest(data)
+    //     }));
+    //     if (cacheKey in jv.cache_db) {
+    //         var cacheData = jv.cache_db[cacheKey];
+    //
+    //         if (config.cache === +config.cache) {
+    //             if ((new Date()).totalSeconds - cacheData.cacheAt < config.cache) {
+    //                 return Promise.resolve({data: JSON.parse(cacheData.data)});
+    //             }
+    //         }
+    //         else {
+    //             return Promise.resolve({data: JSON.parse(cacheData.data)});
+    //         }
+    //     }
+    //     return ori_post(url, data, config);
+    // };
 
 
     //打包Post
     axios.groupPost = function (urls) {
-        return axios.post("/group-ajax", urls, {
-            transformResponse: [function (data) {
-                if (data && data.length) {
-                    data.forEach(it => {
-                        if ("body" in it) {
-                            it.body = it.body.replace(String.fromCharCode(7), "\n-\n");
-                        }
-                    })
-                }
-            }]
-        });
+        return axios.post("/group-ajax", urls
+            // , {
+            //     transformResponse: [function (data) {
+            //         if (data && data.length) {
+            //             data.forEach(it => {
+            //                 if ("body" in it) {
+            //                     it.body = it.body.replace(String.fromCharCode(7), "\n-\n");
+            //                 }
+            //             })
+            //         }
+            //     }]
+            // }
+        );
     }
 };
 

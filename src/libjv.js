@@ -29,23 +29,46 @@ jv = new JvObject();
 
 //提供 基于 localStorage的缓存数据.
 //距离 2000 年的秒数。
-jv.db = {
+jv.store = {
     get(key) {
         if (!key) return null;
-        key = "jv.db." + key;
-        var ret = localStorage.getItem(key);
-        if (!ret) return null;
-        ret = JSON.parse(localStorage.getItem(key));
-        if (!ret) return null;
-        if (ret.expireAt < (new Date()).totalSeconds) {
+        key = "jv.store." + key;
+        var value = localStorage.getItem(key);
+        if (!value) {
+            localStorage.removeItem(key);
+            return null;
+        }
+        var json = JSON.parse(value);
+        if (json.expireAt < Date.now()) {
             localStorage.removeItem(key);
             return null;
         }
 
-        return ret.value;
+        return json.value;
+    },
+    check(){
+        for(var i=localStorage.length -1; i>=0;i--){
+            var key = localStorage.key(i);
+            if( key.startsWith("jv.store.") == false){
+                continue;
+            }
+
+            var value = localStorage.getItem(key);
+            if( !value){
+                localStorage.removeItem(key);
+                continue;
+            }
+            var json = JSON.parse(value);
+            if (json.expireAt < Date.now()) {
+                localStorage.removeItem(key);
+            }
+        }
+    },
+    remove(key){
+        localStorage.removeItem(key);
     },
     set(key, value, cacheSeconds) {
-        key = "jv.db." + key;
+        key = "jv.store." + key;
 
         if (value === null) {
             return localStorage.removeItem(key);
@@ -55,7 +78,7 @@ jv.db = {
 
         if (cacheSeconds < 0) return;
 
-        localStorage.setItem(key, JSON.stringify({value: value, expireAt: (new Date()).totalSeconds + cacheSeconds}));
+        localStorage.setItem(key, JSON.stringify({value: value, expireAt: Date.now() + cacheSeconds * 1000}));
     }
 };
 
@@ -106,7 +129,7 @@ function JvEnum(typeName, json) {
         }
         var value = obj[key];
         if (jv.IsNull(value)) {
-            return ;
+            return;
         }
 
         var v = this.list.filter(it => it.name == value)[0];

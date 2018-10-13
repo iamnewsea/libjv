@@ -5,20 +5,20 @@ Date.from = function (year, dates) {
         return year.AsLocalDate()
     }
     return new Date(new Date(year + "/01/01").valueOf() + (dates - 1) * 86400000);
-}
+};
 
 Date.today = function () {
     var now = new Date();
     return new Date(now.getFullYear() + "/" + (now.getMonth() + 1) + "/" + now.getDate() + " 00:00:00");
-}
+};
 
 
 //获取总秒数。
-Object.defineProperty(Date.prototype, "totalSeconds", {
-    get(format) {
-        return parseInt(this.valueOf() / 1000);
-    }, enumerable: false
-});
+// Object.defineProperty(Date.prototype, "totalSeconds", {
+//     get(format) {
+//         return parseInt(this.valueOf() / 1000);
+//     }, enumerable: false
+// });
 
 Object.defineProperty(Date.prototype, "toDateString", {
     value(format) {

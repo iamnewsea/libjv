@@ -233,7 +233,7 @@ jv.initAxios = function (axios) {
         // if (cacheKey && json.data && (jv.cache_db.length < 500)) {
         //     jv.cache_db[cacheKey] = {data: JSON.stringify(json), cacheAt: (new Date()).totalSeconds};
         // }
-        // return response;
+        return response;
     }, (error) => {
         if (!error.response) {
             jv.error("系统错误");

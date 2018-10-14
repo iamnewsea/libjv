@@ -242,7 +242,6 @@ jv.initAxios = function (axios) {
         var resp = error.response;
         var status = resp.status;
         if (status == 401) {
-            window._vue._data.loginFromVisible = true;
             return Promise.reject(error);
         }
         if (status == 403) {

@@ -188,7 +188,7 @@ jv.fillRes = function (obj, key, args) {
             obj[key1 + "_res"] = "";
             return;
         }
-        args1 = args1 || "";
+        args1 = args1 || "";  //.replace(/，/g,",")
         var stringValue = "";
         var res_values = args1.split(",");
         if (value === true) {

@@ -99,7 +99,7 @@ Object.defineProperty(String.prototype, 'format', {
         }, config = styles[style]
 
         return this
-            .replace(config.escape, String.fromCharCode(7), "g")
+            .replace(new RegExp(config.escape, "g"), String.fromCharCode(7))
             .replace(new RegExp(config.regexp, "g"),
                 //m 是指搜索到的整个部分， "(\\w+)"如： {id} , 而 i  是指 该部分的分组内容 ， 如 id
                 function (m, key) {
@@ -119,7 +119,7 @@ Object.defineProperty(String.prototype, 'format', {
                     }
                     return value || m;
                 })
-            .replace(String.fromCharCode(7), config.escape, "g")
+            .replace( new RegExp(String.fromCharCode(7), "g") , config.escape)
             ;
     }, enumerable: false
 });

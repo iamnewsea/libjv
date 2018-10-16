@@ -1,6 +1,6 @@
 {
   "name": "libjv",
-  "version": "0.8.24",
+  "version": "0.8.25",
   "description": "Es6的单页应用常用扩展",
   "main": "index.js",
   "scripts": {

@@ -46,15 +46,15 @@ jv.store = {
 
         return json.value;
     },
-    check(){
-        for(var i=localStorage.length -1; i>=0;i--){
+    check() {
+        for (var i = localStorage.length - 1; i >= 0; i--) {
             var key = localStorage.key(i);
-            if( key.startsWith("jv.store.") == false){
+            if (key.startsWith("jv.store.") == false) {
                 continue;
             }
 
             var value = localStorage.getItem(key);
-            if( !value){
+            if (!value) {
                 localStorage.removeItem(key);
                 continue;
             }
@@ -64,7 +64,7 @@ jv.store = {
             }
         }
     },
-    remove(key){
+    remove(key) {
         localStorage.removeItem(key);
     },
     set(key, value, cacheSeconds) {
@@ -183,24 +183,27 @@ jv.defEnum = function (typeName, json) {
 jv.fillRes = function (obj, key, args) {
     var res1 = function (key1, args1) {
         if (key1 in obj == false) return;
-        args1 = args1 || "";
         var value = obj[key1];
+        if (jv.IsNull(value)) {
+            obj[key1 + "_res"] = "";
+            return;
+        }
+        args1 = args1 || "";
         var stringValue = "";
-        if (value) {
-            var res_values = args1.split(",");
-            if (value === true) {
-                stringValue = res_values[0] || "是"
-            }
-            else if (value === false) {
-                stringValue = res_values[1] || "否"
-            }
-            else if (value.toString().IsDateFormat()) {
-                stringValue = value.toString().AsLocalDate().toDateString(args1);
-            }
+        var res_values = args1.split(",");
+        if (value === true) {
+            stringValue = res_values[0] || "是"
+        }
+        else if (value === false) {
+            stringValue = res_values[1] || "否"
+        }
+        else if (value.toString().IsDateFormat()) {
+            stringValue = value.toString().AsLocalDate().toDateString(args1);
         }
 
-        obj[key1 + "_res"] = stringValue || "";
+        obj[key1 + "_res"] = stringValue;
     }
+
 
     if (key) {
         res1(key, args);
@@ -380,11 +383,11 @@ jv.param_jmap = function (obj) {
             var isMapValue = mapObject.toString() == "Map";
             if (!isMapValue) {
                 if (Object.keys(mapObject).findIndex(it => {
-                    var code = it.charCodeAt();
-                    if (code >= 65 && code <= 90) return true;
-                    if (code >= 97 && code <= 122) return true;
-                    return false;
-                }) < 0) {
+                        var code = it.charCodeAt();
+                        if (code >= 65 && code <= 90) return true;
+                        if (code >= 97 && code <= 122) return true;
+                        return false;
+                    }) < 0) {
                     isMapValue = true;
                 }
             }

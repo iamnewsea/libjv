@@ -2,7 +2,7 @@ Date.from = function (year, dates) {
     if (!year && !dates) return new Date(-28800000);
 
     if (year.Type == "string" && !dates) {
-        return year.AsLocalDate()
+        return new Date(year)
     }
     return new Date(new Date(year + "/01/01").valueOf() + (dates - 1) * 86400000);
 };

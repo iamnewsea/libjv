@@ -123,6 +123,12 @@ function JvEnum(typeName, json) {
         return {name: key, index: index++, remark: json[key]}
     });
 
+    this.getData = function (key) {
+        if (!jv.IsNull(key)) {
+            return this.list.filter(it => it.name == key)[0] || {};
+        }
+        return this.list;
+    };
     this.fillRes = function (obj, key) {
         if (key in obj == false) {
             return;
@@ -132,13 +138,13 @@ function JvEnum(typeName, json) {
             return;
         }
 
-        var v = this.list.filter(it => it.name == value)[0];
-        if (!v) {
+        var v = this.getData(value);
+        if (!v || v.name) {
             return;
         }
 
         obj[key + "_res"] = v.remark || "";
-    }
+    };
 }
 
 // 判断是 null or defined
@@ -148,14 +154,14 @@ jv.IsNull = function (value) {
     return value === null;
 };
 
-Object.defineProperty(JvEnum.prototype, "getData", {
-    value(key) {
-        if (!jv.IsNull(key)) {
-            return this.list.filter(it => it.name == key)[0] || {};
-        }
-        return this.list;
-    }, enumerable: false
-});
+// Object.defineProperty(JvEnum.prototype, "getData", {
+//     value(key) {
+//         if (!jv.IsNull(key)) {
+//             return this.list.filter(it => it.name == key)[0] || {};
+//         }
+//         return this.list;
+//     }, enumerable: false
+// });
 
 /*
 定义枚举, 生成 jv.枚举 = {}

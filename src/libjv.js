@@ -139,7 +139,7 @@ function JvEnum(typeName, json) {
         }
 
         var v = this.getData(value);
-        if (!v || v.name) {
+        if (!v || !v.name) {
             return;
         }
 

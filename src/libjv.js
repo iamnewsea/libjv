@@ -151,7 +151,7 @@ jv.IsNull = function (value) {
 Object.defineProperty(JvEnum.prototype, "getData", {
     value(key) {
         if (!jv.IsNull(key)) {
-            return this.list.filter(it => it.name == key) || {};
+            return this.list.filter(it => it.name == key)[0] || {};
         }
         return this.list;
     }, enumerable: false

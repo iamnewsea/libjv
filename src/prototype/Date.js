@@ -1,5 +1,5 @@
 Date.from = function (year, dates) {
-    if (!year && !dates) return new Date(-28800000);
+    if (!year && !dates) return new Date();
 
     if (year.Type == "string" && !dates) {
         return new Date(year)

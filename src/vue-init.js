@@ -222,7 +222,7 @@ jv.initAxios = function (axios) {
         var json = response.body = response.data;
         if (json && json.msg) {
             jv.error(json.msg);
-            return Promise.reject(response);
+            return Promise.reject({config: response.config, request: response.request, response, message: json.msg});
         }
 
         //自动转换 Date 类型

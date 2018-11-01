@@ -43,16 +43,16 @@ Object.defineProperty(String.prototype, 'trim', {
 /**
  * 把输入的 2018-09-20 转换为北京本地时间，即： 2018-09-20 GMT+0800
  *
- * new Date("2018-09-20") 相当于  new Date("2018-09-20 08:00:00")
+ * "2018-09-20".AsLocalDate() 相当于  new Date("2018-09-20 08:00:00")
  */
-// Object.defineProperty(String.prototype, 'AsLocalDate', {
-//     value() {
-//         if (this == "") {
-//             return new Date(-28800000);
-//         }
-//         return new Date(this + " GMT+0800")
-//     }, enumerable: false
-// });
+Object.defineProperty(String.prototype, 'AsLocalDate', {
+    value() {
+        if (this == "") {
+            return new Date(-28800000);
+        }
+        return new Date(this + " GMT+0800")
+    }, enumerable: false
+});
 
 Object.defineProperty(String.prototype, 'IsDateFormat', {
     value() {

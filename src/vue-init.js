@@ -108,7 +108,7 @@ jv.initApp = function (vue) {
     });
 
     Object.defineProperty(vueProtype, "$Find", {
-        value() {
+        value(ele) {
             if (this.$el == ele) {
                 return this;
             }

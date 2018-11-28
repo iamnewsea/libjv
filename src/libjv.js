@@ -25,6 +25,7 @@ var JvObject = (function () {
 })();
 
 jv = new JvObject();
+jv.noop= function(){};
 //---------------------------------------------
 
 //提供 基于 localStorage的缓存数据.

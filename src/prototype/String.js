@@ -56,13 +56,13 @@ Object.defineProperty(String.prototype, 'trim', {
 
 Object.defineProperty(String.prototype, 'IsDateFormat', {
     value() {
-        return /^\d{4}-[0-1]?\d-[0-3]?\d$/.test(this)
+        return /^\d{4}[-/][0-1]?\d[-/][0-3]?\dZ?$/.test(this)
     }, enumerable: false
 });
 
 Object.defineProperty(String.prototype, 'IsDateTimeFormat', {
     value() {
-        return /^\d{4}-[0-1]?\d-[0-3]?\d( [0-2]?\d:[0-5]?\d:[0-5]?\d)?$/.test(this)
+        return /^\d{4}[-/][0-1]?\d[-/][0-3]?\d([ T]?[0-2]?\d:[0-5]?\d:[0-5]?\d)?Z?$/.test(this)
     }, enumerable: false
 });
 

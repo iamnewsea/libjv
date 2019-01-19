@@ -212,7 +212,7 @@ jv.fillRes = function (obj, key, args) {
         }
 
         obj[key1 + "_res"] = stringValue;
-    }
+    };
 
 
     if (key) {

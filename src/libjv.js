@@ -25,7 +25,8 @@ var JvObject = (function () {
 })();
 
 jv = new JvObject();
-jv.noop= function(){};
+jv.noop = function () {
+};
 //---------------------------------------------
 
 //提供 基于 localStorage的缓存数据.
@@ -150,7 +151,7 @@ function JvEnum(typeName, json) {
 
 // 判断是 null or defined
 jv.IsNull = function (value) {
-    var type = typeof(value)
+    var type = typeof (value)
     if (type == "undefined") return true;
     return value === null;
 };
@@ -188,56 +189,51 @@ jv.defEnum = function (typeName, json) {
  * @param args
  */
 jv.fillRes = function (obj, key, args) {
-    var res1 = function (key1, args1) {
-        if (key1 in obj == false) return;
-        var value = obj[key1];
+    var res1 = function (key1, value, args1) {
         if (jv.IsNull(value)) {
             obj[key1 + "_res"] = "";
             return;
         }
-        args1 = args1 || "";  //.replace(/，/g,",")
-        var stringValue = "";
-        var res_values = args1.split(",");
-        if (value === true) {
-            stringValue = res_values[0] || "是"
-        }
-        else if (value === false) {
-            stringValue = res_values[1] || "否"
-        }
-        else {
-            var value2String = value.toString();
-            if (value2String.IsDateTimeFormat()) {
-                stringValue = Date.from(value2String).toDateString(args1);
+
+        var type = value.Type;
+
+        if (type == "boolean") {
+            args1 = args1 || "";  //.replace(/，/g,",")
+            var stringValue = "";
+            var res_values = args1.split(",");
+            if (value) {
+                stringValue = res_values[0] || "是"
+            } else {
+                stringValue = res_values[1] || "否"
+            }
+
+            obj[key1 + "_res"] = stringValue;
+        } else if (type == "string") {
+            if (value.IsDateTimeFormat()) {
+                obj[key1 + "_res"] = Date.from(value).toDateString(args1);
             }
         }
-
-        obj[key1 + "_res"] = stringValue;
     };
 
 
     if (key) {
-        res1(key, args);
+        if (key in obj == false) return;
+        res1(key, obj[key], args);
+        return;
     }
-    else {
-        Object.keys(obj).forEach(key => {
-            var value = obj[key];
-            if (!value && value !== false) {
-                return;
-            }
+    Object.keys(obj).forEach(key => {
+        var value = obj[key];
+        if (!value && value !== false) {
+            return;
+        }
 
-            if ((key + "_res") in obj) {
-                return;
-            }
+        if ((key + "_res") in obj) {
+            return;
+        }
 
-            if (value.Type == "string" && value.IsDateTimeFormat()) {
-                res1(key)
-            }
-            else if (value.Type == "boolean") {
-                res1(key);
-            }
-        })
-    }
-}
+        res1(key, value);
+    });
+};
 
 //如果两个对象是数组, 比较内容, 不比较顺序.
 //如果一个是数组且只有一个对象,另一个是对象. 则比较对象.
@@ -393,11 +389,11 @@ jv.param_jmap = function (obj) {
             var isMapValue = mapObject.toString() == "Map";
             if (!isMapValue) {
                 if (Object.keys(mapObject).findIndex(it => {
-                        var code = it.charCodeAt();
-                        if (code >= 65 && code <= 90) return true;
-                        if (code >= 97 && code <= 122) return true;
-                        return false;
-                    }) < 0) {
+                    var code = it.charCodeAt();
+                    if (code >= 65 && code <= 90) return true;
+                    if (code >= 97 && code <= 122) return true;
+                    return false;
+                }) < 0) {
                     isMapValue = true;
                 }
             }
@@ -413,7 +409,7 @@ jv.param_jmap = function (obj) {
                 return;
             }
 
-            var firstType = typeof(value[0]);
+            var firstType = typeof (value[0]);
             if (firstType == "string" || firstType == "number") {
                 ret[key] = value.join(",");
             }
@@ -435,8 +431,7 @@ jv.param_jmap = function (obj) {
                     }
                 }
             }
-        }
-        else if (jv.isPlainObject(value)) {
+        } else if (jv.isPlainObject(value)) {
             var m = jv.param_jmap(value);
             var keys = Object.keys(m);
 
@@ -444,17 +439,14 @@ jv.param_jmap = function (obj) {
                 keys.forEach(sk => {
                     ret[key + "['" + sk + "']"] = m[sk];
                 })
-            }
-            else {
+            } else {
                 keys.forEach(sk => {
                     ret[key + "." + sk] = m[sk];
                 })
             }
-        }
-        else if (value.Type == "date") {
+        } else if (value.Type == "date") {
             ret[key] = value.toDateString();
-        }
-        else {
+        } else {
             ret[key] = value;
         }
     })
@@ -478,8 +470,7 @@ jv.evalExpression = function (obj, path) {
     try {
         ret.value = eval("jv['" + random + "']." + path);
         ret.ok = true;
-    }
-    catch (e) {
+    } catch (e) {
         ret.ok = false;
     }
     delete jv[random];

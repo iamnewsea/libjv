@@ -209,7 +209,7 @@ jv.fillRes = function (obj, key, args) {
 
             obj[key1 + "_res"] = stringValue;
         } else if (type == "string") {
-            if (value.IsDateTimeFormat()) {
+            if (value.IsDateOrDateTimeFormat()) {
                 obj[key1 + "_res"] = Date.from(value).toDateString(args1);
             }
         }

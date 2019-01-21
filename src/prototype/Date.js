@@ -6,13 +6,13 @@ Date.from = function (year, dates) {
 
     if (year.Type == "string" && !dates) {
         var isoFormat = year.replace(/\//g,'-').trim();
-        if( isoFormat.indexOf(" ")){
+        if( isoFormat.IsDateTimeFormat){
             isoFormat = isoFormat.replace(" ","T");
+            if(!isoFormat.endsWith("Z")){
+                isoFormat += "Z";
+            }
         }
 
-        if( !isoFormat.endsWith("Z")){
-            isoFormat += "Z";
-        }
         return new Date(isoFormat);
     }
     return new Date(new Date(year + "-01-01T00:00:00Z").valueOf() + (dates - 1) * 86400000);

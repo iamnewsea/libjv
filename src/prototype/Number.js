@@ -2,8 +2,7 @@
 Object.defineProperty(Number.prototype, "toDateString", {
     value(format) {
         if (!this) return "";
-        var time = this;
-        var t = new Date(time);
+        var t = new Date(this);
         var valueOf = t.valueOf(),
             year = t.getUTCFullYear() ,month = t.getUTCMonth() , day = t.getUTCDate(),
             hour = t.getUTCHours() , minute =t.getUTCMinutes(),  second = t.getUTCSeconds();
@@ -44,7 +43,7 @@ Object.defineProperty(Number.prototype, "toDateString", {
                     return tf(minute);
                     break;
                 case 'dd':
-                    return tf(second);
+                    return tf(day);
                     break;
                 case 'HH':
                     return tf(hour);

@@ -1,43 +1,46 @@
-String.prototype.ori_trim = String.prototype.trim;
 
-Object.defineProperty(String.prototype, 'trim', {
-    value() {
+/**
+ * "@$<li>ok</li>$@".trimPairs("<li>,</li>".split(",") , "<div>,</div>".split(",") ,"$" ,"@" )
+ */
+Object.defineProperty(String.prototype, 'trimPairs', {
+    value: function value() {
         var ps = arguments;
 
-        var value = this.ori_trim();
+        var value = this.trim();
         if (ps.length == 0) {
             return value;
         }
 
-        if (ps.length == 1 && (typeof(ps[0]) != "string") && ps[0].length) {
-            ps = ps[0];
-        }
+        //补全.
+        ps = ps.map(it => {
+            if (it.length == 1) {
+                if (typeof ps[0] == "string") {
+                    return [it, it];
+                } else {
+                    return [it[0], it[0]];
+                }
+            }
+            return it;
+        });
 
         var hit = false;
         for (var i = 0, len = ps.length; i < len; i++) {
-            var hit_inner = false;
-            var v = ps[i];
-            if (value.startsWith(v)) {
-                value = value.slice(v.length).ori_trim();
-                hit_inner = true;
-            }
+            var pairs = ps[i];
 
-            if (value.endsWith(v)) {
-                value = value.slice(0, 0 - v.length).ori_trim();
-                hit_inner = true;
-            }
+            var start = pairs[0], end = pairs[1];
 
-            hit = hit_inner || hit;
-            if (hit_inner) {
-                i--;
+            if (value.startsWith(start) && value.endsWith(end)) {
+                value = value.slice(start.length, 0 - end.length).trim();
+                hit = true;
+                break;
             }
         }
 
         if (hit) {
-            return value.trim(ps);
-        }
-        else return value;
-    }, enumerable: false
+            return value.trimPairs(ps);
+        } else return value;
+    },
+    enumerable: false
 });
 
 /**

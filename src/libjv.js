@@ -259,9 +259,9 @@ jv.fillRes = function (obj, key, args) {
 
         var ext = obj.url.split(".").last()
         if (/png|jpeg|bmp|gif/ig.test(ext)) {
-            var sect = obj.url.split("/").slice(-2, -1).first().split("-")
-            var width = sect.first().AsInt();
-            var height = sect.last().AsInt();
+            var sect = obj.url.split("/").slice(-2, -1)[0].split("-")
+            var width = parseInt(sect[0]);
+            var height = parseInt(sect.last());
 
             if (width > 256 || height > 256) {
                 obj["img256FullUrl"] = obj.fullUrl + "-var/256." + ext

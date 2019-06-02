@@ -189,6 +189,11 @@ jv.defEnum = function (typeName, json) {
  * @param args
  */
 jv.fillRes = function (obj, key, args) {
+    if (!obj) {
+        console.log("jv.fillRes 的 obj为空！")
+        return;
+    }
+
     var res1 = function (key1, value, args1) {
         if (jv.IsNull(value)) {
             obj[key1 + "_res"] = "";
@@ -217,11 +222,19 @@ jv.fillRes = function (obj, key, args) {
         }
     };
 
+    var type = obj.Type;
+    if( type == "array"){
+        Array.from(obj).forEach(it=>{
+            jv.fillRes(it,key,args);
+        });
+        return;
+    }
 
     if (key) {
         if (key in obj == false) return;
         return res1(key, obj[key], args);
     }
+
 
     Object.keys(obj).forEach(key => {
         var value = obj[key];
@@ -236,21 +249,16 @@ jv.fillRes = function (obj, key, args) {
         res1(key, value);
 
         //遍历
-        if( value.Type == "object"){
+        if (value.Type == "object" || value.Type == "array") {
             jv.fillRes(value);
-        }
-        else if( value.Type == "array"){
-            Array.from(value).forEach(it=>{
-                jv.fillRes(it);
-            });
         }
     });
 
-    if(window.Image_Host &&  "id" in obj && "url" in obj && obj.url && !("fullUrl" in obj) &&!("img256FullUrl" in obj)){
+    if (window.Image_Host && "id" in obj && "url" in obj && obj.url && !("fullUrl" in obj) && !("img256FullUrl" in obj)) {
         obj.fullUrl = window.Image_Host + obj.url;
 
         var ext = obj.url.split(".").last()
-        if( /png|jpeg|bmp|gif/ig.test(ext) ) {
+        if (/png|jpeg|bmp|gif/ig.test(ext)) {
             var sect = obj.url.split("/").slice(-2, -1).first().split("-")
             var width = sect.first().AsInt();
             var height = sect.last().AsInt();

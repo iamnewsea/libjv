@@ -1,23 +1,26 @@
-//格式化日期，将毫秒数转化为日期时间
+//格式化日期，将毫秒数转化为日期时间,使用UTC时间.
 Object.defineProperty(Number.prototype, "toDateString", {
     value(format) {
         if (!this) return "";
-        var time = this;
-        var t = new Date(time);
-        if (t.valueOf() <= 0) {
+        var t = new Date(this);
+        var valueOf = t.valueOf(),
+            year = t.getUTCFullYear() ,month = t.getUTCMonth() , day = t.getUTCDate(),
+            hour = t.getUTCHours() , minute =t.getUTCMinutes(),  second = t.getUTCSeconds();
+
+        if (valueOf <= 0) {
             return "";
         }
         if (!format) {
             format = [];
 
-            if (t.valueOf() > 86400000) {
+            if (valueOf > 86400000) {
                 format.push("yyyy-MM-dd");
             }
 
-            if ((t.getHours() || t.getMinutes() ) && !t.getSeconds()) {
+            if (( hour || minute ) && !second) {
                 format.push("HH:mm");
             }
-            else if (t.getHours() || t.getMinutes() || t.getSeconds()) {
+            else if ( hour || minute || second) {
                 format.push("HH:mm:ss");
             }
 
@@ -31,22 +34,22 @@ Object.defineProperty(Number.prototype, "toDateString", {
         return format.replace(/yyyy|MM|dd|HH|mm|ss/g, function (a) {
             switch (a) {
                 case 'yyyy':
-                    return tf(t.getFullYear());
+                    return tf(year);
                     break;
                 case 'MM':
-                    return tf(t.getMonth() + 1);
+                    return tf(month + 1);
                     break;
                 case 'mm':
-                    return tf(t.getMinutes());
+                    return tf(minute);
                     break;
                 case 'dd':
-                    return tf(t.getDate());
+                    return tf(day);
                     break;
                 case 'HH':
-                    return tf(t.getHours());
+                    return tf(hour);
                     break;
                 case 'ss':
-                    return tf(t.getSeconds());
+                    return tf(second);
                     break;
             }
         })

@@ -97,7 +97,7 @@ jv.compressImage = function (op) {
 
 
   var getImageContextTypeByExtName = function (fileNameExt) {
-    return 'image/' + ((fileNameExt.match(/png|jpeg|bmp|gif/) || []) [0] || "jpeg");
+    return 'image/' + ((fileNameExt.match(/png|jpeg|bmp|gif/ig) || []) [0] || "jpeg");
   };
 
   return new Promise((resolve, reject) => {

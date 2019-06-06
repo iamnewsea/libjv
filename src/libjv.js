@@ -25,7 +25,8 @@ var JvObject = (function () {
 })();
 
 jv = new JvObject();
-jv.noop= function(){};
+jv.noop = function () {
+};
 //---------------------------------------------
 
 //提供 基于 localStorage的缓存数据.
@@ -150,7 +151,7 @@ function JvEnum(typeName, json) {
 
 // 判断是 null or defined
 jv.IsNull = function (value) {
-    var type = typeof(value)
+    var type = typeof (value)
     if (type == "undefined") return true;
     return value === null;
 };
@@ -188,56 +189,86 @@ jv.defEnum = function (typeName, json) {
  * @param args
  */
 jv.fillRes = function (obj, key, args) {
-    var res1 = function (key1, args1) {
-        if (key1 in obj == false) return;
-        var value = obj[key1];
+    if (!obj) {
+        console.log("jv.fillRes 的 obj为空！")
+        return;
+    }
+
+    var res1 = function (key1, value, args1) {
         if (jv.IsNull(value)) {
             obj[key1 + "_res"] = "";
             return;
         }
-        args1 = args1 || "";  //.replace(/，/g,",")
-        var stringValue = "";
-        var res_values = args1.split(",");
-        if (value === true) {
-            stringValue = res_values[0] || "是"
-        }
-        else if (value === false) {
-            stringValue = res_values[1] || "否"
-        }
-        else {
-            var value2String = value.toString();
-            if (value2String.IsDateTimeFormat()) {
-                stringValue = Date.from(value2String).toDateString(args1);
+
+        var type = value.Type;
+
+        if (type == "boolean") {
+            args1 = args1 || "";  //.replace(/，/g,",")
+            var stringValue = "";
+            var res_values = args1.split(",");
+            if (value) {
+                stringValue = res_values[0] || "是"
+            } else {
+                stringValue = res_values[1] || "否"
+            }
+
+            obj[key1 + "_res"] = stringValue;
+            return true;
+        } else if (type == "string") {
+            if (value.IsDateOrDateTimeFormat()) {
+                obj[key1 + "_res"] = Date.from(value).toDateString(args1);
+                return true;
             }
         }
+    };
 
-        obj[key1 + "_res"] = stringValue;
+    var type = obj.Type;
+    if( type == "array"){
+        Array.from(obj).forEach(it=>{
+            jv.fillRes(it,key,args);
+        });
+        return;
     }
-
 
     if (key) {
-        res1(key, args);
+        if (key in obj == false) return;
+        return res1(key, obj[key], args);
     }
-    else {
-        Object.keys(obj).forEach(key => {
-            var value = obj[key];
-            if (!value && value !== false) {
-                return;
-            }
 
-            if ((key + "_res") in obj) {
-                return;
-            }
 
-            if (value.Type == "string" && value.IsDateTimeFormat()) {
-                res1(key)
+    Object.keys(obj).forEach(key => {
+        var value = obj[key];
+        if (!value && value !== false) {
+            return;
+        }
+
+        if ((key + "_res") in obj) {
+            return;
+        }
+
+        res1(key, value);
+
+        //遍历
+        if (value.Type == "object" || value.Type == "array") {
+            jv.fillRes(value);
+        }
+    });
+
+    if (window.Image_Host && "id" in obj && "url" in obj && obj.url && !("fullUrl" in obj) && !("img256FullUrl" in obj)) {
+        obj.fullUrl = window.Image_Host + obj.url;
+
+        var ext = obj.url.split(".").last()
+        if (/png|jpeg|bmp|gif/ig.test(ext)) {
+            var sect = obj.url.split("/").slice(-2, -1)[0].split("-")
+            var width = parseInt(sect[0]);
+            var height = parseInt(sect.last());
+
+            if (width > 256 || height > 256) {
+                obj["img256FullUrl"] = obj.fullUrl + "-var/256." + ext
             }
-            else if (value.Type == "boolean") {
-                res1(key);
-            }
-        })
+        }
     }
-}
+};
 
 //如果两个对象是数组, 比较内容, 不比较顺序.
 //如果一个是数组且只有一个对象,另一个是对象. 则比较对象.
@@ -393,11 +424,11 @@ jv.param_jmap = function (obj) {
             var isMapValue = mapObject.toString() == "Map";
             if (!isMapValue) {
                 if (Object.keys(mapObject).findIndex(it => {
-                        var code = it.charCodeAt();
-                        if (code >= 65 && code <= 90) return true;
-                        if (code >= 97 && code <= 122) return true;
-                        return false;
-                    }) < 0) {
+                    var code = it.charCodeAt();
+                    if (code >= 65 && code <= 90) return true;
+                    if (code >= 97 && code <= 122) return true;
+                    return false;
+                }) < 0) {
                     isMapValue = true;
                 }
             }
@@ -413,7 +444,7 @@ jv.param_jmap = function (obj) {
                 return;
             }
 
-            var firstType = typeof(value[0]);
+            var firstType = typeof (value[0]);
             if (firstType == "string" || firstType == "number") {
                 ret[key] = value.join(",");
             }
@@ -435,8 +466,7 @@ jv.param_jmap = function (obj) {
                     }
                 }
             }
-        }
-        else if (jv.isPlainObject(value)) {
+        } else if (jv.isPlainObject(value)) {
             var m = jv.param_jmap(value);
             var keys = Object.keys(m);
 
@@ -444,17 +474,14 @@ jv.param_jmap = function (obj) {
                 keys.forEach(sk => {
                     ret[key + "['" + sk + "']"] = m[sk];
                 })
-            }
-            else {
+            } else {
                 keys.forEach(sk => {
                     ret[key + "." + sk] = m[sk];
                 })
             }
-        }
-        else if (value.Type == "date") {
+        } else if (value.Type == "date") {
             ret[key] = value.toDateString();
-        }
-        else {
+        } else {
             ret[key] = value;
         }
     })
@@ -478,8 +505,7 @@ jv.evalExpression = function (obj, path) {
     try {
         ret.value = eval("jv['" + random + "']." + path);
         ret.ok = true;
-    }
-    catch (e) {
+    } catch (e) {
         ret.ok = false;
     }
     delete jv[random];

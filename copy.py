@@ -4,6 +4,7 @@
 import os
 import sys
 import shutil
+from sys import argv
 
 base_path =  os.path.abspath( os.path.join( __file__ ,"../" ) ) +"/"
 
@@ -21,15 +22,17 @@ def cp(fromPath,toPath):
 
   shutil.copytree(fromPath,toPath)
 
+def mycp(toPath):
+      cp("lib", toPath +"/node_modules/libjv/lib")
+      cp("src", toPath +"/node_modules/libjv/src")
+      shutil.copyfile("index.js",toPath +"/node_modules/libjv/index.js")
+
 if __name__=='__main__':
-    os.system('''npm run compile''')
+    os.system('''npm run build''')
     print("-----------------------------------")
 
-    cp("lib","../app.shop.html/corp/node_modules/libjv/lib")
-    cp("lib","../app.shop.html/admin/node_modules/libjv/lib")
-
-    shutil.copyfile("index.js","../app.shop.html/corp/node_modules/libjv/index.js")
-    shutil.copyfile("index.js","../app.shop.html/admin/node_modules/libjv/index.js")
+    print(argv[1]);
+    mycp(argv[1])
 
     print("完成")
 

@@ -89,7 +89,7 @@ jv.toByteUnit = function (value) {
 jv.compressImage = function (op) {
     var imgDataBase64 = op.imageData,
         maxWidth = op.maxWidth,
-        fileName = op.fileName,
+        fileName = op.fileName || "",
         func = op.func || function () {
             return true;
         }, //是否压缩的回调
@@ -113,7 +113,7 @@ jv.compressImage = function (op) {
                 reject("未能加载图片：" + fileName)
                 return;
             }
-
+            jv.debug();
             if (func(image) === false) {
                 resolve(imgDataBase64);
                 return;
@@ -132,7 +132,7 @@ jv.compressImage = function (op) {
                 ctx.drawImage(image, 0, 0, srcWidth, srcHeight, 0, 0, canvas.width, canvas.height);
 
                 //6.检查Md5,上传
-                var ext = fileName.split('.').slice(1).last();
+                var ext = fileName.split('.').slice(1).last() || "png";
                 resolve(canvas.toDataURL(getImageContextTypeByExtName(ext), quality));
                 image = null;
                 return;
@@ -162,7 +162,7 @@ jv.compressImage = function (op) {
 jv.doUploadFile = function (option) {
     option = option || {};
     var imgBase64 = option.imageBase64,
-        fileName = option.fileName,
+        fileName = option.fileName || "",
         process_callback = option.processCallback || function () {
         },
         post_param = option.postParam || {},

@@ -113,7 +113,7 @@ jv.compressImage = function (op) {
                 reject("未能加载图片：" + fileName)
                 return;
             }
-            jv.debug();
+            // jv.debug();
             if (func(image) === false) {
                 resolve(imgDataBase64);
                 return;

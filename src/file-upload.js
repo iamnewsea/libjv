@@ -239,7 +239,7 @@ jv.doUploadFile = function (option) {
             maxWidth: maxWidth,
             filter: function (image) {
                 //如果图片 <= 256 ,则不处理.
-                if (image.naturalWidth <= 256 || image.naturalHeight <= 256) {
+                if (image.naturalWidth <= maxWidth ) {
                     return false;
                 }
             }

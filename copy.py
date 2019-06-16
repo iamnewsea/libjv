@@ -28,6 +28,7 @@ def mycp(toPath):
       shutil.copyfile("index.js",toPath +"/node_modules/libjv/index.js")
 
 if __name__=='__main__':
+    print("目标文件夹：" + argv[1])
     os.system('''npm run build''')
     print("-----------------------------------")
 

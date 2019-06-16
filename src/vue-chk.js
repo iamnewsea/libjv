@@ -1,7 +1,7 @@
 import jv from "./vue-init"
 
 (function () {
-    if (typeof(HTMLElement) === "undefined") return;
+    if (typeof (HTMLElement) === "undefined") return;
 
 
 // jv.chk_show = function (dom, msg) {
@@ -9,25 +9,24 @@ import jv from "./vue-init"
 //   jv.error(msg);
 // }
 
-    jv.chk_show = function (chk_msg, inputDom, dom) {
-        var tip = dom.popTip(chk_msg);
-        if (chk_msg) {
-            var chkMsgOffset = dom.dataset.chkMsgOffset || dom.getAttribute("chk-msg-offset");
-            if (chkMsgOffset) {
-                chkMsgOffset = inputDom.closest(chkMsgOffset)
+    // jv.chk_show = function (chk_msg, inputDom, dom) {
+    //     var tip = dom.popTip(chk_msg);
+    //     if (chk_msg) {
+    //         var chkMsgOffset = dom.dataset.chkMsgOffset || dom.getAttribute("chk-msg-offset");
+    //         if (chkMsgOffset) {
+    //             chkMsgOffset = inputDom.closest(chkMsgOffset)
+    //
+    //             if (!chkMsgOffset) {
+    //                 chkMsgOffset = inputDom;
+    //             }
+    //         } else {
+    //             chkMsgOffset = inputDom;
+    //         }
+    //         tip.style.marginLeft = (chkMsgOffset.offset_pdom(dom).x || 0) + "px";
+    //     }
+    // };
 
-                if (!chkMsgOffset) {
-                    chkMsgOffset = inputDom;
-                }
-            }
-            else {
-                chkMsgOffset = inputDom;
-            }
-            tip.style.marginLeft = (chkMsgOffset.offset_pdom(dom).x || 0) + "px";
-        }
-    };
-
-//如果返回字符串，则为验证消息， 另外返回布尔值，表示是否通过验证。
+    //如果返回字符串，则为验证消息， 另外返回布尔值，表示是否通过验证。
     jv.chk_range = function (chk_type, chk_body, value) {
         chk_body = chk_body.trim();
 
@@ -68,22 +67,20 @@ import jv from "./vue-init"
 
         if (chk_body[0] == '(' && value <= range[0]) {
             return false;
-        }
-        else if (chk_body[0] == "[" && value < range[0]) {
+        } else if (chk_body[0] == "[" && value < range[0]) {
             return false;
-        }
-        else if (range.length > 1) {
+        } else if (range.length > 1) {
             var lastSign = chk_body[chk_body.length - 1], lastValue = range[1];
             if (lastSign == ")" && value >= lastValue) {
                 return false;
-            }
-            else if (lastSign == "]" && value > lastValue) {
+            } else if (lastSign == "]" && value > lastValue) {
                 return false;
             }
         }
 
         return true;
-    }
+    };
+
     jv.chk_types = {
         "float": function (chk_body, value, inputDom) {
             return (/^[+-]?[0-9]+.?[0-9]*$/).test(value);
@@ -106,7 +103,7 @@ import jv from "./vue-init"
         //*号必填
         "*": function (chk_body, value, inputDom) {
             if (!value.length) {
-                return "必填";
+                return false;
             }
             return true;
         },
@@ -114,7 +111,7 @@ import jv from "./vue-init"
         "": function () {
             return true;
         }
-    }
+    };
 
 //校验器
     /**
@@ -186,31 +183,30 @@ import jv from "./vue-init"
             }
 
             //查找dom下第一个绑定 v-model 的值.如果找不到,则查找 inputDom 的值.
-            var getVModelValue = function (component) {
-                var vdata = component.$vnode.data, ret;
-                if (vdata && vdata.model && vdata.model.expression) {
-                    if ("value" in vdata.model) {
-                        return vdata.model.value || "";
-                    }
-
-                    //对于 el-input 它的值在 component._data.currentValue,对于其它 v-model 它的值在  vdata.model.value
-                    ret = jv.evalExpression(component.$vnode.context._data, vdata.model.expression);
-                    if (ret.ok) {
-                        return ret.value;
-                    }
-                    else {
-                        ret = "";
-                    }
-                }
-
-                for (var it of component.$children) {
-                    ret = getVModelValue(it)
-                    if (ret) {
-                        return ret;
-                    }
-                }
-                return ret;
-            }
+            // var getVModelValue = function (component) {
+            //     var vdata = component.$vnode.data, ret;
+            //     if (vdata && vdata.model && vdata.model.expression) {
+            //         if ("value" in vdata.model) {
+            //             return vdata.model.value || "";
+            //         }
+            //
+            //         //对于 el-input 它的值在 component._data.currentValue,对于其它 v-model 它的值在  vdata.model.value
+            //         ret = jv.evalExpression(component.$vnode.context._data, vdata.model.expression);
+            //         if (ret.ok) {
+            //             return ret.value;
+            //         } else {
+            //             ret = "";
+            //         }
+            //     }
+            //
+            //     for (var it of component.$children) {
+            //         ret = getVModelValue(it)
+            //         if (ret) {
+            //             return ret;
+            //         }
+            //     }
+            //     return ret;
+            // }
 
             var isValidateChar = function (code) {
                 if (code == 45 || code == 95) return true;
@@ -232,14 +228,13 @@ import jv from "./vue-init"
                 return chk_type_index;
             }
 
-            var inputChanged = function (e) {
-                var inputDom = e.target;
+            var chk_item = function (inputDom) {
                 var chk_dom = inputDom.chk_dom;
                 var chk = chk_dom.dataset.chk || chk_dom.getAttribute("chk") || "";
                 chk = chk.trim();
                 if (!chk) return;
+                var chk_error_msg = chk_dom.dataset.chkMsg || chk_dom.getAttribute("chk-msg") || "";
 
-                var chk_msg = "", chk_define_msg = "";
 
                 var chk_type_index = getNextNonCharIndex(chk),
                     chk_type = chk.slice(0, chk_type_index),
@@ -248,27 +243,27 @@ import jv from "./vue-init"
                 if (chk[0] == ':') {
                     chk_type = ":";
                     chk_body = chk.slice(1);
-                }
-                else if (chk_type == "reg") {
+                } else if (chk_type == "reg") {
                     if (chk[chk_type_index] != ':') {
-                        chk_msg = "[Error]正则表达式缺少冒号"
+                        return "[Error]正则表达式缺少冒号"
                     }
                     chk_body = chk.slice(chk_type_index + 1);
-                }
-                else {
+                } else {
                     chk_body = chk.slice(chk_type_index);
                 }
 
 
-                var value = getVModelValue(chk_dom.__vue__);
-                if (value !== null) {
-                }
-                else {
-                    value = getInputValue(chk_dom);
-                }
+                // var value = getVModelValue(chk_dom.__vue__);
+                // if (value !== null) {
+                // }
+                // else {
+                //     value = getInputValue(chk_dom);
+                // }
+
+                var value = getInputValue(chk_dom);
 
                 if (value === null) {
-                    chk_msg = "找不到输入框"
+                    return "找不到输入框"
                 }
 
                 //如果是类型带着?表示可空.
@@ -281,27 +276,18 @@ import jv from "./vue-init"
                     }
                 }
 
-                if (chk_type != ":") {
-                    chk_define_msg = chk_dom.dataset.chkMsg || chk_dom.getAttribute("chk-msg") || "";
-                }
-
-                if (chk_msg) {
-                }
-                else if (chk_type == ":") {
-                    chk_msg = eval("(value,dom) => {" + chk_body + "}")(value, inputDom)
-                }
-                else if (chk_type == "reg") {
+                if (chk_type == ":") {
+                    return eval("(value,dom) => {" + chk_body + "}")(value, inputDom)
+                } else if (chk_type == "reg") {
                     //如果不是类型，则整体按正则算。
                     var reg;
                     try {
                         reg = eval(chk_body);
-                        chk_msg = reg.test(value) ? "" : "不符合正则表达式规则";
+                        return reg.test(value) ? "" : chk_error_msg;
+                    } catch (e) {
+                        return "正则表达式不正确";
                     }
-                    catch (e) {
-                        chk_msg = "正则表达式不正确";
-                    }
-                }
-                else if (chk) {
+                } else if (chk) {
                     //如果定义了 * 号,表示必填.
                     var chk_type2 = Object.keys(jv.chk_types).find(it => chk.startsWith(it)) || "";
                     if (chk_type2) {
@@ -313,65 +299,62 @@ import jv from "./vue-init"
                         var chk_type_ret = jv.chk_types[chk_type](chk_body, value, inputDom, chk_dom);
 
                         if (chk_type_ret === false) {
-                            chk_msg = "不符合 " + chk_type + " 规范";
-                        }
-                        else if (chk_type_ret === true) {
-                            chk_msg = "";
-                        }
-                        else {
-                            chk_msg = chk_type_ret;
+                            return chk_error_msg;
                         }
 
                         if (!chk_msg && chk_body) {
                             // chk_body.split("&")
-                            chk_msg = jv.chk_range(chk_type, chk_body, value);
+                            var ret = jv.chk_range(chk_type, chk_body, value);
+                            if (ret === false) {
+                                return chk_error_msg;
+                            }
+                            if (ret && (ret.Type == "string")) {
+                                return chk_error_msg + " " + ret;
+                            }
                         }
-
-
-                        if (chk_msg === true) {
-                            chk_msg = "";
-                        }
-                        else if (chk_msg === false) {
-                            chk_msg = "验证失败 " + chk_type;
-                        }
-                    }
-                    else {
-                        chk_msg = "[Error]不识别的类型" + chk_type;
+                    } else {
+                        return "[Error]不识别的类型" + chk_type;
                     }
                 }
 
-                if (chk_msg) {
-                    chk_msg = chk_define_msg || chk_msg;
-                }
-
-                e.chk_msg = chk_msg;
-                jv.chk_show(chk_msg, inputDom, chk_dom);
-
-                //即使没有消息,也要调用.使调用方隐藏提示.
-                if (chk_show && (chk_show(chk_msg, inputDom, chk_dom) === false)) {
-                    e.chk_return_value = false;
-                    return;
-                }
-            }
+                return true;
+            };
             //
 
             var ret = true, list = Array.from(this.querySelectorAll("[chk]"));
-            list = list.concat(Array.from(this.querySelectorAll("[data-chk]")))
+            // list = list.concat(Array.from(this.querySelectorAll("[data-chk]")))
 
             for (var chk_dom of list) {
                 var inputDom = getInputDom(chk_dom);
                 if (!inputDom) continue;
 
                 inputDom.chk_dom = chk_dom;
-                inputDom.removeEventListener("blur", inputChanged);
-                inputDom.addEventListener("blur", inputChanged);
+                // inputDom.removeEventListener("blur", inputChanged);
+                // inputDom.addEventListener("blur", inputChanged);
+                //
+                // //Chrome
+                //
+                // //可以通过 ev 传值。
+                // var ev = inputDom.trigger("blur");
+                var chk_msg = chk_item(inputDom);
 
-                //Chrome
+                if (!chk_msg) {
+                    jv.chk_clear && jv.chk_clear({target: inputDom, chk_dom: chk_dom});
+                    continue;
+                }
 
-                //可以通过 ev 传值。
-                var ev = inputDom.trigger("blur");
-                ret = !ev.chk_msg && ret;
-                if (ev.chk_return_value === false) {
+                ret &= false;
+
+                var chk_error_obj = {msg: chk_msg, type: "chk", target: inputDom, chk_dom: chk_dom};
+
+                if (jv.chk_error) {
+                    jv.chk_error(chk_error_obj);
+                } else {
+                    jv.error(chk_msg, "", chk_error_obj);
+                }
+
+                //即使没有消息,也要调用.使调用方隐藏提示.
+                if (chk_show && (chk_show(chk_error_obj) === false)) {
                     break;
                 }
             }

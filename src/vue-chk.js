@@ -317,7 +317,7 @@ import jv from "./vue-init"
                     }
                 }
 
-                return true;
+                return "";
             };
             //
 

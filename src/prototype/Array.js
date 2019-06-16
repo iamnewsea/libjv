@@ -83,11 +83,13 @@ Object.defineProperty(Array.prototype, "distinct", {
     }, enumerable: false
 });
 
-// Object.defineProperty(Array.prototype, "reSplice", {
-//   value() {
-//     this.splice.apply(this, [0, this.length].concat(this));
-//   }, enumerable: false
-// });
+//使用 splice 方法，使数据变化有效。参数可以是具体的值，也可以是数组对象。可以是任意多个。
+Object.defineProperty(Array.prototype, "pushAll", {
+  value(ary) {
+    this.splice.apply(this, [0, this.length].concat(this).concat( jv.IsNull(ary) ? [] : ary ));
+  }, enumerable: false
+});
+
 //交换两项的位置
 Object.defineProperty(Array.prototype, "swap", {
     value(index1, index2) {

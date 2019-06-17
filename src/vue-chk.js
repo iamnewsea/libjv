@@ -146,7 +146,7 @@ import jv from "./vue-init"
                     return dom;
                 }
 
-                if (dom.childNodes.length == 0) return "";
+                if (!dom.childNodes.length ) return null;
 
                 var domInput = dom.querySelector("input[type=hidden]")
                 if (!domInput) {
@@ -155,32 +155,27 @@ import jv from "./vue-init"
                 if (!domInput) {
                     domInput = dom.querySelector("textarea");
                 }
+                return domInput;
+            };
 
-                if (!domInput) {
-                    return null;
-                }
-
-                return getInputDom(domInput);
-            }
-
-            var getInputValue = function (dom) {
-                if (!dom.tagName) {
-                    return null;
-                }
-
-                if (dom.tagName == "INPUT" || dom.tagName == "TEXTAREA") {
-                    return dom.value;
-                }
-
-                var ret;
-                for (var item of dom.children) {
-                    ret = getInputValue(item);
-                    if (ret) {
-                        return ret;
-                    }
-                }
-                return null;
-            }
+            // var getInputValue = function (dom) {
+            //     if (!dom.tagName) {
+            //         return null;
+            //     }
+            //
+            //     if (dom.tagName == "INPUT" || dom.tagName == "TEXTAREA") {
+            //         return dom.value;
+            //     }
+            //
+            //     var ret;
+            //     for (var item of dom.children) {
+            //         ret = getInputValue(item);
+            //         if (ret) {
+            //             return ret;
+            //         }
+            //     }
+            //     return null;
+            // }
 
             //查找dom下第一个绑定 v-model 的值.如果找不到,则查找 inputDom 的值.
             // var getVModelValue = function (component) {
@@ -228,13 +223,12 @@ import jv from "./vue-init"
                 return chk_type_index;
             }
 
-            var chk_item = function (inputDom) {
-                var chk_dom = inputDom.chk_dom;
+            var chk_item = function (chk_dom,inputDom) {
+
                 var chk = chk_dom.dataset.chk || chk_dom.getAttribute("chk") || "";
                 chk = chk.trim();
-                if (!chk) return;
-                var chk_error_msg = chk_dom.dataset.chkMsg || chk_dom.getAttribute("chk-msg") || "";
-
+                if (!chk) return "";
+                var chk_error_msg = chk_dom.dataset.chkMsg || chk_dom.getAttribute("chk-msg") || "请检查输入值";
 
                 var chk_type_index = getNextNonCharIndex(chk),
                     chk_type = chk.slice(0, chk_type_index),
@@ -260,11 +254,7 @@ import jv from "./vue-init"
                 //     value = getInputValue(chk_dom);
                 // }
 
-                var value = getInputValue(chk_dom);
-
-                if (value === null) {
-                    return "找不到输入框"
-                }
+                var value = inputDom.value;
 
                 //如果是类型带着?表示可空.
                 if (chk_body[0] == '?') {
@@ -325,10 +315,6 @@ import jv from "./vue-init"
             // list = list.concat(Array.from(this.querySelectorAll("[data-chk]")))
 
             for (var chk_dom of list) {
-                var inputDom = getInputDom(chk_dom);
-                if (!inputDom) continue;
-
-                inputDom.chk_dom = chk_dom;
                 // inputDom.removeEventListener("blur", inputChanged);
                 // inputDom.addEventListener("blur", inputChanged);
                 //
@@ -336,7 +322,10 @@ import jv from "./vue-init"
                 //
                 // //可以通过 ev 传值。
                 // var ev = inputDom.trigger("blur");
-                var chk_msg = chk_item(inputDom);
+                var inputDom = getInputDom(chk_dom);
+                if (!inputDom) return "找不到输入框";
+
+                var chk_msg = chk_item(chk_dom,inputDom);
 
                 if (!chk_msg) {
                     jv.chk_clear && jv.chk_clear({target: inputDom, chk_dom: chk_dom});

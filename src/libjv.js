@@ -194,13 +194,13 @@ jv.fillRes = function (obj, key, args) {
         return;
     }
 
-    var res1 = function (key1, value, args1) {
+    var res1 = function (key1, value, args1,type) {
         if (jv.IsNull(value)) {
             obj[key1 + "_res"] = "";
             return;
         }
 
-        var type = value.Type;
+        type = type || value.Type;
 
         if (type == "boolean") {
             args1 = args1 || "";  //.replace(/，/g,",")
@@ -222,13 +222,13 @@ jv.fillRes = function (obj, key, args) {
         }
     };
 
-    var type = obj.Type;
-    if (type == "array") {
+    var type = obj.PrimitiveType;
+    if (type == "array" || type == "set") {
         Array.from(obj).forEach(it => {
             jv.fillRes(it, key, args);
         });
         return;
-    } else if (type != "object") {
+    } else if ( !obj.ObjectType ) {
         return;
     }
     if (key) {
@@ -247,10 +247,11 @@ jv.fillRes = function (obj, key, args) {
             return;
         }
 
-        res1(key, value);
+        var type = value.Type;
+        res1(key, value , null , type);
 
         //遍历
-        if (value.Type == "object" || value.Type == "array") {
+        if (type == "object" || type == "array") {
             jv.fillRes(value);
         }
     });
@@ -328,13 +329,15 @@ jv.refDataEquals = function (a, b, equalFunc) {
 }
 
 jv.isPlainObject = function (obj) {
+    if( !obj) return false;
+    return obj.IsObject;
     // Detect obvious negatives
     // Use toString instead of jQuery.type to catch host objects
-    if (!obj || ({}).toString.call(obj) !== "[object Object]") {
-        return false;
-    }
-    return true;
-}
+    // if (!obj || ({}).toString.call(obj) !== "[object Object]") {
+    //     return false;
+    // }
+    // return true;
+};
 
 jv.random = function (min, max) {
     if (!min && !max) {
@@ -423,8 +426,8 @@ jv.param_jmap = function (obj) {
         if (value === undefined) return;
         if (value === null) return;
 
-        var isMap = function (mapObject) {
-            var isMapValue = mapObject.toString() == "Map";
+        var isMap = function (mapObject,objType) {
+            var isMapValue = objType == "map";
             if (!isMapValue) {
                 if (Object.keys(mapObject).findIndex(it => {
                     var code = it.charCodeAt();
@@ -454,11 +457,13 @@ jv.param_jmap = function (obj) {
 
             for (var i in value) {
                 var item = value[i];
-                if (jv.isPlainObject(item)) {
+                if(!item)continue;
+                var objType = item.ObjectType;
+                if (objType) {
                     var m = jv.param_jmap(item);
                     var keys = Object.keys(m);
 
-                    if (isMap(item)) {
+                    if (isMap(item,objType)) {
                         keys.forEach(sk => {
                             ret[key + "[" + i + "]['" + sk + "']"] = m[sk];
                         })
@@ -469,25 +474,28 @@ jv.param_jmap = function (obj) {
                     }
                 }
             }
-        } else if (jv.isPlainObject(value)) {
-            var m = jv.param_jmap(value);
-            var keys = Object.keys(m);
-
-            if (isMap(value)) {
-                keys.forEach(sk => {
-                    ret[key + "['" + sk + "']"] = m[sk];
-                })
-            } else {
-                keys.forEach(sk => {
-                    ret[key + "." + sk] = m[sk];
-                })
-            }
-        } else if (value.Type == "date") {
-            ret[key] = value.toDateString();
         } else {
-            ret[key] = value;
+            var objType = item.ObjectType;
+            if (objType) {
+                var m = jv.param_jmap(value);
+                var keys = Object.keys(m);
+
+                if (isMap(value,objType)) {
+                    keys.forEach(sk => {
+                        ret[key + "['" + sk + "']"] = m[sk];
+                    })
+                } else {
+                    keys.forEach(sk => {
+                        ret[key + "." + sk] = m[sk];
+                    })
+                }
+            } else if (value.Type == "date") {
+                ret[key] = value.toDateString();
+            } else {
+                ret[key] = value;
+            }
         }
-    })
+    });
 
     return ret;
 }

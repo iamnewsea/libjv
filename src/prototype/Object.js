@@ -29,7 +29,33 @@ Object.defineProperty(Object.prototype, "Type", {
     }, enumerable: false
 });
 
+var primitives = ["object","array","function","map","set","math","date","regexp","string","number","boolean","symbol","undefined","null"];
+//判断是否是基本数据类型
+//如果是内置数据类型，返回内置数据类型。
+//否则，返回 false
+Object.defineProperty(Object.prototype, "PrimitiveType", {
+    get() {
+        var type = this.Type;
+        if( primitives.includes(type) ){
+            return type;
+        }
+        return false;
+    }, enumerable: false
+});
 
+//判断类型
+Object.defineProperty(Object.prototype, "ObjectType", {
+    get() {
+        var type = this.Type;
+        if( [ "object","map"].includes(type)){
+            return type;
+        }
+        if( primitives.includes(type) ){
+            return false;
+        }
+        return type;
+    }, enumerable: false
+});
 
 //大于等于 and 小于等于
 Object.defineProperty(Object.prototype, "Between", {

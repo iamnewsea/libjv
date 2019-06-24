@@ -223,13 +223,14 @@ jv.fillRes = function (obj, key, args) {
     };
 
     var type = obj.Type;
-    if( type == "array"){
-        Array.from(obj).forEach(it=>{
-            jv.fillRes(it,key,args);
+    if (type == "array") {
+        Array.from(obj).forEach(it => {
+            jv.fillRes(it, key, args);
         });
         return;
+    } else if (type != "object") {
+        return;
     }
-
     if (key) {
         if (key in obj == false) return;
         return res1(key, obj[key], args);
@@ -254,6 +255,7 @@ jv.fillRes = function (obj, key, args) {
         }
     });
 
+
     if (window.Image_Host && "id" in obj && "url" in obj && obj.url && !("fullUrl" in obj) && !("img256FullUrl" in obj)) {
         obj.fullUrl = window.Image_Host + obj.url;
 
@@ -268,6 +270,7 @@ jv.fillRes = function (obj, key, args) {
             }
         }
     }
+
 };
 
 //如果两个对象是数组, 比较内容, 不比较顺序.

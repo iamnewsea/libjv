@@ -29,6 +29,10 @@ def mycp(toPath):
 
 if __name__=='__main__':
     print("目标文件夹：" + argv[1])
+    if not os.path.exists( argv[1] + "/node_modules"):
+        print("找不到 node_modules 文件夹，请检查目标文件夹")
+        sys.exit();
+
     os.system('''npm run build''')
     print("-----------------------------------")
 

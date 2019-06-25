@@ -29,15 +29,25 @@ Object.defineProperty(Array.prototype, "last", {
 });
 
 //增强型ForEach，函数返回 false 退出循环。
+// filter第二个参数是 index
 //返回循环的个数。
 Object.defineProperty(Array.prototype, "ForEach", {
-    value(filter) {
+    value(filter, trueAction, falseAction) {
         var ret = 0;
         if (!this.length || !filter) return ret;
 
         for (var i = 0, len = this.length; i < len; i++) {
             var item = this[i];
-            if (filter(item) === false) return ret;
+            var ret = filter(item, i);
+            if (ret === false) {
+                if (falseAction && (falseAction(item, i) !== false)) {
+                    continue;
+                }
+                return ret;
+            }
+            else if (ret === true && trueAction) {
+                trueAction(item, i);
+            }
             ret++;
         }
         return ret;
@@ -162,5 +172,36 @@ Object.defineProperty(Array.prototype, "unwind", {
             });
         });
         return ret;
+    }, enumerable: false
+});
+
+Object.defineProperty(Array.prototype, "removeAt", {
+    value(index) {
+        if (index < 0 || index >= this.length) return this;
+        return this.splice(index, 1);
+    }, enumerable: false
+});
+
+Object.defineProperty(Array.prototype, "removeItem", {
+    value(item) {
+        var indeies = [];
+        this.ForEach((it, index) => {
+            if (it === item) {
+                indeies.push(index)
+            }
+        });
+
+        if (item && item.Type == "function") {
+            this.ForEach(item, (it, index) => {
+                indeies.push(index)
+            }, it => null);
+        }
+
+        if (!indeies.length) return this;
+
+        indeies.reverse().ForEach((index) => {
+            this.splice(index, 1);
+        });
+        return this;
     }, enumerable: false
 });

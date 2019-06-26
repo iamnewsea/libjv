@@ -44,8 +44,7 @@ Object.defineProperty(Array.prototype, "ForEach", {
                     continue;
                 }
                 return ret;
-            }
-            else if (ret === true && trueAction) {
+            } else if (ret === true && trueAction) {
                 trueAction(item, i);
             }
             ret++;
@@ -176,22 +175,22 @@ Object.defineProperty(Array.prototype, "unwind", {
 });
 
 Object.defineProperty(Array.prototype, "max", {
-    value() {
-        if(!this.length) return 0;
-        return Math.max.apply( Math, this );
+    value(emptyValue) {
+        if (!this.length) return emptyValue || 0;
+        return Math.max.apply(Math, this);
     }, enumerable: false
 });
 
 Object.defineProperty(Array.prototype, "min", {
-    value() {
-        if(!this.length) return 0;
-        return Math.min.apply( Math,this);
+    value(emptyValue) {
+        if (!this.length) return emptyValue || 0;
+        return Math.min.apply(Math, this);
     }, enumerable: false
 });
 Object.defineProperty(Array.prototype, "sum", {
-    value() {
-        if(!this.length) return 0;
-        return this.reduce((t,i)=>t+i);
+    value(emptyValue) {
+        if (!this.length) return emptyValue || 0;
+        return this.reduce((t, i) => t + i);
     }, enumerable: false
 });
 

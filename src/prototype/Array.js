@@ -175,6 +175,23 @@ Object.defineProperty(Array.prototype, "unwind", {
     }, enumerable: false
 });
 
+Object.defineProperty(Array.prototype, "max", {
+    value() {
+        return Math.max.apply( Math, this );
+    }, enumerable: false
+});
+
+Object.defineProperty(Array.prototype, "min", {
+    value() {
+        return Math.min.apply( Math, this );
+    }, enumerable: false
+});
+Object.defineProperty(Array.prototype, "sum", {
+    value() {
+        return this.reduce((t,i)=>t+i);
+    }, enumerable: false
+});
+
 Object.defineProperty(Array.prototype, "removeAt", {
     value(index) {
         if (index < 0 || index >= this.length) return this;

@@ -177,17 +177,20 @@ Object.defineProperty(Array.prototype, "unwind", {
 
 Object.defineProperty(Array.prototype, "max", {
     value() {
+        if(!this.length) return 0;
         return Math.max.apply( Math, this );
     }, enumerable: false
 });
 
 Object.defineProperty(Array.prototype, "min", {
     value() {
-        return Math.min.apply( Math, this );
+        if(!this.length) return 0;
+        return Math.min.apply( Math,this);
     }, enumerable: false
 });
 Object.defineProperty(Array.prototype, "sum", {
     value() {
+        if(!this.length) return 0;
         return this.reduce((t,i)=>t+i);
     }, enumerable: false
 });

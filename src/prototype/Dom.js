@@ -1,6 +1,6 @@
 (function () {
     //如果不是浏览器环境,则退出
-    if (typeof(document) === "undefined") return;
+    if (typeof (document) === "undefined") return;
 
     //避免多次执行
     if (location.json) return;
@@ -101,9 +101,7 @@
         return location.protocol + "//" + location.host + location.pathname + "?" + Object.keys(location.json).map(it => it + "=" + encodeURIComponent(location.json[it])).join("&")
     };
 
-//-----------------------------------------------------------------
-
-
+    //-----------------------------------------------------------------
     if (!Node.prototype.addEventListener && Node.prototype.attachEvent) {
         //兼容性添加。
         Object.defineProperty(Node.prototype, "addEventListener", {
@@ -119,7 +117,7 @@
         });
     }
 
-//获取距离父dom的 x,y 距离.
+    //获取距离父dom的 x,y 距离.
     Object.defineProperty(Node.prototype, "offset_pdom", {
         value(pdom) {
             if (this == pdom) return {x: 0, y: 0};
@@ -154,7 +152,7 @@
         , enumerable: false
     });
 
-//触发无素事件.value附加到event上.返回event
+    //触发无素事件.value附加到event上.返回event
     Object.defineProperty(Node.prototype, "trigger", {
         value(event, value) {
             if (Node.prototype.dispatchEvent) {
@@ -162,8 +160,7 @@
                 ev.initEvent(event, true, true);
                 this.dispatchEvent(ev);
                 return ev;
-            }
-            else {
+            } else {
                 var ev = document.createEventObject();
                 this.fireEvent("on" + event, ev)
                 return ev;
@@ -190,6 +187,26 @@
         });
     }
 
+    if (!Element.prototype.scrollBy) {
+        //兼容性添加。
+        Object.defineProperty(Element.prototype, "scrollBy", {
+            value(offset_x, offset_y) {
+                this.scrollLeft = this.scrollLeft + offset_x;
+                this.scrollTop = this.scrollTop + offset_y;
+                return;
+            }, enumerable: false
+        });
+    }
+    if (!Element.prototype.scrollTo) {
+        //兼容性添加。
+        Object.defineProperty(Element.prototype, "scrollTo", {
+            value(x, y) {
+                this.scrollLeft = x;
+                this.scrollTop = y;
+                return;
+            }, enumerable: false
+        });
+    }
     // //冒泡提示
     // Object.defineProperty(HTMLElement.prototype, "popTip", {
     //     value(msg) {
@@ -240,8 +257,7 @@
 
             if (parent.lastChild == this) {
                 parent.appendChild(newElement);
-            }
-            else {
+            } else {
                 parent.insertBefore(newElement, this.nextSibling);
             }
         }, enumerable: false

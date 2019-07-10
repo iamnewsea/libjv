@@ -25,6 +25,7 @@ var JvObject = (function () {
 })();
 
 jv = new JvObject();
+jv.prototype = JvObject.prototype;
 jv.noop = function () {
 };
 //---------------------------------------------

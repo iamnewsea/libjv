@@ -7,84 +7,84 @@ jv.info = jv.error = jv.warn = function (msg) {
 
 
 //init router permission
-jv.initRouter = function (router) {
-//规则：如果没有定义，按上级配置。 如果最上级没有配置，按false
-    router.options.routes.recursion(it => {
-        return it.children;
-    }, it => {
-
-        if (!("_permission" in it)) {
-            it._permission = it.permission || false;
-        }
-        if (!("_url" in it)) {
-            it._url = it.path || "";
-        }
-
-        if (it.children) {
-            var emptyPathItem = null;
-            for (let item of it.children) {
-                if (!("permission" in item)) {
-                    item._permission = it._permission;
-                }
-                else {
-                    item._permission = item.permission;
-                }
-
-                if (!item.path) {
-                    emptyPathItem = it;
-                    item._url = it._url;
-                }
-                else {
-                    item._url = it._url + "/" + item.path;
-                }
-            }
-
-            if (emptyPathItem) {
-                emptyPathItem._url = "";
-                emptyPathItem._permission = false;
-            }
-        }
-    })
-
-    router.options.permission = [];
-    router.options.routes.recursion(it => {
-        return it.children;
-    }, it => {
-        if (it._permission && it._url) {
-            router.options.permission.push(it._url);
-        }
-    })
-
-    router.options.routes.recursion(it => {
-        return it.children;
-    }, it => {
-        delete it._permission
-        delete it._url
-    });
-}
-
-//获取需要在菜单上设置的权限页面.
-jv.getPermissions = function () {
-    var ret = {};
-    var routes = window._vue.$router.options.routes;
-    routes.recursion(it => {
-        return it.children;
-    }, it => {
-        if (it.permission) {
-            ret[it.path] = it.permission;
-        }
-    });
-
-    _vue.menus.recursion(it => {
-        return it.subMenus;
-    }, it => {
-        if (it.url in ret) {
-            delete ret[it.url];
-        }
-    })
-
-    return ret;
-}
+// jv.initRouter = function (router) {
+// //规则：如果没有定义，按上级配置。 如果最上级没有配置，按false
+//     router.options.routes.recursion(it => {
+//         return it.children;
+//     }, it => {
+//
+//         if (!("_permission" in it)) {
+//             it._permission = it.permission || false;
+//         }
+//         if (!("_url" in it)) {
+//             it._url = it.path || "";
+//         }
+//
+//         if (it.children) {
+//             var emptyPathItem = null;
+//             for (let item of it.children) {
+//                 if (!("permission" in item)) {
+//                     item._permission = it._permission;
+//                 }
+//                 else {
+//                     item._permission = item.permission;
+//                 }
+//
+//                 if (!item.path) {
+//                     emptyPathItem = it;
+//                     item._url = it._url;
+//                 }
+//                 else {
+//                     item._url = it._url + "/" + item.path;
+//                 }
+//             }
+//
+//             if (emptyPathItem) {
+//                 emptyPathItem._url = "";
+//                 emptyPathItem._permission = false;
+//             }
+//         }
+//     })
+//
+//     router.options.permission = [];
+//     router.options.routes.recursion(it => {
+//         return it.children;
+//     }, it => {
+//         if (it._permission && it._url) {
+//             router.options.permission.push(it._url);
+//         }
+//     })
+//
+//     router.options.routes.recursion(it => {
+//         return it.children;
+//     }, it => {
+//         delete it._permission
+//         delete it._url
+//     });
+// }
+//
+// //获取需要在菜单上设置的权限页面.
+// jv.getPermissions = function () {
+//     var ret = {};
+//     var routes = window._vue.$router.options.routes;
+//     routes.recursion(it => {
+//         return it.children;
+//     }, it => {
+//         if (it.permission) {
+//             ret[it.path] = it.permission;
+//         }
+//     });
+//
+//     _vue.menus.recursion(it => {
+//         return it.subMenus;
+//     }, it => {
+//         if (it.url in ret) {
+//             delete ret[it.url];
+//         }
+//     })
+//
+//     return ret;
+// }
 
 jv.initApp = function (vue) {
     jv.Vue = vue;

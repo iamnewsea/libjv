@@ -133,24 +133,25 @@ jv.initApp = function (vue) {
             }
         }, enumerable: false
     });
-}
-
-jv.getAjaxCacheKey = function (config) {
-    if (!config || !config.cache || !config.url) {
-        return "";
-    }
-
-    var type = (config.data || {}).Type;
-    if (type == "formData") {
-        return "";
-    }
-
-    var data_string = config.data;
-    if (type != "string") {
-        data_string = JSON.stringify(config.data);
-    }
-    return config.method + ":" + config.url + "!" + data_string;
 };
+
+// jv.getAjaxCacheKey = function (config) {
+//     if (!config || !config.cache || !config.url) {
+//         return "";
+//     }
+//
+//     var type = (config.data || {}).Type;
+//     if (type == "formData") {
+//         return "";
+//     }
+//
+//     var data_string = config.data;
+//     if (type != "string") {
+//         data_string = JSON.stringify(config.data);
+//     }
+//     return config.method + ":" + config.url + "!" + data_string;
+// };
+
 jv.initAxios = function (axios) {
 
     jv.ajax = axios;
@@ -290,21 +291,21 @@ jv.initAxios = function (axios) {
 
 
     //打包Post
-    axios.groupPost = function (urls) {
-        return axios.post("/group-ajax", urls
-            // , {
-            //     transformResponse: [function (data) {
-            //         if (data && data.length) {
-            //             data.forEach(it => {
-            //                 if ("body" in it) {
-            //                     it.body = it.body.replace(String.fromCharCode(7), "\n-\n");
-            //                 }
-            //             })
-            //         }
-            //     }]
-            // }
-        );
-    }
+    // axios.groupPost = function (urls) {
+    //     return axios.post("/group-ajax", urls
+    //         // , {
+    //         //     transformResponse: [function (data) {
+    //         //         if (data && data.length) {
+    //         //             data.forEach(it => {
+    //         //                 if ("body" in it) {
+    //         //                     it.body = it.body.replace(String.fromCharCode(7), "\n-\n");
+    //         //                 }
+    //         //             })
+    //         //         }
+    //         //     }]
+    //         // }
+    //     );
+    // }
 };
 
 export default jv;

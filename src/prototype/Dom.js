@@ -111,9 +111,9 @@
 	// };
 
 	//使用 json 替代 location.json
-	location.json2href = function (json) {
+	location.json2search = function (json) {
 		json = json || location.json;
-		return "//" + location.host + location.pathname + "?" + Object.keys(json).map(it => {
+		var ret = Object.keys(json).map(it => {
 			var v = json[it];
 			if (jv.IsNull(v)) {
 				return "";
@@ -124,7 +124,12 @@
 			}
 
 			return it + "=" + encodeURIComponent(v)
-		}).join("&")
+		}).join("&");
+
+		if (ret) {
+			return "?" + ret;
+		}
+		return ret;
 	};
 
 	//-----------------------------------------------------------------

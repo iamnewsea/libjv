@@ -113,7 +113,7 @@
 	//使用 json 替代 location.json
 	location.json2href = function (json) {
 		json = json || location.json;
-		return location.protocol + "//" + location.host + location.pathname + "?" + Object.keys(json).map(it => {
+		return "//" + location.host + location.pathname + "?" + Object.keys(json).map(it => {
 			var v = json[it];
 			if (jv.IsNull(v)) {
 				return "";

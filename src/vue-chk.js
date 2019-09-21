@@ -82,26 +82,30 @@ import jv from "./vue-init"
     };
 
     jv.chk_types = {
-        "float": function (chk_body, value, inputDom) {
+        "float": function (chk_body, value) {
             return (/^[+-]?[0-9]+.?[0-9]*$/).test(value);
         },
-        "int": function (chk_body, value, inputDom) {
+        "int": function (chk_body, value) {
             return (/^[+-]?[0-9]+$/).test(value);
         },
-        "date": function (chk_body, value, inputDom) {
+        "date": function (chk_body, value) {
             return (/^\d{4}[-/]([01]?\d|2[0-4])[-/]([0-2]?\d|3[0-1])$/).test(value);
         },
-        "date-time": function (chk_body, value, inputDom) {
+        "date-time": function (chk_body, value) {
             return (/^\d{4}[-/]([01]?\d|2[0-4])[-/]([0-2]?\d|3[0-1]) ([01]?\d|2[0-3]):[0-5]?\d:[0-5]?\d$/).test(value);
         },
-        "time": function (chk_body, value, inputDom) {
+        "time": function (chk_body, value) {
             return (/^([01]?\d|2[0-3]):[0-5]?\d:[0-5]?\d$/).test(value);
         },
-        "email": function (chk_body, value, inputDom) {
+        "email": function (chk_body, value) {
             return (/^([\w-])+@([\w-])+(\.[\w-]{1,})$/).test(value);
         },
+        //名称
+        "name": function (chk_body, value) {
+            return (/^[\w\d]+$/).test(value);
+        },
         //*号必填
-        "*": function (chk_body, value, inputDom) {
+        "*": function (chk_body, value) {
             if (!value.length) {
                 return false;
             }

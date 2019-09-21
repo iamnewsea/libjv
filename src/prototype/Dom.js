@@ -69,14 +69,16 @@
 		return ret;
 	};
 
-	location.json = function () {
-		// http://blog.csdn.net/lvjin110/article/details/37663067
-
-		return query2Json(location.search.slice(1));
-	}();
+	// location.json = function () {
+	// 	// http://blog.csdn.net/lvjin110/article/details/37663067
+	//
+	// 	return query2Json(location.search.slice(1));
+	// }();
 
 	let loadHasjJson = function () {
 		// http://blog.csdn.net/lvjin110/article/details/37663067
+
+		location.json = query2Json(location.search.slice(1));
 
 		let index = location.hash.indexOf("?");
 		if (index < 0) return {};
@@ -85,6 +87,8 @@
 	};
 
 	loadHasjJson();
+
+
 	window.removeEventListener("hashchange", loadHasjJson);
 	window.addEventListener("hashchange", loadHasjJson);
 

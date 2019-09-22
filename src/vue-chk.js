@@ -231,8 +231,9 @@ import jv from "./vue-init"
 
 				var chk = chk_dom.dataset.chk || chk_dom.getAttribute("chk") || "";
 				chk = chk.trim();
-				if (!chk) return "";
-				var chk_error_msg = chk_dom.dataset.chkMsg || chk_dom.getAttribute("chk-msg") || chk_dom.placeholder || inputDom.placeholder || "请检查输入值";
+				var ret = {result: true};
+				if (!chk) return ret;
+				ret.msg = chk_dom.dataset.chkMsg || chk_dom.getAttribute("chk-msg") || chk_dom.placeholder || inputDom.placeholder;
 
 				var chk_type_index = getNextNonCharIndex(chk),
 					chk_type = chk.slice(0, chk_type_index),
@@ -243,7 +244,9 @@ import jv from "./vue-init"
 					chk_body = chk.slice(1);
 				} else if (chk_type == "reg") {
 					if (chk[chk_type_index] != ':') {
-						return "[Error]正则表达式缺少冒号"
+						ret.result = false;
+						ret.detail = "[Error]正则表达式缺少冒号";
+						return ret;
 					}
 					chk_body = chk.slice(chk_type_index + 1);
 				} else {
@@ -271,47 +274,62 @@ import jv from "./vue-init"
 				}
 
 				if (chk_type == ":") {
-					return eval("(value,dom) => {" + chk_body + "}")(value, inputDom)
+					var r = eval("(value,dom) => {" + chk_body + "}")(value, inputDom);
+					ret.result = !r;
+					ret.detail = r;
+					return ret;
 				} else if (chk_type == "reg") {
 					//如果不是类型，则整体按正则算。
 					var reg;
+					ret.detail = "校验正则表达式不通过";
 					try {
 						reg = eval(chk_body);
-						return reg.test(value) ? "" : chk_error_msg;
+						ret.result = reg.test(value);
+						return ret;
 					} catch (e) {
-						return "正则表达式不正确";
+						ret.result = false;
+						ret.detail = "正则表达式非法";
+						return ret;
 					}
 				} else if (chk) {
 					//如果定义了 * 号,表示必填.
 					var chk_type2 = Object.keys(jv.chk_types).find(it => chk.startsWith(it)) || "";
 					if (chk_type2) {
 						chk_type = chk_type2;
-						chk_body = chk.slice(chk_type.length + 1).trim();
+						chk_body = chk.slice(chk_type.length).trim();
 					}
 
-					if (chk_type in jv.chk_types) {
-						var chk_type_ret = jv.chk_types[chk_type](chk_body, value, inputDom, chk_dom);
+					if (!(chk_type in jv.chk_types)) {
+						ret.result = false;
+						ret.detail = "[Error]不识别的类型" + chk_type;
+						return ret;
+					}
 
-						if (chk_type_ret === false) {
-							return chk_error_msg;
-						}
+					var r2 = jv.chk_types[chk_type](chk_body, value, inputDom, chk_dom);
 
-						if (!chk_msg && chk_body) {
-							// chk_body.split("&")
-							var ret = jv.chk_range(chk_type, chk_body, value);
-							if (ret === false) {
-								return chk_error_msg;
-							}
-							if (ret && (ret.Type == "string")) {
-								return chk_error_msg + " " + ret;
-							}
+					if (r2 === false) {
+						ret.result = false;
+						ret.detail = "需要 " + chk_type + " 类型";
+						return ret;
+					}
+
+					if (chk_body) {
+						// chk_body.split("&")
+						var r = jv.chk_range(chk_type, chk_body, value);
+						if (r === false) {
+							ret.result = r;
+							ret.detail = "范围不正确";
+							return ret;
 						}
-					} else {
-						return "[Error]不识别的类型" + chk_type;
+						if (r && (r.Type == "string")) {
+							ret.result = false;
+							ret.detail = r;
+							return r;
+						}
 					}
 				}
 
-				return "";
+				return ret;
 			};
 			//
 
@@ -329,27 +347,34 @@ import jv from "./vue-init"
 				var inputDom = getInputDom(chk_dom);
 				if (!inputDom) return "找不到输入框";
 
-				var chk_msg = chk_item(chk_dom, inputDom);
+				var chk_result = chk_item(chk_dom, inputDom);
 
-				if (!chk_msg) {
+				if (chk_result.result) {
 					jv.chk_clear && jv.chk_clear({target: inputDom, chk_dom: chk_dom});
 					continue;
 				}
 
 				ret &= false;
 
-				var chk_error_obj = {msg: chk_msg, type: "chk", target: inputDom, chk_dom: chk_dom};
+				chk_result.type = "chk";
+				chk_result.target = inputDom;
+				chk_result.chk_dom = chk_dom;
+
 
 				if (jv.chk_error) {
-					jv.chk_error(chk_error_obj);
-				} else {
-					jv.error(chk_msg, "校验失败", null, chk_error_obj);
+					if (jv.chk_error(chk_error_obj) === false) {
+						break;
+					}
+				} else if (jv.error) {
+					if (jv.error(chk_result.msg, "校验失败", null, chk_result) === false) {
+						break;
+					}
 				}
 
 				//即使没有消息,也要调用.使调用方隐藏提示.
-				if (chk_show && (chk_show(chk_error_obj) === false)) {
-					break;
-				}
+				// if (chk_show && (chk_show(chk_error_obj) === false)) {
+				// 	break;
+				// }
 			}
 
 			return ret;

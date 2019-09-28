@@ -30,24 +30,33 @@ jv.noop = function () {
 };
 //---------------------------------------------
 
-//提供 基于 localStorage的缓存数据.
-//距离 2000 年的秒数。
+//提供 基于 localStorage的缓存数据，增加过期时间机制。额外多保存一个 key ，默认有效期是4个小时。
 jv.store = {
     get(key) {
         if (!key) return null;
         key = "jv.store." + key;
+        var expireAt_key = key + "..expireAt";
         var value = localStorage.getItem(key);
-        if (!value) {
+        if (jv.IsNull(value)) {
             localStorage.removeItem(key);
-            return null;
-        }
-        var json = JSON.parse(value);
-        if (json.expireAt < Date.now()) {
-            localStorage.removeItem(key);
+            localStorage.removeItem(expireAt_key);
             return null;
         }
 
-        return json.value;
+        this.check_key(key);
+        return value;
+    },
+    check_key(key) {
+        var expireAt_key = key + "..expireAt";
+        var expireAt = localStorage.getItem(expireAt_key);
+        if (!expireAt) {
+            return;
+        }
+        if (parseInt(expireAt) < Date.now()) {
+            localStorage.removeItem(key);
+            localStorage.removeItem(expireAt_key);
+            return null;
+        }
     },
     check() {
         for (var i = localStorage.length - 1; i >= 0; i--) {
@@ -56,32 +65,52 @@ jv.store = {
                 continue;
             }
 
-            var value = localStorage.getItem(key);
-            if (!value) {
-                localStorage.removeItem(key);
+            if (key.endsWith("..expireAt") == false) {
                 continue;
             }
-            var json = JSON.parse(value);
-            if (json.expireAt < Date.now()) {
-                localStorage.removeItem(key);
-            }
+
+            var cacheKey = key.slice(9, 0 - 10);
+
+            this.check_key(cacheKey);
         }
     },
     remove(key) {
+        if (!key) return;
+
         localStorage.removeItem(key);
+        var expireAt_key = key + "..expireAt";
+        localStorage.removeItem(expireAt_key);
     },
     set(key, value, cacheSeconds) {
+        if (!key) return;
+
         key = "jv.store." + key;
+        var expireAt_key = key + "..expireAt";
 
         if (value === null) {
-            return localStorage.removeItem(key);
+             localStorage.removeItem(key);
+             localStorage.removeItem(expireAt_key);
+             return ;
         }
 
-        cacheSeconds = cacheSeconds || 600; //默认10分钟。
+        localStorage.setItem(key, value);
+
+        cacheSeconds = cacheSeconds || 14400; //默认4小时。
 
         if (cacheSeconds < 0) return;
 
-        localStorage.setItem(key, JSON.stringify({value: value, expireAt: Date.now() + cacheSeconds * 1000}));
+        localStorage.setItem(expireAt_key, Date.now() + cacheSeconds);
+    },
+    setExpire(key, cacheSeconds){
+        if (!key) return;
+        cacheSeconds = cacheSeconds || 14400;
+        if( cacheSeconds < 0);
+
+        var expireAt_key = key + "..expireAt";
+        localStorage.removeItem(key);
+        localStorage.removeItem(expireAt_key);
+
+        localStorage.setItem(expireAt_key, Date.now() + cacheSeconds);
     }
 };
 
@@ -195,7 +224,7 @@ jv.fillRes = function (obj, key, args) {
         return;
     }
 
-    var res1 = function (key1, value, args1,type) {
+    var res1 = function (key1, value, args1, type) {
         if (jv.IsNull(value)) {
             obj[key1 + "_res"] = "";
             return;
@@ -229,7 +258,7 @@ jv.fillRes = function (obj, key, args) {
             jv.fillRes(it, key, args);
         });
         return;
-    } else if ( !obj.ObjectType ) {
+    } else if (!obj.ObjectType) {
         return;
     }
     if (key) {
@@ -249,7 +278,7 @@ jv.fillRes = function (obj, key, args) {
         }
 
         var type = value.Type;
-        res1(key, value , null , type);
+        res1(key, value, null, type);
 
         //遍历
         if (type == "object" || type == "array") {
@@ -330,7 +359,7 @@ jv.refDataEquals = function (a, b, equalFunc) {
 }
 
 jv.isPlainObject = function (obj) {
-    if( !obj) return false;
+    if (!obj) return false;
     return obj.ObjectType;
     // Detect obvious negatives
     // Use toString instead of jQuery.type to catch host objects
@@ -427,7 +456,7 @@ jv.param_jmap = function (obj) {
         if (value === undefined) return;
         if (value === null) return;
 
-        var isMap = function (mapObject,objType) {
+        var isMap = function (mapObject, objType) {
             var isMapValue = objType == "map";
             if (!isMapValue) {
                 if (Object.keys(mapObject).findIndex(it => {
@@ -458,13 +487,13 @@ jv.param_jmap = function (obj) {
 
             for (var i in value) {
                 var item = value[i];
-                if(!item)continue;
+                if (!item) continue;
                 var objType = item.ObjectType;
                 if (objType) {
                     var m = jv.param_jmap(item);
                     var keys = Object.keys(m);
 
-                    if (isMap(item,objType)) {
+                    if (isMap(item, objType)) {
                         keys.forEach(sk => {
                             ret[key + "[" + i + "]['" + sk + "']"] = m[sk];
                         })
@@ -481,7 +510,7 @@ jv.param_jmap = function (obj) {
                 var m = jv.param_jmap(value);
                 var keys = Object.keys(m);
 
-                if (isMap(value,objType)) {
+                if (isMap(value, objType)) {
                     keys.forEach(sk => {
                         ret[key + "['" + sk + "']"] = m[sk];
                     })

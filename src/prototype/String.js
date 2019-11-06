@@ -1,4 +1,3 @@
-
 /**
  * "@$<li>ok</li>$@".trimPairs("<li>,</li>".split(",") , "<div>,</div>".split(",") ,"$" ,"@" )
  */
@@ -60,7 +59,7 @@ Object.defineProperty(String.prototype, 'trimPairs', {
 //只做一件事。 空字符串时，返回空数组。
 Object.defineProperty(String.prototype, 'Split', {
     value(sep) {
-        if( !this) return [];
+        if (!this) return [];
         return this.split(sep);
     }, enumerable: false
 });
@@ -100,7 +99,10 @@ Object.defineProperty(String.prototype, 'findIndex', {
 });
 
 
-//参数是 Json 的 format。参数： json , 样式: {} , ${}, @ 仅有这三种.
+//参数是 Json 的 format。参数：
+// json 数据
+// 样式: {} , ${}, @ 仅有这三种.
+// 数据回调：取到每一个值后，执行该回调。
 /*
 样式:
     {}   : {
@@ -109,8 +111,9 @@ Object.defineProperty(String.prototype, 'findIndex', {
 
 样式如下:
     "hello {user.name}!".format({user:{name:"world"}} );
+    "hello [0]!".format(["world"] );
     "hello ${user.name}!".format({user:{name:"world"}} , "${}");
-    "hello @name!".format({name:"world"} , "@");
+    "hello @name!".format({name:"world"} , "@", it=>it.toUpperCase() );
 =>
     hello world!
  */
@@ -118,13 +121,13 @@ Object.defineProperty(String.prototype, 'format', {
     value() {
         var json = arguments[0],
             style = arguments[1] || "{}", // 默认样式.
-            emptyFunc = arguments[2];
+            itemCallback = arguments[2];
 
         var styles = {
             "{}": {escape: "{{", regexp: "{([^}]+)}"},
             "${}": {escape: "$${", regexp: "\\${([^}]+)}"},
             "@": {escape: "@@", regexp: "@(\\w+)"}
-        }, config = styles[style]
+        }, config = styles[style];
 
         return this
             .replace(new RegExp(config.escape, "g"), String.fromCharCode(7))
@@ -133,21 +136,22 @@ Object.defineProperty(String.prototype, 'format', {
                 function (m, key) {
                     var value = m;
                     try {
-                        value = eval("(function(){ return  this." + key + "; })").call(json)
-                    }
-                    catch (e) {
+                        value = eval("(function(){ return  this['" + key + "']; })").call(json)
+                    } catch (e) {
                         console.log("String.format 执行出错, " + e.message);
-                        if (emptyFunc) {
-                            value = emptyFunc(key)
-                        }
+                        throw e;
                     }
 
-                    if ((value === 0) || (value === false) || (value === "")) {
-                        return value;
+                    // if ((value === 0) || (value === false) || (value === "") || value === null ) {
+                    //     return value;
+                    // }
+                    // return value || m;
+                    if (itemCallback) {
+                        return itemCallback(value)
                     }
-                    return value || m;
+                    return value;
                 })
-            .replace( new RegExp(String.fromCharCode(7), "g") , config.escape)
+            .replace(new RegExp(String.fromCharCode(7), "g"), config.escape)
             ;
     }, enumerable: false
 });

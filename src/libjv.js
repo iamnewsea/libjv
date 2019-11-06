@@ -88,9 +88,9 @@ jv.store = {
         var expireAt_key = key + "..expireAt";
 
         if (value === null) {
-             localStorage.removeItem(key);
-             localStorage.removeItem(expireAt_key);
-             return ;
+            localStorage.removeItem(key);
+            localStorage.removeItem(expireAt_key);
+            return;
         }
 
         localStorage.setItem(key, value);
@@ -101,10 +101,10 @@ jv.store = {
 
         localStorage.setItem(expireAt_key, Date.now() + cacheSeconds);
     },
-    setExpire(key, cacheSeconds){
+    setExpire(key, cacheSeconds) {
         if (!key) return;
         cacheSeconds = cacheSeconds || 14400;
-        if( cacheSeconds < 0);
+        if (cacheSeconds < 0) ;
 
         var expireAt_key = key + "..expireAt";
         localStorage.removeItem(key);
@@ -304,36 +304,26 @@ jv.fillRes = function (obj, key, args) {
 
 };
 
-//如果两个对象是数组, 比较内容, 不比较顺序.
-//如果一个是数组且只有一个对象,另一个是对象. 则比较对象.
-jv.refDataEquals = function (a, b, equalFunc) {
-    if (!equalFunc) {
-        equalFunc = function (_a, _b) {
-            if ("id" in _a && "id" in _b) {
-                return _a.id == _b.id;
-            }
-            return _a == _b;
-        }
-    }
+/*如果两个对象是数组, 使用refDataEquals比较内容, 不比较顺序.
 
-    var a_is_array = a instanceof Array,
-        b_is_array = b instanceof Array;
+如果两个对象是对象，则比较每个属性的值，依然使用 refDataEquals比较。
+如果对象的值是 null 或 undefined,则忽略 key 的比较
+objectEqualField 指定比较对象的id字段，如果该字段有值且相同，认为两个对象是相等的。
+忽略String,Number类型差异，忽略null,undefined差异， 简单值比较都使用 String 进行比较
+*/
+jv.dataEquals = function (a, b, objectEqualField) {
+    objectEqualField = objectEqualField || "";
 
-    if (a_is_array) {
-        a = a.distinct();
-        if (a.length == 1) {
-            a = a[0];
-            a_is_array = false;
-        }
+    if (jv.IsNull(a) && jv.IsNull(b)) {
+        return true;
     }
+    if (a == b) return true;
 
-    if (b_is_array) {
-        b = b.distinct();
-        if (b.length == 1) {
-            b = b[0];
-            b_is_array = false;
-        }
-    }
+    var a_type = a.Type,
+        b_type = b.Type;
+
+    var a_is_array = (a_type == "array" || a_type == "set"),
+        b_is_array = (b_type == "array" || b_type == "set");
 
     if (a_is_array ^ b_is_array) {
         return false;
@@ -346,17 +336,68 @@ jv.refDataEquals = function (a, b, equalFunc) {
             return false;
         }
 
-        if (a.intersect(b, equalFunc).length != a_length) {
+        if (a.intersect(b, (_a, _b) => {
+            jv.dataEquals(_a, _b, objectEqualField)
+        }).length != a_length) {
             return false;
         }
-    }
-    //都不是数组.
-    else {
-        return equalFunc(a, b);
+        return true;
     }
 
-    return true;
-}
+
+    var a_is_object = !!a.ObjectType,
+        b_is_object = !!b.ObjectType;
+
+    if (a_is_object ^ b_is_object) {
+        return false;
+    }
+
+    if (a_is_object && b_is_object) {
+        if (objectEqualField) {
+            if (objectEqualField in a && objectEqualField in b && a[objectEqualField] && (a[objectEqualField] == b[objectEqualField])) {
+                return true;
+            }
+        }
+
+        var a_keys = Object.keys(a),
+            b_keys = Object.keys(b);
+
+        var a_more_keys = a_keys.minus(b_keys);
+        if (a_more_keys.some(key => !jv.IsNull(a[key]))) {
+            return false;
+        }
+
+        var b_more_keys = b_keys.minus(a_keys);
+        if (b_more_keys.some(key => !jv.IsNull(b[key]))) {
+            return false;
+        }
+
+        if (a_keys.intersect(b_keys).some(key => {
+            var a_value = a[key],
+                b_value = b[key];
+
+            return !jv.dataEquals(a_value, b_value, objectEqualField);
+        })) {
+            return false;
+        }
+
+        return true;
+    }
+
+    var a_simple_type = a_type == "string" || a_type == "number",
+        b_simple_type = b_type == "string" || b_type == "number";
+
+    if (a_simple_type ^ b_simple_type) {
+        return false;
+    }
+
+    if (a_simple_type && b_simple_type) {
+        return a.toString() == b.toString();
+    }
+
+
+    return a == b;
+};
 
 jv.isPlainObject = function (obj) {
     if (!obj) return false;

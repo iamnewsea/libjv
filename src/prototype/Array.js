@@ -136,6 +136,24 @@ Object.defineProperty(Array.prototype, "recursion", {
 });
 
 //集合减法，用 filter .
+Object.defineProperty(Array.prototype, "minus", {
+    value(other, eqFunc) {
+        if (jv.IsNull(other)) return this;
+        if (!other.length ) return this;
+
+        eqFunc = eqFunc || ((a, b) => a == b);
+        var ret = [];
+
+        for (var i = 0, len = this.length; i < len; i++) {
+            var one = this[i];
+            var two = other.findIndex(it=>eqFunc(one,it));
+            if (two < 0) {
+                ret.push(one);
+            }
+        }
+        return ret;
+    }
+});
 /**
  * 获取两个数组交集,返回 Set 类型
  */
@@ -201,6 +219,10 @@ Object.defineProperty(Array.prototype, "removeAt", {
     }, enumerable: false
 });
 
+/**
+ * 移除某项。
+ * 参数可以是某一项，也可以是回调，参数：item,index
+ */
 Object.defineProperty(Array.prototype, "removeItem", {
     value(item) {
         var indeies = [];

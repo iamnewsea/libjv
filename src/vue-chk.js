@@ -141,6 +141,7 @@ import jv from "./vue-init"
         //chk_show:如何显示的回调.
         value: function (chk_show) {
 
+            var index = 0;
             //
             var getInputDom = function (dom) {
                 if (dom.tagName == "INPUT") {
@@ -359,7 +360,7 @@ import jv from "./vue-init"
                 }
 
                 ret &= false;
-
+                chk_result.index = index++;
                 chk_result.type = "chk";
                 chk_result.target = inputDom;
                 chk_result.chk_dom = chk_dom;

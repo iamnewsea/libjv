@@ -33,10 +33,14 @@ jv.noop = function () {
 //提供 基于 localStorage的缓存数据，增加过期时间机制。额外多保存一个 key ，默认有效期是4个小时。
 jv.store = {
     getJson(key) {
-        return JSON.parse(this.get(key));
+        var v = this.get(key);
+        if (!v) return null;
+        return JSON.parse(v);
     },
     setJson(key, value, cacheSeconds) {
+        if (!value) return false;
         this.set(key, JSON.stringify(value), cacheSeconds);
+        return true;
     },
     get(key) {
         if (!key) return null;

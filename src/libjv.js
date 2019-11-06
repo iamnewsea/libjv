@@ -32,6 +32,12 @@ jv.noop = function () {
 
 //提供 基于 localStorage的缓存数据，增加过期时间机制。额外多保存一个 key ，默认有效期是4个小时。
 jv.store = {
+    getJson(key) {
+        return JSON.parse(this.get(key));
+    },
+    setJson(key, value, cacheSeconds) {
+        this.set(key, JSON.stringify(value), cacheSeconds);
+    },
     get(key) {
         if (!key) return null;
         key = "jv.store." + key;
@@ -99,7 +105,7 @@ jv.store = {
 
         if (cacheSeconds < 0) return;
 
-        localStorage.setItem(expireAt_key, Date.now() + cacheSeconds);
+        localStorage.setItem(expireAt_key, Date.now() + cacheSeconds * 1000);
     },
     setExpire(key, cacheSeconds) {
         if (!key) return;
@@ -110,7 +116,7 @@ jv.store = {
         localStorage.removeItem(key);
         localStorage.removeItem(expireAt_key);
 
-        localStorage.setItem(expireAt_key, Date.now() + cacheSeconds);
+        localStorage.setItem(expireAt_key, Date.now() + cacheSeconds * 1000);
     }
 };
 
@@ -246,7 +252,7 @@ jv.fillRes = function (obj, key, args) {
             return true;
         } else if (type == "string") {
             if (value.IsDateOrDateTimeFormat()) {
-                obj[key1 + "_res"] = Date.from(value).toDateString(args1,"utc");
+                obj[key1 + "_res"] = Date.from(value).toDateString(args1, "utc");
                 return true;
             }
         }

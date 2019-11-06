@@ -29,10 +29,12 @@ Object.defineProperty(Number.prototype, "toDateString", {
         }
 
 
-        return format.replace(/yyyy|MM|dd|HH|mm|ss|fff/g, function (a) {
+        return format.replace(/yyyy|yy|MM|dd|HH|mm|ss|fff/g, function (a) {
             switch (a) {
                 case 'yyyy':
                     return (year + "");
+                case 'yy':
+                    return (year + "").slice(-2);
                 case 'MM':
                     return (month + 1 + "").padStart(2,'0');
                 case 'mm':

@@ -1,11 +1,30 @@
-//格式化日期，将毫秒数转化为日期时间,使用UTC时间.
+//格式化日期，将毫秒数转化为日期时间.
+// timezone 的值： utc , local , 默认使用 local
 Object.defineProperty(Number.prototype, "toDateString", {
-    value(format) {
+    value(format, timezone) {
         if (!this) return "";
         var t = new Date(this);
         var valueOf = t.valueOf(),
-            year = t.getUTCFullYear() ,month = t.getUTCMonth() , day = t.getUTCDate(),
-            hour = t.getUTCHours() , minute =t.getUTCMinutes(),  second = t.getUTCSeconds(), ms = t.getUTCMilliseconds();
+            year = t.getFullYear(), month = t.getMonth(), day = t.getDate(),
+            hour = t.getHours(), minute = t.getMinutes(), second = t.getSeconds(), ms = t.getMilliseconds();
+
+        if (!timezone || timezone.toUpperCase() == "LOCAL") {
+            year = t.getFullYear();
+            month = t.getMonth();
+            day = t.getDate();
+            hour = t.getHours();
+            minute = t.getMinutes();
+            second = t.getSeconds();
+            ms = t.getMilliseconds();
+        } else if (timezone.toUpperCase() == "UTC") {
+            year = t.getUTCFullYear();
+            month = t.getUTCMonth();
+            day = t.getUTCDate();
+            hour = t.getUTCHours();
+            minute = t.getUTCMinutes();
+            second = t.getUTCSeconds();
+            ms = t.getUTCMilliseconds();
+        }
 
         if (valueOf <= 0) {
             return "";
@@ -17,10 +36,9 @@ Object.defineProperty(Number.prototype, "toDateString", {
                 format.push("yyyy-MM-dd");
             }
 
-            if (( hour || minute ) && !second) {
+            if ((hour || minute) && !second) {
                 format.push("HH:mm");
-            }
-            else if ( hour || minute || second) {
+            } else if (hour || minute || second) {
                 format.push("HH:mm:ss");
             }
 
@@ -36,17 +54,17 @@ Object.defineProperty(Number.prototype, "toDateString", {
                 case 'yy':
                     return (year + "").slice(-2);
                 case 'MM':
-                    return (month + 1 + "").padStart(2,'0');
+                    return (month + 1 + "").padStart(2, '0');
                 case 'mm':
-                    return  (minute+ "").padStart(2,'0');
+                    return (minute + "").padStart(2, '0');
                 case 'dd':
-                    return  (day+ "").padStart(2,'0');
+                    return (day + "").padStart(2, '0');
                 case 'HH':
-                    return  (hour+ "").padStart(2,'0');
+                    return (hour + "").padStart(2, '0');
                 case 'ss':
-                    return  (second + "").padStart(2,'0');
+                    return (second + "").padStart(2, '0');
                 case 'fff':
-                    return  (ms + "").padStart(3,'0');
+                    return (ms + "").padStart(3, '0');
                 default:
                     break;
             }
@@ -75,15 +93,12 @@ Object.defineProperty(Number.prototype, 'format', {
         if (zero1Index < 0) {
             return this.toString();
             ;
-        }
-        else if (zero1Index == 0) {
+        } else if (zero1Index == 0) {
             dotIndex = formatValue.indexOf(".");
 
-        }
-        else if (formatValue[0] == ".") {
+        } else if (formatValue[0] == ".") {
             dotIndex = 0;
-        }
-        else {
+        } else {
             return this.toString();
         }
 
@@ -94,8 +109,7 @@ Object.defineProperty(Number.prototype, 'format', {
 
         if (dotIndex < 0) {
             beforeMustLength = formatValue.length;
-        }
-        else if (dotIndex > zero1Index) {
+        } else if (dotIndex > zero1Index) {
             beforeMustLength = dotIndex - zero1Index;
         }
 

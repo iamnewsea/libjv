@@ -366,11 +366,7 @@ import jv from "./vue-init"
 
 
                 if (jv.chk_error) {
-                    if (jv.chk_error(chk_error_obj) === false) {
-                        break;
-                    }
-                } else if (jv.error) {
-                    if (jv.error(chk_result.msg, "校验失败", null, chk_result) === false) {
+                    if (jv.chk_error(chk_result) === false) {
                         break;
                     }
                 }

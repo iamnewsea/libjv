@@ -33,8 +33,8 @@ Date.today = function () {
 // });
 
 Object.defineProperty(Date.prototype, "toDateString", {
-    value(format) {
-        return this.valueOf().toDateString(format);
+    value(format,timezone) {
+        return this.valueOf().toDateString(format,timezone);
     }, enumerable: false
 });
 

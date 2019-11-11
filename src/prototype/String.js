@@ -155,3 +155,10 @@ Object.defineProperty(String.prototype, 'format', {
             ;
     }, enumerable: false
 });
+
+
+Object.defineProperty(Date.prototype, "toDateString", {
+    value(format, timezone) {
+        return new Date(this).toDateString(format, timezone);
+    }, enumerable: false
+});

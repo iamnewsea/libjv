@@ -4,7 +4,7 @@ Object.defineProperty(Array.prototype, "spliceDate", {
         if (this.length == 0) return [];
         return this.map(it => {
             if (!it) return it;
-            return it.valueOf().toDateString();
+            return it.valueOf().toDateString(null,"local");
         });
     }
     , enumerable: false

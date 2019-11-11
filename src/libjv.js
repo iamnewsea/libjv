@@ -256,7 +256,7 @@ jv.fillRes = function (obj, key, args) {
             return true;
         } else if (type == "string") {
             if (value.IsDateOrDateTimeFormat()) {
-                obj[key1 + "_res"] = Date.from(value).toDateString(args1, "utc");
+                obj[key1 + "_res"] = Date.from(value).toDateString(args1, "local");
                 return true;
             }
         }
@@ -571,7 +571,7 @@ jv.param_jmap = function (obj) {
                     })
                 }
             } else if (value.Type == "date") {
-                ret[key] = value.toDateString();
+                ret[key] = value.toDateString(null,"local");
             } else {
                 ret[key] = value;
             }

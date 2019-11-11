@@ -157,7 +157,7 @@ Object.defineProperty(String.prototype, 'format', {
 });
 
 
-Object.defineProperty(Date.prototype, "toDateString", {
+Object.defineProperty(String.prototype, "toDateString", {
     value(format, timezone) {
         return new Date(this).toDateString(format, timezone);
     }, enumerable: false

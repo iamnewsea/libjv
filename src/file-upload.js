@@ -106,8 +106,8 @@ jv.compressImage = function (op) {
         //   return;
         // }
 
-        var image = document.createElement("img");
-
+        var image = new Image();
+        image.crossOrigin = "anonymous";
         image.onload = function () {
             if (!image.naturalWidth) {
                 reject("未能加载图片：" + fileName)

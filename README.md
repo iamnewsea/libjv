@@ -2,6 +2,9 @@
 Es6的单页应用常用扩展
 https://github.com/krasimir/webpack-library-starter
 
+# 安装依赖包
+> npm i --registry=https://registry.npm.taobao.org
+
 # 验证
 ```html
 <div ref="form">

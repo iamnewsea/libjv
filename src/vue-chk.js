@@ -140,6 +140,7 @@ import jv from "./vue-init"
     Object.defineProperty(HTMLElement.prototype, "chk", {
         //chk_show:如何显示的回调.
         value: function (chk_show) {
+            if( jv.chk_ing){ jv.chk_ing() }
 
             var index = 0;
             //
@@ -182,31 +183,31 @@ import jv from "./vue-init"
             //     return null;
             // }
 
-            //查找dom下第一个绑定 v-model 的值.如果找不到,则查找 inputDom 的值.
-            // var getVModelValue = function (component) {
-            //     var vdata = component.$vnode.data, ret;
-            //     if (vdata && vdata.model && vdata.model.expression) {
-            //         if ("value" in vdata.model) {
-            //             return vdata.model.value || "";
-            //         }
-            //
-            //         //对于 el-input 它的值在 component._data.currentValue,对于其它 v-model 它的值在  vdata.model.value
-            //         ret = jv.evalExpression(component.$vnode.context._data, vdata.model.expression);
-            //         if (ret.ok) {
-            //             return ret.value;
-            //         } else {
-            //             ret = "";
-            //         }
-            //     }
-            //
-            //     for (var it of component.$children) {
-            //         ret = getVModelValue(it)
-            //         if (ret) {
-            //             return ret;
-            //         }
-            //     }
-            //     return ret;
-            // }
+            //查找dom下第一个绑定 v-model 的值.返回 { vnode : v-model 对象, value : v-model 的值, data }
+            var getVueModel = function (component) {
+                var vnode = component.$vnode, vdata = vnode.data, ret, data = vnode.context._data;
+                if (vdata && vdata.model && vdata.model.expression) {
+                    if ("value" in vdata.model) {
+                        return {vnode: vnode, value: vdata.model.value || "", data: data};
+                    }
+
+                    //对于 el-input 它的值在 component._data.currentValue,对于其它 v-model 它的值在  vdata.model.value
+                    ret = jv.evalExpression(data, vdata.model.expression);
+                    if (ret.ok) {
+                        return {vnode: vnode, value: ret.value, data: data};
+                    } else {
+                        ret = null;
+                    }
+                }
+
+                for (var it of component.$children) {
+                    ret = getVueModel(it)
+                    if (ret) {
+                        return ret;
+                    }
+                }
+                return ret;
+            };
 
             var isValidateChar = function (code) {
                 if (code == 45 || code == 95) return true;
@@ -228,13 +229,14 @@ import jv from "./vue-init"
                 return chk_type_index;
             }
 
-            var chk_item = function (chk_dom, inputDom) {
+            //vueModel = { vnode , value }
+            var chk_item = function (chk_dom, inputDom, vueModel) {
 
                 var chk = chk_dom.dataset.chk || chk_dom.getAttribute("chk") || "";
                 chk = chk.trim();
                 var ret = {result: true};
                 if (!chk) return ret;
-                ret.msg = chk_dom.dataset.chkMsg || chk_dom.getAttribute("chk-msg") || chk_dom.placeholder || inputDom.placeholder;
+                ret.msg = chk_dom.dataset.chkMsg || chk_dom.getAttribute("chk-msg") || chk_dom.placeholder || (inputDom && inputDom.placeholder);
 
                 var chk_type_index = getNextNonCharIndex(chk),
                     chk_type = chk.slice(0, chk_type_index),
@@ -262,7 +264,12 @@ import jv from "./vue-init"
                 //     value = getInputValue(chk_dom);
                 // }
 
-                var value = inputDom.value;
+                var value;
+                if (vueModel) {
+                    value = vueModel.value;
+                } else {
+                    value = inputDom.value;
+                }
 
                 //如果是类型带着?表示可空.
                 if (chk_body[0] == '?') {
@@ -275,7 +282,7 @@ import jv from "./vue-init"
                 }
 
                 if (chk_type == ":") {
-                    var r = eval("(value,dom) => {" + chk_body + "}")(value, inputDom);
+                    var r = eval("(value,dom,data) => {" + chk_body + "}")(value, inputDom, vueModel);
                     ret.result = !r;
                     ret.msg = r;
                     return ret;
@@ -306,7 +313,7 @@ import jv from "./vue-init"
                         return ret;
                     }
 
-                    var r2 = jv.chk_types[chk_type](chk_body, value, inputDom, chk_dom);
+                    var r2 = jv.chk_types[chk_type](chk_body, value, chk_dom);
 
                     if (r2 === false) {
                         ret.result = false;
@@ -349,13 +356,21 @@ import jv from "./vue-init"
                 //
                 // //可以通过 ev 传值。
                 // var ev = inputDom.trigger("blur");
-                var inputDom = getInputDom(chk_dom);
-                if (!inputDom) return "找不到输入框";
 
-                var chk_result = chk_item(chk_dom, inputDom);
+                var inputDom, vueModel = chk_dom.__vue__;
+
+                if (vueModel) {
+                    vueModel = getVueModel(vueModel);
+                }
+
+                if (!vueModel) {
+                    inputDom = getInputDom(chk_dom);
+                    if (!inputDom) return "找不到输入框";
+                }
+                var chk_result = chk_item(chk_dom, inputDom, vueModel);
 
                 if (chk_result.result) {
-                    jv.chk_clear && jv.chk_clear({target: inputDom, chk_dom: chk_dom});
+                    jv.chk_clear && jv.chk_clear({target: inputDom, vueModel:vueModel, chk_dom: chk_dom});
                     continue;
                 }
 
@@ -363,6 +378,7 @@ import jv from "./vue-init"
                 chk_result.index = index++;
                 chk_result.type = "chk";
                 chk_result.target = inputDom;
+                chk_result.vueModel = vueModel;
                 chk_result.chk_dom = chk_dom;
 
 

@@ -277,7 +277,7 @@ import jv from "./vue-init"
                 if (chk_type == ":") {
                     var r = eval("(value,dom) => {" + chk_body + "}")(value, inputDom);
                     ret.result = !r;
-                    ret.detail = r;
+                    ret.msg = r;
                     return ret;
                 } else if (chk_type == "reg") {
                     //如果不是类型，则整体按正则算。

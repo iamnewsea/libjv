@@ -150,12 +150,11 @@ jv.compressImage = function (op) {
 
 /**
  * option:
- * imageBase64:
- * imageLocalPath: 如果 image_base64 为空，取这个。
+ * imageBase64: 必传
  * postParam: 上传时额外带的数据
- * fileName:
+ * fileName: 必传
  * processCallback:
- * axios:
+ * axios: 必传, this.$http
  * maxWidth: 压缩使用。
  *
  */
@@ -193,10 +192,10 @@ jv.doUploadFile = function (option) {
                 }
                 process_callback(e.percent + 10);
             }
-        }).then(res => {
-            return Promise.resolve(res.data.data);
-        });
-
+        })
+        //     .then(res => {
+        //     return Promise.resolve(res.data.data);
+        // });
     };
 
 

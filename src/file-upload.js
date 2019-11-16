@@ -219,10 +219,9 @@ jv.doUploadFile = function (option) {
                 return axios.post("/sys/check_upload", param)
                     .then(res => {
                         process_callback(10);
-                        //8.1 如果服务器存在该文件，返回
-                        if (res.data && res.data.id) {
-                            process_callback(100);
-                            return Promise.resolve(res.data);
+                        //8.1 如果服务器存在该文件，返回 data 属性，且 data 属性有 id
+                        if (res.data.data && res.data.data.id) {
+                            return Promise.resolve(res);
                         } else {
                             return ajaxPost(file)
                         }
@@ -238,7 +237,7 @@ jv.doUploadFile = function (option) {
             maxWidth: maxWidth,
             filter: function (image) {
                 //如果图片 <= 256 ,则不处理.
-                if (image.naturalWidth <= maxWidth ) {
+                if (image.naturalWidth <= maxWidth) {
                     return false;
                 }
             }

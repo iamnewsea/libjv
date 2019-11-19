@@ -237,7 +237,7 @@ jv.initAxios = function (axios) {
         return response;
     }, (error) => {
         if (!error.response) {
-            jv.error("系统错误");
+            jv.error("错误:" + JSON.stringify(error),"","ajax");
             return Promise.reject(error);
         }
         var resp = error.response;
@@ -246,19 +246,19 @@ jv.initAxios = function (axios) {
             return Promise.reject(error);
         }
         if (status == 403) {
-            jv.error("由于系统的权限限制，禁止您的访问");
+            jv.error("由于系统的权限限制，禁止您的访问","","ajax");
             return Promise.reject(error);
         }
         if (status == 404) {
-            jv.error("找不到请求！");
+            jv.error("找不到请求！","","ajax");
             return Promise.reject(error);
         }
 
         var data = resp.data;
         /*{"timestamp":1502603323197,"status":500,"error":"Internal Server Error","exception":"java.lang.Exception","message":"更新条件为空，不允许更新","path":"/sys/synchroMenuAndPermiss"}*/
-        var errorMsg = (data && (data.msg || data.message)) || "系统错误";
+        var errorMsg = (data && (data.msg || data.message)) || "系统错误:" + JSON.stringify(data);
 
-        jv.error(errorMsg.slice(0, 100));
+        jv.error(errorMsg.slice(0, 100),"","ajax");
         return Promise.reject(error);
     });
 

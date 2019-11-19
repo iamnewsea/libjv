@@ -70,6 +70,7 @@
         return ret;
     };
 
+
     //使用 json 替代 location.json
     location.json2search = function (json) {
         json = json || location.json;
@@ -92,6 +93,20 @@
         return ret;
     };
 
+    location.getHost = function (url) {
+        var r;
+        if (url.startsWith("//")) {
+            r = /^\/\/([^/\\]+)/i.test(url)
+        } else {
+            r = /^http[s]*\:\/\/([^/\\]+)/i.test(url)
+        }
+
+        if (r) {
+            return r[1];
+        }
+        return "";
+    };
+
     // location.json = function () {
     // 	// http://blog.csdn.net/lvjin110/article/details/37663067
     //
@@ -99,15 +114,15 @@
     // }();
     // http://blog.csdn.net/lvjin110/article/details/37663067
 
-	let loadQueryJson = function() {
-		location.json = location.query2Json(location.search.slice(1));
-		var tail = location.search + location.hash;
-		if (tail) {
-			location.fullPath = location.href.slice(0, 0 - tail.length);
-		} else {
-			location.fullPath = location.href;
-		}
-	}
+    let loadQueryJson = function () {
+        location.json = location.query2Json(location.search.slice(1));
+        var tail = location.search + location.hash;
+        if (tail) {
+            location.fullPath = location.href.slice(0, 0 - tail.length);
+        } else {
+            location.fullPath = location.href;
+        }
+    }
 
     let loadLocationHashJson = function () {
         let index = location.hash.indexOf("?");
@@ -118,33 +133,35 @@
         location.hashJson = location.query2Json(location.hash.slice(index + 1));
     };
 
-    loadLocationHashJson();
+
+    let loadAllJson = function () {
+        loadQueryJson();
+        loadLocationHashJson();
+
+        if (location.changed) {
+            location.changed();
+        }
+    };
+
+    loadAllJson();
+
 
     window.removeEventListener("hashchange", loadLocationHashJson);
     window.addEventListener("hashchange", loadLocationHashJson);
 
 
-    let loadAllJson= function(){
-		loadQueryJson();
-		loadLocationHashJson();
-
-		if(location.changed){
-			location.changed();
-		}
-	};
-
     //vue 使用了 pushState
     let pushState_ori = history.pushState
     history.pushState = function () {
-		loadAllJson();
+        loadAllJson();
         return pushState_ori.apply(null, arguments);
     };
 
-	window.removeEventListener("popstate", loadAllJson);
-	window.addEventListener("popstate", loadAllJson);
+    window.removeEventListener("popstate", loadAllJson);
+    window.addEventListener("popstate", loadAllJson);
 
 
-	//-----------------------------------------------------------------
+    //-----------------------------------------------------------------
     if (!Node.prototype.addEventListener && Node.prototype.attachEvent) {
         //兼容性添加。
         Object.defineProperty(Node.prototype, "addEventListener", {

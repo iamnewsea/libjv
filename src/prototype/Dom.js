@@ -45,7 +45,7 @@
 		};
 	})();
 
-	window.query2Json = function (query) {
+	location.query2Json = function (query) {
 		query = query || location.search.slice(1);
 		let ret = {};
 		query.split("&").forEach(function (it) {
@@ -70,6 +70,28 @@
 		return ret;
 	};
 
+	//使用 json 替代 location.json
+	location.json2search = function (json) {
+		json = json || location.json;
+		var ret = Object.keys(json).map(it => {
+			var v = json[it];
+			if (jv.IsNull(v)) {
+				return "";
+			}
+
+			if (v.Type == "array") {
+				return v.map(m => it + "=" + encodeURIComponent(m)).join("&")
+			}
+
+			return it + "=" + encodeURIComponent(v)
+		}).join("&");
+
+		if (ret) {
+			return "?" + ret;
+		}
+		return ret;
+	};
+
 	// location.json = function () {
 	// 	// http://blog.csdn.net/lvjin110/article/details/37663067
 	//
@@ -79,16 +101,15 @@
 	let loadLocationJson = function () {
 		// http://blog.csdn.net/lvjin110/article/details/37663067
 
-		location.json = window.query2Json(location.search.slice(1));
+		location.json = location.query2Json(location.search.slice(1));
 
 		let index = location.hash.indexOf("?");
 		if (index < 0) return {};
 
-		location.hashJson = window.query2Json(location.hash.slice(index + 1));
+		location.hashJson = location.query2Json(location.hash.slice(index + 1));
 	};
 
 	loadLocationJson();
-
 
 	window.removeEventListener("hashchange", loadLocationJson);
 	window.addEventListener("hashchange", loadLocationJson);
@@ -115,27 +136,6 @@
 	//     return pushState_ori.apply(null, arguments);
 	// };
 
-	//使用 json 替代 location.json
-	window.json2search = function (json) {
-		json = json || location.json;
-		var ret = Object.keys(json).map(it => {
-			var v = json[it];
-			if (jv.IsNull(v)) {
-				return "";
-			}
-
-			if (v.Type == "array") {
-				return v.map(m => it + "=" + encodeURIComponent(m)).join("&")
-			}
-
-			return it + "=" + encodeURIComponent(v)
-		}).join("&");
-
-		if (ret) {
-			return "?" + ret;
-		}
-		return ret;
-	};
 
 	//-----------------------------------------------------------------
 	if (!Node.prototype.addEventListener && Node.prototype.attachEvent) {

@@ -116,7 +116,7 @@
 	// };
 
 	//使用 json 替代 location.json
-	location.json2search = function (json) {
+	window.json2search = function (json) {
 		json = json || location.json;
 		var ret = Object.keys(json).map(it => {
 			var v = json[it];

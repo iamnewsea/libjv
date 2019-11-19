@@ -3,7 +3,7 @@
 	if (typeof (document) === "undefined") return;
 
 	//避免多次执行
-	if (location.json) return;
+	// if (location.json) return;
 
 	document.cookieJson = (function () {
 		// http://blog.csdn.net/lvjin110/article/details/37663067
@@ -45,7 +45,8 @@
 		};
 	})();
 
-	let query2Json = function (query) {
+	window.query2Json = function (query) {
+		query = query || location.search.slice(1);
 		let ret = {};
 		query.split("&").forEach(function (it) {
 			var sects = it.split("=");
@@ -75,22 +76,22 @@
 	// 	return query2Json(location.search.slice(1));
 	// }();
 
-	let loadHasjJson = function () {
+	let loadLocationJson = function () {
 		// http://blog.csdn.net/lvjin110/article/details/37663067
 
-		location.json = query2Json(location.search.slice(1));
+		location.json = window.query2Json(location.search.slice(1));
 
 		let index = location.hash.indexOf("?");
 		if (index < 0) return {};
 
-		location.hashJson = query2Json(location.hash.slice(index + 1));
+		location.hashJson = window.query2Json(location.hash.slice(index + 1));
 	};
 
-	loadHasjJson();
+	loadLocationJson();
 
 
-	window.removeEventListener("hashchange", loadHasjJson);
-	window.addEventListener("hashchange", loadHasjJson);
+	window.removeEventListener("hashchange", loadLocationJson);
+	window.addEventListener("hashchange", loadLocationJson);
 
 	//vue 使用了 pushState
 	// let pushState_ori = history.pushState

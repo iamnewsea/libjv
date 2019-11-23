@@ -87,6 +87,12 @@ Object.defineProperty(String.prototype, 'IsDateOrDateTimeFormat', {
     }, enumerable: false
 });
 
+Object.defineProperty(String.prototype, 'IsNumberFormat', {
+    value() {
+        return /^[-+]?((\d+\.*\d*)|(\.\d+))$/.test(this)
+    }, enumerable: false
+});
+
 Object.defineProperty(String.prototype, 'findIndex', {
     value() {
         //第一个是 action , 第二个是 index.

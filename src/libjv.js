@@ -301,20 +301,20 @@ jv.fillRes = function (obj, key, args) {
     });
 
 
-    if (window.Image_Host && "id" in obj && "url" in obj && obj.url && !("fullUrl" in obj) && !("img256FullUrl" in obj)) {
-        obj.fullUrl = window.Image_Host + obj.url;
-
-        var ext = obj.url.split(".").last()
-        if (/png|jpeg|bmp|gif/ig.test(ext)) {
-            var sect = obj.url.split("/").slice(-2, -1)[0].split("-")
-            var width = parseInt(sect[0]);
-            var height = parseInt(sect.last());
-
-            if (width > 256 || height > 256) {
-                obj["img256FullUrl"] = obj.fullUrl + "-var/256." + ext
-            }
-        }
-    }
+    // if (window.Image_Host && "id" in obj && "url" in obj && obj.url && !("fullUrl" in obj) && !("img256FullUrl" in obj)) {
+    //     obj.fullUrl = window.Image_Host + obj.url;
+    //
+    //     var ext = obj.url.split(".").last()
+    //     if (/png|jpeg|bmp|gif/ig.test(ext)) {
+    //         var sect = obj.url.split("/").slice(-2, -1)[0].split("-")
+    //         var width = parseInt(sect[0]);
+    //         var height = parseInt(sect.last());
+    //
+    //         if (width > 256 || height > 256) {
+    //             obj["img256FullUrl"] = obj.fullUrl + "-var/256." + ext
+    //         }
+    //     }
+    // }
 
 };
 

@@ -103,7 +103,7 @@ jv.initApp = function (vue) {
 
     Object.defineProperty(vueProtype, "chk", {
         value(chk_show) {
-            return this.$el.chk(chk_show);
+            return jv.chk_vue_dom(this, chk_show);
         }, enumerable: false
     });
 

@@ -25,6 +25,147 @@ if (document.querySelector("[ref=form]").chk() == false) {
 //验证通过的逻辑
 ```
 
+集成验证提示
+```
+    jv._last_error_msg = "";
+    jv._last_error_title = "";
+    jv.showLastError = function () {
+        if (!jv._last_error_msg) return;
+        return jv.error(jv._last_error_msg, jv._last_error_title);
+    };
+
+    jv.error = function (msg, title, opt) {
+        if (opt == "ajax") {
+            document.write((title || "") + "<br />" + msg)
+            return;
+        }
+
+        var msg2 = msg;
+        if (title) {
+            msg2 = "[" + title + "] " + msg2;
+        }
+
+        console.error(msg2);
+
+        jv._last_error_msg = msg;
+        jv._last_error_title = title;
+
+        var ret = jv.main.$notify(Object.assign({
+            title: title || '错误',
+            message: msg,
+            type: 'error',
+            customClass: "popmsg error_msg"
+        }, opt));
+
+        return ret;
+    };
+
+    jv.confirm = function (msg, buttons, opt) {
+        var msgs = (buttons || "").split(",");
+        return jv.main.$confirm(msg, '提示', Object.assign({
+            confirmButtonText: msgs[0] || '确定',
+            cancelButtonText: msgs[1] || '取消',
+            type: 'warning'
+        }, opt));
+    };
+
+    jv.prompt = function (msg, title, opt) {
+        return jv.main.$prompt(msg, title || '提示', Object.assign({
+            confirmButtonText: '确定',
+            cancelButtonText: '取消'
+        }, opt));
+    };
+
+    jv.chk_clear = function (chk_opt) {
+        if (chk_opt && chk_opt.target) {
+            chk_opt.target.classList.remove("chk_error");
+        } else {
+            Array.from(document.body.getElementsByClassName("chk_error")).forEach(it => it.classList.remove("chk_error"));
+        }
+    };
+
+    jv.chk_error = function (chk_opt) {
+        if (!chk_opt || chk_opt.type != "chk") {
+            return;
+        }
+
+        var msg = chk_opt.msg;
+        if (!msg) {
+            var kv = chk_opt.target.closest(".kv");
+            if (kv) {
+                msg = ((kv.getElementsByClassName("k")[0] || {}).textContent || "").trim() + " " + chk_opt.detail;
+            }
+        }
+
+        // jv.chk_clear();
+        chk_opt.target.classList.add("chk_error");
+        console.error(msg);
+        //只提示第一个
+        if (!chk_opt.index) {
+            jv.pop_msg(msg, "数据校验失败", "chk");
+        }
+    };
+
+    jv.pop_msg = function (msg, title, type) {
+        var msg2 = msg;
+        if (title) {
+            msg2 = "[" + title + "] " + "[" + type + "] " + msg2;
+        }
+
+        if (type in console) {
+            console[type](msg2);
+        }
+
+        if (window.vant) {
+            return vant.Toast.fail({
+                    message: msg,
+                    icon: type == "error" ? 'warning-o' : "info-o"
+                }
+            );
+        }
+
+        if (window.ELEMENT) {
+            return jv.error(msg, title);
+        }
+
+        var p = document.getElementById("_pop_msg_root_");
+        if (!p) {
+            p = document.createElement("div");
+            p.timer_number = 0;
+            p.timerId = setInterval(function () {
+                if (p.timer_number < 0 && p.timer_number >= 7) {
+                    return;
+                }
+
+                p.timer_number++;
+                if (p.timer_number >= 5) {
+                    p.classList.remove("fade_in");
+                    p.classList.add("fade_out");
+                    return;
+                }
+
+            }, 1000);
+            p.onmouseenter = function () {
+                p.timer_number = -1;
+            };
+            p.onmouseleave = function () {
+                p.timer_number = 0;
+            };
+
+            p.id = "_pop_msg_root_";
+            p.classList.add("pop_msg");
+            p.innerHTML = "<fieldset><legend></legend><div class='msg'></div></fieldset>";
+            document.body.appendChild(p);
+        }
+        p.timer_number = 0;
+        p.classList.remove("fade_in", "fade_out");
+
+        p.getElementsByTagName("legend")[0].innerHTML = title;
+        p.getElementsByClassName("msg")[0].innerHTML = msg;
+
+        p.classList.add("fade_in");
+    };
+```
 ## 验证规则: 
 * document.querySelector("[ref=form]") 表示要验证的区域.
 * 对每一个chk属性,验证里面的 v-model 绑定 或 input,textarea 元素. 优先使用 v-model值.

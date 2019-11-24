@@ -1,0 +1,317 @@
+<!--<template>-->
+  <!--<div class="avatar-uploader">-->
+    <!--<div class="el-upload" :class="'el-upload-' + fileType" :el-upload-id="myValue.id">-->
+      <!--<div @click="upload_Click" v-if="!myValue.id && !percentage || (fileType !='img' && fileType != 'video')">-->
+        <!--<slot>-->
+          <!--<i class="el-icon-plus avatar-uploader-icon"></i>-->
+        <!--</slot>-->
+      <!--</div>-->
+
+      <!--<el-progress type="circle" :percentage="percentage" v-if="percentage"></el-progress>-->
+      <!--<div class="el-upload-preview" v-if="myValue.id && myValue.fullUrl && (fileType =='img' || fileType == 'video')"  onmouseleave="this.classList.remove('deleting')">-->
+        <!--<img class="avatar-uploader-icon" :src="myValue.fullUrl" v-if="fileType=='img'"/>-->
+        <!--<video v-else-if="fileType=='video'" :src="myValue.fullUrl" class="avatar-uploader-icon"-->
+               <!--controls="controls"></video>-->
+        <!--<div class="el-upload-bg">-->
+        <!--</div>-->
+        <!--<div class="el-upload-icon confirm-icon">-->
+          <!--<el-tag type="danger" @click="onRemove($event)" style="padding-left:12px;padding-right:12px;">确认删除?</el-tag>-->
+        <!--</div>-->
+        <!--<div class="el-upload-icon hover-icon">-->
+          <!--<i class="el-icon-view" @click="file_preview"></i>-->
+          <!--<i class="el-icon-delete" @click="$event.target.closest('.el-upload-preview').classList.add('deleting')"></i>-->
+        <!--</div>-->
+      <!--</div>-->
+
+      <!--<input type="file" name="file" style="display: none" @change="file_change" @click="file_click">-->
+    <!--</div>-->
+  <!--</div>-->
+<!--</template>-->
+<!--<script>-->
+  <!--export default {-->
+    <!--name: "Upload1",-->
+    <!--props: {-->
+      <!--value: {-->
+        <!--type: Object, default: function () {-->
+          <!--return {id: "", url: ""}-->
+        <!--}-->
+      <!--},-->
+      <!--uid: {type: null, default: 0},     // 表示该图片所属的表的行Id.-->
+      <!--db: {type: String, default: ""},-->
+      <!--scales: {-->
+        <!--type: [String, Array], default: function () {-->
+          <!--return []; //"1:1", "16:9"-->
+        <!--}-->
+      <!--}, //空表示保持原始 宽:高-->
+      <!--maxWidth: {type: Number, default: 800},-->
+      <!--fileType: {type: String, default: "img"},-->
+      <!--maxSize: {type: String, default: "5M"}-->
+    <!--},-->
+    <!--data() {-->
+      <!--return {-->
+        <!--myValue: Object.assign({}, this.value || {}),-->
+        <!--percentage: 0, scales_value: this.scales-->
+      <!--};-->
+    <!--},-->
+    <!--watch: {-->
+      <!--value: {-->
+        <!--deep: true, handler(v) {-->
+          <!--if (jv.dataEquals(this.myValue, v, (a, b) => {-->
+            <!--return a.id == b.id && a.fullUrl == b.fullUrl;-->
+          <!--})) {-->
+            <!--return;-->
+          <!--}-->
+
+          <!--this.myValue = Object.assign({}, this.value);-->
+        <!--}-->
+      <!--},-->
+      <!--scales: {-->
+        <!--immediate: true, handler: function (value) {-->
+          <!--if (typeof (value) == "string") {-->
+            <!--if (!value) {-->
+              <!--this.scales_value = [];-->
+            <!--} else {-->
+              <!--this.scales_value = value.split(",");-->
+            <!--}-->
+
+            <!--return;-->
+          <!--}-->
+
+          <!--if (!value) {-->
+            <!--this.scales_value = [];-->
+          <!--} else {-->
+            <!--this.scales_value = value;-->
+          <!--}-->
+        <!--}-->
+      <!--}-->
+    <!--},-->
+    <!--methods: {-->
+      <!--upload_Click() {-->
+        <!--var input = this.$el.querySelector("input");-->
+        <!--if (input) {-->
+          <!--input.click();-->
+        <!--}-->
+      <!--},-->
+      <!--file_click(e) {-->
+        <!--var v = {data: this.myValue}-->
+        <!--this.$emit("clicking", v)-->
+        <!--if (v.returnValue === false) {-->
+          <!--e.preventDefault();-->
+          <!--return false;-->
+        <!--}-->
+      <!--},-->
+      <!--file_change(e) {-->
+        <!--var rawFile = e.target.files[0];-->
+        <!--if (!rawFile) {-->
+          <!--return;-->
+        <!--}-->
+        <!--this.imageRemark = "";-->
+
+        <!--var fileName = rawFile.name;-->
+        <!--var chkItem = this.checkFileType(fileName, this.fileType)-->
+        <!--if (chkItem) {-->
+          <!--this.percentage = 0;-->
+          <!--jv.error("文件类型不允许，只能上传: " + chkItem.type + "类型！");-->
+          <!--return;-->
+        <!--}-->
+
+        <!--var reader = new FileReader();-->
+        <!--reader.onload = () => {-->
+          <!--var base64Data = reader.result;-->
+
+          <!--e.target.value = "";-->
+          <!--if ((this.fileType != "img") || (!this.scales_value.length)) {-->
+            <!--jv.doUploadFile({-->
+              <!--fileType: this.fileType,-->
+              <!--maxWidth: this.fileType == "img" && this.maxWidth || 0,-->
+              <!--imageBase64: base64Data,-->
+              <!--fileName: fileName,-->
+              <!--axios: this.$http,-->
+              <!--processCallback: process => {-->
+                <!--this.percentage = process;-->
+              <!--}-->
+            <!--}).then(data => {-->
+              <!--this.emit(data);-->
+            <!--});-->
+            <!--return;-->
+          <!--}-->
+
+          <!--jv.EditImage({-->
+            <!--image: base64Data,-->
+            <!--scales: this.scales_value,-->
+            <!--fileName: fileName,-->
+            <!--imageRemark: this.withRemark ? "" : null,-->
+            <!--//callback : 返回 base64 格式的图片数据-->
+            <!--callback: (imageData, imageRemark) => {-->
+              <!--if (!imageData) {-->
+                <!--return jv.error("裁剪出错");-->
+              <!--}-->
+
+              <!--this.imageRemark = imageRemark;-->
+
+              <!--jv.doUploadFile({-->
+                <!--fileType: this.fileType,-->
+                <!--maxWidth: this.maxWidth,-->
+                <!--imageBase64: imageData,-->
+                <!--fileName: fileName,-->
+                <!--axios: this.$http,-->
+                <!--processCallback: process => {-->
+                  <!--this.percentage = process;-->
+                <!--}-->
+              <!--}).then(data => {-->
+                <!--this.emit(data);-->
+              <!--});-->
+
+            <!--}-->
+          <!--});-->
+        <!--};-->
+        <!--//readAsDataURL这个方法来读取数据，取出数据的url作为FileReader的result-->
+        <!--reader.readAsDataURL(rawFile);-->
+      <!--},-->
+      <!--checkFileType(fileName, fileType) {-->
+        <!--var dotIndex = fileName.lastIndexOf('.');-->
+        <!--if (dotIndex < 0) return false;-->
+
+        <!--var ext = fileName.slice(dotIndex + 1).toLowerCase();-->
+
+        <!--var typeDict = {};-->
+        <!--typeDict["img"] = {type: "png,jpg,gif,bmp,ico,icon", remark: "图片文件"};-->
+        <!--typeDict["doc"] = {type: "doc,docx,xls,xlsx,pdf", remark: "office文档"};-->
+        <!--typeDict["video"] = {type: "mp4,avi,webm,ogg,mov", remark: "视频文件"};-->
+
+        <!--var item = typeDict[fileType];-->
+        <!--if (item) {-->
+          <!--if (item.type.split(",").indexOf(ext) < 0) return item;-->
+        <!--}-->
+        <!--return;-->
+      <!--},-->
+      <!--emit(json) {-->
+        <!--this.percentage = 0;-->
+        <!--this.myValue = json || this.myValue;-->
+
+        <!--this.$el.querySelector("input").value = "";-->
+
+        <!--this.$emit("input", this.myValue);-->
+
+        <!--if (this.db && this.uid) {-->
+          <!--var param = {-->
+            <!--db: this.db,-->
+            <!--id: this.uid,-->
+            <!--image: {id: this.myValue.id, url: this.myValue.url}-->
+          <!--};-->
+          <!--this.$http.post("/image/set", param).then(res => {-->
+            <!--this.$emit("change", this.myValue, this.uid);-->
+          <!--});-->
+        <!--} else {-->
+          <!--this.$emit("change", this.myValue, this.uid);-->
+        <!--}-->
+      <!--},-->
+      <!--onRemove(e) {-->
+        <!--e.target.closest(".avatar-uploader").classList.remove("deleting");-->
+        <!--this.myValue.id = "";-->
+        <!--this.myValue.url = "";-->
+        <!--this.myValue.fullUrl = "";-->
+        <!--this.emit({});-->
+      <!--},-->
+      <!--file_preview() {-->
+        <!--jv.Preview({type: this.fileType, url: this.myValue.fullUrl});-->
+      <!--}-->
+    <!--}-->
+  <!--}-->
+<!--</script>-->
+<!--<style>-->
+  <!--.avatar-uploader .withRemark {-->
+    <!--overflow: hidden;-->
+    <!--text-overflow: ellipsis;-->
+    <!--width: 140px;-->
+    <!--margin: auto;-->
+    <!--color: gray;-->
+    <!-- -webkit-line-clamp: 1;-->
+    <!-- -webkit-box-orient: vertical;-->
+    <!--display: -webkit-box;-->
+    <!--height: 36px;-->
+  <!--}-->
+
+  <!--.avatar-uploader .el-upload {-->
+    <!--border: 0px solid #d9d9d9;-->
+    <!--border-radius: 6px;-->
+    <!--cursor: pointer;-->
+    <!--position: relative;-->
+    <!--overflow: hidden-->
+  <!--}-->
+
+  <!--.avatar-uploader .el-upload:hover {-->
+    <!--border-color: #20a0ff-->
+  <!--}-->
+
+  <!--.avatar-uploader .avatar-uploader-icon {-->
+    <!--border: 1px dashed #d9d9d9;-->
+    <!--vertical-align: top;-->
+    <!--font-size: 28px;-->
+    <!--color: #8c939d;-->
+    <!--width: 146px;-->
+    <!--text-align: center;-->
+  <!--}-->
+
+  <!--.avatar-uploader .avatar-uploader-icon:hover {-->
+    <!--cursor: pointer;-->
+    <!--border-color: #20a0ff-->
+  <!--}-->
+
+  <!--.avatar-uploader .el-upload-preview {-->
+    <!--position: relative;-->
+    <!--width: 146px;-->
+  <!--}-->
+
+  <!--.avatar-uploader .el-upload-preview > div {-->
+    <!--display: none;-->
+    <!--position: absolute;-->
+    <!--top: 0;-->
+    <!--left: 0;-->
+    <!--right: 0;-->
+    <!--bottom: 0;-->
+  <!--}-->
+
+
+  <!--.avatar-uploader .el-upload-preview .el-upload-bg {-->
+    <!--background-color: #00000c;-->
+    <!--opacity: 0.5;-->
+  <!--}-->
+
+  <!--.avatar-uploader .el-upload-preview .el-upload-icon {-->
+    <!--font-size: 28px;-->
+    <!--color: white;-->
+    <!--width: 146px;-->
+    <!--text-align: center;-->
+    <!--display: none;-->
+    <!--align-items: center;-->
+    <!--justify-content: space-around;-->
+  <!--}-->
+
+  <!--/*.avatar-uploader .el-upload-preview .el-upload-icon > div {*/-->
+  <!--/*height: 72px;*/-->
+  <!--/*line-height: 72px;*/-->
+  <!--/*}*/-->
+
+  <!--.avatar-uploader .el-upload-preview .el-upload-icon i {-->
+    <!--margin: 5px;-->
+  <!--}-->
+
+  <!--.avatar-uploader .el-upload-preview:hover .el-upload-bg{-->
+    <!--display: block;-->
+  <!--}-->
+
+  <!--.avatar-uploader .el-upload-preview:hover .hover-icon {-->
+    <!--display: flex;-->
+  <!--}-->
+  <!--.avatar-uploader .el-upload-preview:hover .confirm-icon {-->
+    <!--display: none;-->
+  <!--}-->
+
+  <!--.avatar-uploader .deleting:hover .confirm-icon{-->
+    <!--display: flex;-->
+  <!--}-->
+  <!--.avatar-uploader .deleting:hover .hover-icon{-->
+    <!--display: none;-->
+  <!--}-->
+<!--</style>-->

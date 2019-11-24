@@ -1,0 +1,17 @@
+.DS_Store
+npm-debug.log
+yarn-error.log
+test/unit/coverage
+dist/
+node_modules
+.DS_Store
+npm-debug.log
+lerna-debug.log
+npm-debug.log.*
+lerna-debug.log.*
+.idea
+.npmrc
+coverage
+waiter.config.js
+build/bin/algolia-key.js
+.envrc

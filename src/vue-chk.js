@@ -221,18 +221,33 @@ import jv from "./vue-init"
         return ret;
     };
 
+    var convertValue = function (value) {
+        var v = value;
+        if (jv.IsNull(v)) {
+            v = "";
+        }
+        if (v.Type == "date") {
+            v = v.toDateString();
+        } else {
+            v = v.toString();
+        }
+        return v;
+    };
     //查找dom下第一个绑定 v-model 的值.返回 { vnode : v-model 对象, value : v-model 的值, data }
     var getVueData = function (component) {
+
+
         var vnode = component.$vnode, vdata = vnode.data, ret = {}, data = vnode.context._data;
         if (vdata && vdata.model && vdata.model.expression) {
             if ("value" in vdata.model) {
-                return {value: vdata.model.value || "", data: data};
+
+                return {value: convertValue(vdata.model.value), data: data};
             }
 
             //对于 el-input 它的值在 component._data.currentValue,对于其它 v-model 它的值在  vdata.model.value
             var ret = jv.evalExpression(data, vdata.model.expression);
             if (ret.ok) {
-                return {value: ret.value || "", data: data};
+                return {value: convertValue(ret.value), data: data};
             } else return {};
         }
 
@@ -372,42 +387,43 @@ import jv from "./vue-init"
     // Object.defineProperty(jv.Vue.prototype, "chk", {
     //     //chk_show:如何显示的回调.
     //     value: function (singleShow) {
-        jv.chk_vue_dom = function(container,singleShow){
-            var index = 0, ret = true, list = getAllVuesChkDom(container);
+    jv.chk_vue_dom = function (container, singleShow) {
+        var index = 0, ret = true, list = getAllVuesChkDom(container);
 
-            for (var chk_dom of list) {
-                var chk_result = chk_item(chk_dom);
+        for (var chk_dom of list) {
+            var chk_result = chk_item(chk_dom);
 
-                var chkEvent = new CustomEvent('chked', {
-                    detail: {
-                        result: chk_result.result,
-                        msg: chk_result.msg,
-                        detail: chk_result.detail
-                    }
-                });
-
-                var tooltip = getVueTooltipFromUp(chk_dom);
-                if (tooltip) {
-                    tooltip.$emit("chked", chkEvent);
-                } else {
-                    chk_dom.$emit("chked", chkEvent);
+            var chkEvent = new CustomEvent('chked', {
+                detail: {
+                    result: chk_result.result,
+                    msg: chk_result.msg,
+                    detail: chk_result.detail
                 }
+            });
 
-
-                if (chk_result.result) {
-                    chk_dom.$el.classList.remove("chk_error");
-                    continue;
-                }
-
-                chk_dom.$el.classList.add("chk_error");
-
-                if (singleShow) {
-                    break;
-                }
+            var tooltip = getVueTooltipFromUp(chk_dom);
+            if (tooltip) {
+                tooltip.$emit("chked", chkEvent);
+            } else {
+                chk_dom.$emit("chked", chkEvent);
             }
 
-            return ret;
+
+            if (chk_result.result) {
+                chk_dom.$el.classList.remove("chk_error");
+                continue;
+            }
+
+            ret &= false;
+            chk_dom.$el.classList.add("chk_error");
+
+            if (singleShow) {
+                break;
+            }
         }
+
+        return ret;
+    }
 
 
 //注册样式. 把 chk有值,且里面没有问号的元素,添加属性 chk-require ,供样式表显示必填样式.

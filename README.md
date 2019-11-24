@@ -8,3 +8,8 @@
 ## 安装依赖包
 > npm i --registry=https://registry.npm.taobao.org
 
+>作者 imnewsea
+
+
+![](https://gitee.com/uploads/74/1227074_imnewsea.png)
+

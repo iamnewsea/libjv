@@ -350,9 +350,7 @@ jv.dataEquals = function (a, b, objectEqualField) {
             return false;
         }
 
-        if (a.intersect(b, (_a, _b) => {
-            jv.dataEquals(_a, _b, objectEqualField)
-        }).length != a_length) {
+        if (a.intersect(b, (_a, _b) => jv.dataEquals(_a, _b, objectEqualField) ).length != a_length) {
             return false;
         }
         return true;

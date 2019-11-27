@@ -56,11 +56,15 @@
             }
         },
         methods: {
+            //以后废掉它
             doQuery() {
                 this.page = 1;
                 this.loadData();
             },
-            loadData() {
+            loadData(pager) {
+                if( pager ){
+                    this.page = pager;
+                }
                 if (this.page == 1) {
                     this.total = 0;
                 }

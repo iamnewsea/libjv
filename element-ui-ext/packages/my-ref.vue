@@ -103,7 +103,7 @@
     },
     methods: {
       doQuery() {
-        this.$refs["list"].doQuery();
+        this.$refs["list"].loadData(1);
       },
       dataLoaded(res, option) {
         var json = res.data.data;
@@ -158,7 +158,7 @@
 
         this.$nextTick(it => {
           this.query_length = this.$refs.dialog.$el.querySelector(".query").children.length;
-          this.$refs["list"].doQuery();
+          this.$refs["list"].loadData(1);
         });
       },
       handleClick() {

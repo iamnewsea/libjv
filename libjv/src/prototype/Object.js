@@ -68,5 +68,6 @@ Object.defineProperty(Object.prototype, "Between", {
 
         if (this < start) return false;
         if (this > end) return false;
+        return true;
     }, enumerable: false
 });

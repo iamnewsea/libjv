@@ -205,6 +205,40 @@ jv.IsNull = function (value) {
 //     }, enumerable: false
 // });
 
+/**
+ * 遍历Json对象。返回 false 停止遍历所有
+ * @param json
+ * @param eachJsonItemCallback 参数：key,value,object,deepth
+ */
+jv.recursionJson = function (json, eachJsonItemCallback, deepth) {
+    if (!json) {
+        return;
+    }
+    deepth = deepth || 0;
+
+    var obj = json, type = obj.PrimitiveType;
+    if (type == "array" || type == "set") {
+        return Array.from(obj).ForEach(it => {
+            return jv.recursionJson(it, eachJsonItemCallback, deepth + 1);
+        });
+    } else if (!obj.ObjectType) {
+        return;
+    }
+
+    return Object.keys(obj).ForEach(key => {
+        var value = obj[key];
+        if (eachJsonItemCallback(key, value, obj) === false) {
+            return false;
+        }
+
+        if (value) {
+            if (jv.recursionJson(value, eachJsonItemCallback, deepth + 1) === false) {
+                return false;
+            }
+        }
+    });
+};
+
 /*
 定义枚举, 生成 jv.枚举 = {}
 使用 对象.Enumer(键,jv.枚举)  对对象的key进行枚举化。
@@ -234,16 +268,24 @@ jv.fillRes = function (obj, key, args) {
         return;
     }
 
-    var res1 = function (key1, value, args1, type) {
-        if (jv.IsNull(value)) {
-            obj[key1 + "_res"] = "";
+    var res1 = function (key1, value, target, args1) {
+        if (!target) {
+            return;
+        }
+        if ((key + "_res") in target) {
             return;
         }
 
-        type = type || value.Type;
+        if (jv.IsNull(value)) {
+            target[key1 + "_res"] = "";
+            return;
+        }
+
+        var type = value.Type;
 
         if (type == "boolean") {
             args1 = args1 || "";  //.replace(/，/g,",")
+
             var stringValue = "";
             var res_values = args1.split(",");
             if (value) {
@@ -252,54 +294,33 @@ jv.fillRes = function (obj, key, args) {
                 stringValue = res_values[1] || "否"
             }
 
-            obj[key1 + "_res"] = stringValue;
+            target[key1 + "_res"] = stringValue;
+
             return true;
         } else if (type == "string") {
-            if( value.IsDateFormat()){
-                obj[key1 + "_res"] = value;
+            if (value.IsDateFormat()) {
+                target[key1 + "_res"] = value;
                 return true;
-            }
-            else if (value.IsDateTimeFormat()) {
-                obj[key1 + "_res"] = new Date(value).toDateString(args1, "local");
+            } else if (value.IsDateTimeFormat()) {
+                target[key1 + "_res"] = new Date(value).toDateString(args1, "local");
                 return true;
             }
         }
     };
 
-    var type = obj.PrimitiveType;
-    if (type == "array" || type == "set") {
-        Array.from(obj).forEach(it => {
-            jv.fillRes(it, key, args);
+
+    if (key) {
+        jv.recursionJson(obj, (k, v, o) => {
+            if (k == key) {
+                res1(k, v, o, args);
+            }
         });
         return;
-    } else if (!obj.ObjectType) {
-        return;
-    }
-    if (key) {
-        if (key in obj == false) return;
-        return res1(key, obj[key], args);
     }
 
-
-    Object.keys(obj).forEach(key => {
-        var value = obj[key];
-        if (!value && value !== false) {
-            return;
-        }
-
-        if ((key + "_res") in obj) {
-            return;
-        }
-
-        var type = value.Type;
-        res1(key, value, null, type);
-
-        //遍历
-        if (type == "object" || type == "array") {
-            jv.fillRes(value);
-        }
+    jv.recursionJson(obj, (k, v, o) => {
+        res1(k, v, o, args);
     });
-
 
     // if (window.Image_Host && "id" in obj && "url" in obj && obj.url && !("fullUrl" in obj) && !("img256FullUrl" in obj)) {
     //     obj.fullUrl = window.Image_Host + obj.url;
@@ -315,7 +336,6 @@ jv.fillRes = function (obj, key, args) {
     //         }
     //     }
     // }
-
 };
 
 /*如果两个对象是数组, 使用refDataEquals比较内容, 不比较顺序.
@@ -350,7 +370,7 @@ jv.dataEquals = function (a, b, objectEqualField) {
             return false;
         }
 
-        if (a.intersect(b, (_a, _b) => jv.dataEquals(_a, _b, objectEqualField) ).length != a_length) {
+        if (a.intersect(b, (_a, _b) => jv.dataEquals(_a, _b, objectEqualField)).length != a_length) {
             return false;
         }
         return true;
@@ -573,7 +593,7 @@ jv.param_jmap = function (obj) {
                     })
                 }
             } else if (value.Type == "date") {
-                ret[key] = value.toDateString(null,"local");
+                ret[key] = value.toDateString(null, "local");
             } else {
                 ret[key] = value;
             }

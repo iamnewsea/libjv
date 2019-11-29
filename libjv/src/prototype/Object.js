@@ -71,3 +71,15 @@ Object.defineProperty(Object.prototype, "Between", {
         return true;
     }, enumerable: false
 });
+
+//移除Json的指定Keys，返回新对象。
+Object.defineProperty(Object.prototype, "RemoveKeys", {
+    value() {
+        var ret = Object.assign({},this);
+        Array.from(arguments).forEach(it=>{
+            delete ret[it];
+        });
+        return ret;
+    }, enumerable: false
+});
+

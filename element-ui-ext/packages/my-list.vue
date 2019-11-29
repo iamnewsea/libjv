@@ -6,7 +6,7 @@
       <slot></slot>
     </el-table>
     <el-pagination layout="prev, pager, next" v-if="total>pageSize"
-                   :total="total" :page-size="pageSize" :currentPage.sync="page" @current-change="loadData"
+                   :total="total" :page-size="pageSize" :currentPage.sync="pageNumber" @current-change="loadData"
                    style="text-align: right;margin-top:20px;">
     </el-pagination>
   </div>
@@ -37,7 +37,7 @@
             return {
                 loading: false,
                 total: 0,
-                page: 1,
+                pageNumber: 1,
                 tableData: []
             }
         },
@@ -58,21 +58,22 @@
         methods: {
             //以后废掉它
             doQuery() {
-                this.page = 1;
+                this.pageNumber = 1;
                 this.loadData();
             },
-            loadData(pager) {
-                if( pager ){
-                    this.page = pager;
+            loadData(pageNumber) {
+                if( pageNumber ){
+                    this.pageNumber = pageNumber;
                 }
-                if (this.page == 1) {
+                if (this.pageNumber == 1) {
                     this.total = 0;
                 }
 
                 this.loading = true;
 
                 let para = Object.assign({}, this.query, {
-                    skip: (this.page - 1) * this.pageSize,
+                    pageNumber: this.pageNumber,
+                    skip: (this.pageNumber - 1) * this.pageSize,
                     take: this.pageSize
                 });
 

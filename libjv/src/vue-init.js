@@ -152,9 +152,18 @@ jv.initApp = function (vue) {
 //     return config.method + ":" + config.url + "!" + data_string;
 // };
 
-jv.initAxios = function (axios) {
+/**
+ *
+ * @param axios
+ * @param ignoreJavaBooleanKey ：默认为false , 是否处理 Java Boolean的Key，如：接口返回 admin:true , 转化为： isAdmin: true
+ * @param ignoreResType ： 默认为false , 系统默认对 boolean,date添加 _res 额外键，设置这个字段，会忽略指定的类型。该值是逗号分隔的字符串，有如下值：boolean,date
+ */
+jv.initAxios = function (axios, ignoreJavaBooleanKey, ignoreResType) {
 
     jv.ajax = axios;
+    axios.defaults.ignoreJavaBooleanKey = ignoreJavaBooleanKey;
+    axios.defaults.ignoreResType = ignoreResType;
+
     axios.defaults.baseURL = window.Server_Host;
     axios.defaults.withCredentials = true;
     // axios.defaults.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
@@ -175,48 +184,37 @@ jv.initAxios = function (axios) {
 
 // Add a request interceptor
     axios.interceptors.request.use(function (config) {
-        console.log((new Date()).valueOf().toDateString() + " [" + config.method + "] " + config.baseURL + config.url)
+        console.log((new Date()).valueOf().toDateString() + " [" + config.method + "] " + config.baseURL + config.url);
+
+
+        if (config.ignoreJavaBooleanKey) return config;
+        if (!config.data) return config;
+        var type = config.data.Type;
+        if (!config.data.ObjectType && !["array", "set"].includes(type)) return config;
+
+        //处理Java的布尔类型
+        jv.recursionJson(config.data, (key1, value, target) => {
+            if (value !== false && value !== true) {
+                return;
+            }
+
+            //转为 isUpper 形式。
+            if (key1.length > 2 && (key1.slice(0, 2) == "is" && key1.charCodeAt(2).Between(65, 90))) {
+                var key2 = key1[0].toLowerCase() + key1.slice(1);
+                if (key2 in target == false) {
+                    target[key2] = value;
+                    delete target[key1];
+                }
+            }
+        });
+
+
         return config;
     }, function (error) {
         // Do something with request error
         return Promise.reject(error);
     });
-// Add a response interceptor
 
-    // process.on('uncaughtException', function (e) {
-    //     console.error('Catch in process', e);
-    // });
-
-    // var dateTimeRegex = /^\d{4}-[0-1]?\d-[0-3]?\d( [0-2]?\d:[0-5]?\d:[0-5]?\d)?$/
-    //
-    // var translateDate = function (value, callback) {
-    //     if (!value) return;
-    //     var dtValue, valueType = value.Type;
-    //
-    //     if (valueType == "array") {
-    //         for (var i = value.length - 1; i >= 0; i--) {
-    //             dtValue = translateDate(value[i]);
-    //             if (dtValue) {
-    //                 value[i] = dtValue;
-    //             }
-    //         }
-    //     }
-    //     else if (valueType == "object") {
-    //         let keys = Object.keys(value);
-    //         for (var i = keys.length - 1; i >= 0; i--) {
-    //             var key = keys[i];
-    //             dtValue = translateDate(value[key]);
-    //             if (dtValue) {
-    //                 value[key] = dtValue;
-    //             }
-    //         }
-    //     }
-    //     else if (valueType == "string") {
-    //         if (dateTimeRegex.test(value)) {
-    //             return new Date(value);
-    //         }
-    //     }
-    // };
 
     axios.interceptors.response.use((response) => {
         // Do something with response data
@@ -226,18 +224,40 @@ jv.initAxios = function (axios) {
             return Promise.reject({config: response.config, request: response.request, response, message: json.msg});
         }
 
-        //自动转换 Date 类型
-        // translateDate(json);
+        var type = json.Type;
+        if (!json.ObjectType && !["array", "set"].includes(type)) return response;
 
-        // var cacheKey = jv.getAjaxCacheKey(response.config);
-        // //最多保存500个缓存记录
-        // if (cacheKey && json.data && (jv.cache_db.length < 500)) {
-        //     jv.cache_db[cacheKey] = {data: JSON.stringify(json), cacheAt: (new Date()).totalSeconds};
-        // }
+        //处理。
+        var data = json;
+        if ((response.headers["content-type"] || "").indexOf("application/json") < 0) return response;
+
+
+        //处理Java的布尔类型
+        if (!response.config.ignoreJavaBooleanKey) {
+            jv.recursionJson(json, (key1, value, target) => {
+                if (value !== false && value !== true) {
+                    return;
+                }
+
+                //转为 isUpper 形式。
+                if (key1.length > 2 && (key1.slice(0, 2) == "is" && key1.charCodeAt(2).Between(65, 90))) {
+
+                } else {
+                    var key2 = "is" + key1[0].toUpperCase() + key1.slice(1)
+                    if (key2 in target == false) {
+                        target[key2] = value;
+                        delete target[key1];
+                    }
+                }
+            });
+        }
+
+        jv.fillRes(json, null, null, ignoreResType);
+
         return response;
     }, (error) => {
         if (!error.response) {
-            jv.error("错误:" + JSON.stringify(error),"","ajax");
+            jv.error("错误:" + JSON.stringify(error), "", "ajax");
             return Promise.reject(error);
         }
         var resp = error.response;
@@ -246,11 +266,11 @@ jv.initAxios = function (axios) {
             return Promise.reject(error);
         }
         if (status == 403) {
-            jv.error("由于系统的权限限制，禁止您的访问","","ajax");
+            jv.error("由于系统的权限限制，禁止您的访问", "", "ajax");
             return Promise.reject(error);
         }
         if (status == 404) {
-            jv.error("找不到请求！","","ajax");
+            jv.error("找不到请求！", "", "ajax");
             return Promise.reject(error);
         }
 
@@ -258,54 +278,10 @@ jv.initAxios = function (axios) {
         /*{"timestamp":1502603323197,"status":500,"error":"Internal Server Error","exception":"java.lang.Exception","message":"更新条件为空，不允许更新","path":"/sys/synchroMenuAndPermiss"}*/
         var errorMsg = (data && (data.msg || data.message)) || "系统错误:" + JSON.stringify(data);
 
-        jv.error(errorMsg.slice(0, 100),"","ajax");
+        jv.error(errorMsg.slice(0, 100), "", "ajax");
         return Promise.reject(error);
     });
 
-
-    // var ori_post = axios.post;
-    // axios.post = function (url, data, config) {
-    //     if (config && config.cache && config.cache.Type == "function") {
-    //         config.cache = config.cache(config.data);
-    //     }
-    //
-    //     var cacheKey = jv.getAjaxCacheKey(Object.assign({}, config, {
-    //         method: "post",
-    //         url: jv.ajax.defaults.baseURL + url,
-    //         data: jv.ajax.defaults.transformRequest(data)
-    //     }));
-    //     if (cacheKey in jv.cache_db) {
-    //         var cacheData = jv.cache_db[cacheKey];
-    //
-    //         if (config.cache === +config.cache) {
-    //             if ((new Date()).totalSeconds - cacheData.cacheAt < config.cache) {
-    //                 return Promise.resolve({data: JSON.parse(cacheData.data)});
-    //             }
-    //         }
-    //         else {
-    //             return Promise.resolve({data: JSON.parse(cacheData.data)});
-    //         }
-    //     }
-    //     return ori_post(url, data, config);
-    // };
-
-
-    //打包Post
-    // axios.groupPost = function (urls) {
-    //     return axios.post("/group-ajax", urls
-    //         // , {
-    //         //     transformResponse: [function (data) {
-    //         //         if (data && data.length) {
-    //         //             data.forEach(it => {
-    //         //                 if ("body" in it) {
-    //         //                     it.body = it.body.replace(String.fromCharCode(7), "\n-\n");
-    //         //                 }
-    //         //             })
-    //         //         }
-    //         //     }]
-    //         // }
-    //     );
-    // }
 };
 
 export default jv;

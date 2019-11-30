@@ -18,6 +18,7 @@
         inheritAttrs: false,
         props: {
             border: {type: Boolean, default: true},
+            store: {type: Boolean, default: true}, //是否存储查询，分页，总页数
             stripe: {type: Boolean, default: true},
             fit: {type: Boolean, default: true},
             pageSize: {type: Number, default: 10},
@@ -56,13 +57,19 @@
             }
         },
         methods: {
+            getStoredData() {
+                return jv.store.getJson(this.$route.path) || {};
+            },
+            setStoreData(data){
+                jv.store.setJson(this.$route.path,data || {});
+            },
             //以后废掉它
             doQuery() {
                 this.pageNumber = 1;
                 this.loadData();
             },
             loadData(pageNumber) {
-                if( pageNumber ){
+                if (pageNumber) {
                     this.pageNumber = pageNumber;
                 }
                 if (this.pageNumber == 1) {
@@ -81,8 +88,26 @@
                     this.$emit("loaded", res, para);
                     this.tableData = res.data.data;
                     //返回来的total只有第一次获取的时候才有值，第二次获取之后都是-1
+
+                    var storeValue;
+                    if (this.store) {
+                        storeValue = this.getStoredData();
+                        storeValue.query = this.query;
+                        storeValue.pageNumber = this.pageNumber;
+                        this.setStoreData(storeValue);
+                    }
+
                     if (res.data.total >= 0) {
                         this.total = res.data.total;
+
+                        if (this.store) {
+                            storeValue.total = this.total;
+                            this.setStoreData(storeValue);
+                        }
+                    } else {
+                        if (this.store && !this.total) {
+                            this.total = storeValue.total;
+                        }
                     }
                     this.$emit("input", res.data);
                     this.loading = false;

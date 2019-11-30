@@ -261,12 +261,18 @@ jv.defEnum = function (typeName, json) {
  * @param obj
  * @param key
  * @param args
+ * @param ignoreResTypes:  表示要忽略的Res类型：boolean,date ,是一个数组。
  */
-jv.fillRes = function (obj, key, args) {
+jv.fillRes = function (obj, key, args, ignoreResTypes) {
     if (!obj) {
-        console.log("jv.fillRes 的 obj为空！")
+        console.log("jv.fillRes 的 obj为空！");
         return;
     }
+
+    var ignoreBoolean =ignoreResTypes && ignoreResTypes.includes("boolean"),
+        ignoreDate =ignoreResTypes && ignoreResTypes.includes("date");
+
+    if (ignoreBoolean && ignoreDate) return;
 
     var res1 = function (key1, value, target, args1) {
         if (!target) {
@@ -283,7 +289,7 @@ jv.fillRes = function (obj, key, args) {
 
         var type = value.Type;
 
-        if (type == "boolean") {
+        if (ignoreBoolean && (type == "boolean")) {
             args1 = args1 || "";  //.replace(/，/g,",")
 
             var stringValue = "";
@@ -297,7 +303,7 @@ jv.fillRes = function (obj, key, args) {
             target[key1 + "_res"] = stringValue;
 
             return true;
-        } else if (type == "string") {
+        } else if (ignoreDate && (type == "string")) {
             if (value.IsDateFormat()) {
                 target[key1 + "_res"] = value;
                 return true;
@@ -321,21 +327,6 @@ jv.fillRes = function (obj, key, args) {
     jv.recursionJson(obj, (k, v, o) => {
         res1(k, v, o, args);
     });
-
-    // if (window.Image_Host && "id" in obj && "url" in obj && obj.url && !("fullUrl" in obj) && !("img256FullUrl" in obj)) {
-    //     obj.fullUrl = window.Image_Host + obj.url;
-    //
-    //     var ext = obj.url.split(".").last()
-    //     if (/png|jpeg|bmp|gif/ig.test(ext)) {
-    //         var sect = obj.url.split("/").slice(-2, -1)[0].split("-")
-    //         var width = parseInt(sect[0]);
-    //         var height = parseInt(sect.last());
-    //
-    //         if (width > 256 || height > 256) {
-    //             obj["img256FullUrl"] = obj.fullUrl + "-var/256." + ext
-    //         }
-    //     }
-    // }
 };
 
 /*如果两个对象是数组, 使用refDataEquals比较内容, 不比较顺序.

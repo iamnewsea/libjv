@@ -26,8 +26,12 @@ var JvObject = (function () {
 
 jv = new JvObject();
 jv.prototype = JvObject.prototype;
-jv.noop = function () {
-};
+jv.noop = () => {};
+
+jv.info = console.info;
+jv.error = console.error;
+jv.warn = console.warn;
+
 //---------------------------------------------
 
 //提供 基于 localStorage的缓存数据，增加过期时间机制。额外多保存一个 key ，默认有效期是4个小时。
@@ -269,8 +273,8 @@ jv.fillRes = function (obj, key, args, ignoreResTypes) {
         return;
     }
 
-    var ignoreBoolean =ignoreResTypes && ignoreResTypes.includes("boolean"),
-        ignoreDate =ignoreResTypes && ignoreResTypes.includes("date");
+    var ignoreBoolean = ignoreResTypes && ignoreResTypes.includes("boolean"),
+        ignoreDate = ignoreResTypes && ignoreResTypes.includes("date");
 
     if (ignoreBoolean && ignoreDate) return;
 

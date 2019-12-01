@@ -1,9 +1,8 @@
 import jv from "./libjv"
 
 //默认实现。
-jv.info = jv.error = jv.warn = function (msg) {
-    alert(msg);
-};
+
+
 
 
 //init router permission

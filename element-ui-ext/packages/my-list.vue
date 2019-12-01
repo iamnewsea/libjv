@@ -60,8 +60,8 @@
             getStoredData() {
                 return jv.store.getJson(this.$route.path) || {};
             },
-            setStoreData(data){
-                jv.store.setJson(this.$route.path,data || {});
+            setStoreData(data) {
+                jv.store.setJson(this.$route.path, data || {});
             },
             //以后废掉它
             doQuery() {
@@ -71,7 +71,10 @@
             loadData(pageNumber) {
                 if (pageNumber) {
                     this.pageNumber = pageNumber;
+                } else if (pageNumber === 0) {
+                    this.pageNumber = 1;
                 }
+
                 if (this.pageNumber == 1) {
                     this.total = 0;
                 }

@@ -6,7 +6,8 @@
         <img class="avatar-uploader-icon" :src="item.fullUrl" v-if="item.fileType=='img'"/>
         <video v-else-if="item.fileType=='video'" :src="item.fullUrl" class="avatar-uploader-icon"
                controls="controls"></video>
-        <div v-else  class="avatar-uploader-icon upload-fill el-icon-document" :class="'upload-icon-'+ item.fileType"></div>
+        <div v-else class="avatar-uploader-icon upload-fill el-icon-document"
+             :class="'upload-icon-'+ item.fileType"></div>
         <div class="el-upload-bg">
         </div>
         <div class="el-upload-icon confirm-icon">
@@ -15,7 +16,8 @@
         </div>
         <div class="el-upload-icon hover-icon" style="flex-direction: column;">
           <div>
-            <i class="el-icon-view" @click="file_preview(index)" v-if="item.fileType == 'img' || item.fileType == 'video'"></i>
+            <i class="el-icon-view" @click="file_preview(index)"
+               v-if="item.fileType == 'img' || item.fileType == 'video'"></i>
             <i class="el-icon-download" @click="file_download(index)" v-else></i>
             <i class="el-icon-delete"
                @click="$event.target.closest('.el-upload-preview').classList.add('deleting')"></i>
@@ -205,74 +207,42 @@
                 }
                 // this.imageRemark = "";
 
-                var readFile = file => {
-                    return new Promise((r, e) => {
-                        var reader = new FileReader();
-                        reader.onload = () => {
-                            r(reader.result);
-                        };
-                        reader.readAsDataURL(file);
-                    });
-                };
+                // var readFile = file => {
+                //     return new Promise((r, e) => {
+                //         var reader = new FileReader();
+                //         reader.onload = () => {
+                //             r(reader.result);
+                //         };
+                //         reader.readAsDataURL(file);
+                //     });
+                // };
+
                 var fileName = rawFile.name, fileType = this.getFileType(fileName).type;
 
-                return readFile(rawFile)
-                    .then(base64Data => {
-                        if ((fileType.type != "img") || (this.scales_value.length == 0 && this.maxWidth <= 0)) {
-                            return this.doUpload(base64Data, fileName);
+                if (fileType.type == "img" && this.scales_value.length == 0 && this.maxWidth > 0) {
+                    return this.doUpload(rawFile, null, fileName, this.maxWidth);
+                } else if (fileType.type == "img" && this.scales_value.length) {
+                } else {
+                    return this.doUpload(rawFile, null, fileName);
+                }
+
+                return jv.file2Base64Data(rawFile).then(base64 => {
+                    jv.EditImage({
+                        image: base64Data,
+                        scales: this.scales_value,
+                        fileName: fileName,
+                        // imageRemark: this.withRemark ? "" : null,
+                        //callback : 返回 base64 格式的图片数据
+                        callback: (imageData, imageRemark) => {
+                            if (!imageData) {
+                                return Promise.reject("裁剪出错");
+                            }
+                            // this.imageRemark = imageRemark;
+
+                            return this.doUpload(null, imageData, fileName, this.maxWidth);
                         }
-
-                        if (this.scales_value.length == 0 && this.maxWidth > 0) {
-                            return jv.compressImage({
-                                imageData: base64Data,
-                                fileName: fileName,
-                                maxWidth: this.maxWidth,
-                                filter: function (image) {
-                                    //如果图片 <= 64 ,则不处理.
-                                    if (image.naturalWidth <= 64 || image.naturalHeight <= 64) {
-                                        return false;
-                                    }
-                                }
-                            }).then(imageData => {
-                                return this.doUpload(imageData, fileName);
-                            });
-                        }
-
-                        return new Promise((r, e) => {
-                            jv.EditImage({
-                                image: base64Data,
-                                scales: this.scales_value,
-                                fileName: fileName,
-                                // imageRemark: this.withRemark ? "" : null,
-                                //callback : 返回 base64 格式的图片数据
-                                callback: (imageData, imageRemark) => {
-                                    if (!imageData) {
-                                        return e("裁剪出错");
-                                    }
-                                    // this.imageRemark = imageRemark;
-
-                                    if (this.maxWidth <= 0) {
-                                        return r(this.doUpload(imageData, fileName));
-                                    }
-
-                                    r(jv.compressImage({
-                                            imageData: imageData,
-                                            fileName: fileName,
-                                            maxWidth: this.maxWidth,
-                                            filter: function (image) {
-                                                //如果图片 <= 64 ,则不处理.
-                                                if (image.naturalWidth <= 64 || image.naturalHeight <= 64) {
-                                                    return false;
-                                                }
-                                            }
-                                        }).then(imageData => {
-                                            return this.doUpload(imageData, fileName);
-                                        })
-                                    );
-                                }
-                            });
-                        });
                     });
+                });
             },
             getFileType(fileName) {
                 var dotIndex = fileName.lastIndexOf('.');
@@ -291,69 +261,76 @@
                 }
 
                 return {type: ""};
-            }
-            ,
+            },
             //7.检查Md5,上传
-            doUpload(imgBase64, fileName) {
-                this.percentage = 4;
-                var imgData = jv.dataURLtoBlob(imgBase64);
-                //这里必须要用 [] 包一下。
-                var file = new Blob([imgData.data], {type: imgData.type});
-                file.name = fileName;
-
-                if (imgData.data.length > this.maxSize) {
-                    this.percentage = 0;
-                    jv.error("文件太大，超出许可范围！");
-                    return;
-                }
-
-                //真正上传从 10% 开始。
-                jv.getFileMd5(file).then(md5 => {
-                    this.percentage = 6;
-                    var param = {md5: md5};
-                    // if (this.proxy && this.proxyCorpId) {
-                    //   param["Corp-Id"] = this.proxyCorpId
-                    // }
-                    //8.检查服务器文件的 Md5值。
-                    this.$http.post("/sys/check_upload", param).then(res => {
-
-                        this.percentage = 8;
-                        //8.1 如果服务器存在该文件，返回
-                        var data = res.data.data;
-                        if (data && data.id) {
-                            this.percentage = 100;
-                            this.emit(data, "add");
-                            return;
-                        } else {
-                            this.post(file);
-                        }
-                    }, error => {
-                        this.percentage = 0;
-                    });
-                }, error => {
-                    this.percentage = 0;
-                });
-            },
-            post(processedFile) {
-                var file = processedFile || this.$el.querySelector("input");
-
-                const formData = new FormData();
-                formData.append(file.name.split("/").last(), file);
-
-                this.$http.post(window.Server_Host + "/sys/upload", formData, {
-                    onUploadProgress: e => {
-                        if (e.total > 0) {
-                            e.percent = parseInt(e.loaded / e.total * 90);
-                        }
-                        this.percentage = e.percent + 10;
-                    }
-                }).then(res => {
+            doUpload(file, imgBase64, fileName) {
+                return jv.doUploadFile({
+                    file: file,
+                    imageBase64: imgBase64,
+                    fileName: fileName,
+                    axios: this.$http,
+                    maxWidth: 0,
+                    processCallback: p => this.percentage = p
+                }).then(res=>{
                     this.emit(res.data.data, "add");
-                }).catch(e => {
-                    this.percentage = 0;
-                    jv.error(e);
+                    return res;
                 });
+                // this.percentage = 4;
+                // var file = jv.base64Data2File(imgBase64, fileName);
+                //
+                // if (file.length > this.maxSize) {
+                //     this.percentage = 0;
+                //     jv.error("文件太大，超出许可范围！");
+                //     return;
+                // }
+                //
+                // //真正上传从 10% 开始。
+                // jv.getFileMd5(file).then(md5 => {
+                //     this.percentage = 6;
+                //     var param = {md5: md5};
+                //     // if (this.proxy && this.proxyCorpId) {
+                //     //   param["Corp-Id"] = this.proxyCorpId
+                //     // }
+                //     //8.检查服务器文件的 Md5值。
+                //     this.$http.post("/sys/check_upload", param).then(res => {
+                //
+                //         this.percentage = 8;
+                //         //8.1 如果服务器存在该文件，返回
+                //         var data = res.data.data;
+                //         if (data && data.id) {
+                //             this.percentage = 100;
+                //             this.emit(data, "add");
+                //             return;
+                //         } else {
+                //             this.post(file);
+                //         }
+                //     }, error => {
+                //         this.percentage = 0;
+                //     });
+                // }, error => {
+                //     this.percentage = 0;
+                // });
             },
+            // post(processedFile) {
+            //     var file = processedFile || this.$el.querySelector("input");
+            //
+            //     const formData = new FormData();
+            //     formData.append(file.name.split("/").last(), file);
+            //
+            //     this.$http.post(window.Server_Host + "/sys/upload", formData, {
+            //         onUploadProgress: e => {
+            //             if (e.total > 0) {
+            //                 e.percent = parseInt(e.loaded / e.total * 90);
+            //             }
+            //             this.percentage = e.percent + 10;
+            //         }
+            //     }).then(res => {
+            //         this.emit(res.data.data, "add");
+            //     }).catch(e => {
+            //         this.percentage = 0;
+            //         jv.error(e);
+            //     });
+            // },
             move_left(index) {
                 if (!index) return;
 
@@ -442,8 +419,8 @@
             file_preview(index) {
                 jv.Preview({type: this.myValue[index].fileType, url: this.myValue[index].fullUrl});
             },
-            file_download(index){
-                window.open(this.myValue[index].fullUrl,"download")
+            file_download(index) {
+                window.open(this.myValue[index].fullUrl, "download")
             }
         }
     }
@@ -474,7 +451,7 @@
     cursor: pointer;
     position: relative;
     display: flex;
-    margin:0 8px 8px 0;
+    margin: 0 8px 8px 0;
     /*overflow: hidden*/
   }
 
@@ -490,7 +467,7 @@
     color: #8c939d;
     width: 146px;
     text-align: center;
-    height:146px;
+    height: 146px;
     min-height: 120px;
   }
 
@@ -499,11 +476,11 @@
     justify-content: center;
     align-items: center;
     width: 140px;
-    height:140px;
+    height: 140px;
   }
 
-  .el-upload .el-icon-document:before{
-    font-size:64px;
+  .el-upload .el-icon-document:before {
+    font-size: 64px;
   }
 
   .avatar-uploader .avatar-uploader-icon:hover {
@@ -514,7 +491,7 @@
   .avatar-uploader .el-upload-preview {
     position: relative;
     width: 146px;
-    min-width:146px;
+    min-width: 146px;
   }
 
   .avatar-uploader .el-upload-preview > div {
@@ -525,7 +502,8 @@
     right: 0;
     bottom: 0;
   }
-  .avatar-uploader .el-upload-preview .upload-fill{
+
+  .avatar-uploader .el-upload-preview .upload-fill {
     display: block;
   }
 

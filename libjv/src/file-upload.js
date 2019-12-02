@@ -36,14 +36,28 @@ jv.getFileMd5 = function (file) {
     });
 }
 
-jv.dataURLtoBlob = function (dataurl) {
-    var arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+//base64的字符串内容 转为 file 对象
+jv.base64Data2File = function (base64Data, fileName) {
+    var arr = base64Data.split(','), mime = arr[0].match(/:(.*?);/)[1],
         bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
     while (n--) {
         u8arr[n] = bstr.charCodeAt(n);
     }
-    return {data: u8arr, type: mime};
-}
+
+    //这里必须要用 [] 包一下。
+    return new Blob([u8arr], {type: mime, name: fileName});
+};
+
+//file对象 转为 base64字符串内容,返回 Promise 对象。
+jv.file2Base64Data = function (file) {
+    return new Promise((r, e) => {
+        var reader = new FileReader();
+        reader.onload = () => {
+            r(reader.result);
+        };
+        reader.readAsDataURL(file);
+    });
+};
 
 
 jv.toByteUnit = function (value) {
@@ -147,10 +161,33 @@ jv.compressImage = function (op) {
     });
 }
 
+jv.uploadFileAjaxPost = function (file, axios, post_param, percentCallback) {
+
+    const formData = new FormData();
+    formData.append(file.name.split("/").last(), file);
+    for (var key in post_param) {
+        formData.append(key, post_param[key]);
+    }
+
+    return axios.post(window.Server_Host + "/sys/upload", formData, {
+        onUploadProgress: e => {
+            if (e.total > 0) {
+                e.percent = parseInt(e.loaded / e.total * 90);
+            }
+            percentCallback(e.percent + 10);
+        }
+    },{
+        "Content-Type":"multipart/form-data"
+    }).then(res => {
+        percentCallback(100);
+        return res;
+    })
+};
 
 /**
  * option:
  * imageBase64: 必传
+ * file: 优先使用 file , 如果 file 为空，则使用 imgBase64
  * postParam: 上传时额外带的数据
  * fileName: 必传
  * processCallback:
@@ -161,13 +198,17 @@ jv.compressImage = function (op) {
 jv.doUploadFile = function (option) {
     option = option || {};
     var imgBase64 = option.imageBase64,
-        fileName = option.fileName || "",
+        file = option.file,   // imgBase64 和 file ,优先使用 file , 如果 file 为空，则使用 imgBase64
+        fileName = option.fileName || "file",
         process_callback = option.processCallback || function () {
         },
         post_param = option.postParam || {},
         axios = option.axios,
         maxWidth = option.maxWidth;
 
+    if (!imgBase64 && !file) {
+        return Promise.reject("找不到文件数据")
+    }
 
     // if (imgData.data.length > this.maxSize) {
     //     // this.percentage = 0;
@@ -175,36 +216,8 @@ jv.doUploadFile = function (option) {
     //     return Promise.reject("文件太大，超出许可范围！")
     // }
 
-
-    var ajaxPost = function (processedFile) {
-        var file = processedFile;
-
-        const formData = new FormData();
-        formData.append(file.name.split("/").last(), file);
-        for (var key in post_param) {
-            formData.append(key, post_param[key]);
-        }
-
-        return axios.post(window.Server_Host + "/sys/upload", formData, {
-            onUploadProgress: e => {
-                if (e.total > 0) {
-                    e.percent = parseInt(e.loaded / e.total * 90);
-                }
-                process_callback(e.percent + 10);
-            }
-        })
-        //     .then(res => {
-        //     return Promise.resolve(res.data.data);
-        // });
-    };
-
-
     //真正上传从 10% 开始。
-    var doWork = function (imgBase64) {
-        var imgData = jv.dataURLtoBlob(imgBase64),
-            file = new Blob([imgData.data], {type: imgData.type});
-        file.name = fileName;
-
+    var doWork = function (file) {
         return jv.getFileMd5(file)
             .then(md5 => {
                 process_callback(5);
@@ -220,33 +233,54 @@ jv.doUploadFile = function (option) {
                     .then(res => {
                         process_callback(10);
                         //8.1 如果服务器存在该文件，返回 data 属性，且 data 属性有 id
-                        if (res.data.data && res.data.data.id) {
+                        var data = res.data.data;
+                        if (data && data.id) {
+                            process_callback(100);
                             return Promise.resolve(res);
                         } else {
-                            return ajaxPost(file)
+                            return jv.uploadFileAjaxPost(file, axios, post_param, process_callback)
                         }
                     });
+            }).catch(err => {
+                process_callback(0);
             });
     };
 
 
+    var ret = Promise.resolve(imgBase64);
+
     if (maxWidth) {
-        return jv.compressImage({
-            imageData: imgBase64,
-            fileName: fileName,
-            maxWidth: maxWidth,
-            filter: function (image) {
-                //如果图片 <= 256 ,则不处理.
-                if (image.naturalWidth <= maxWidth) {
-                    return false;
+        if (!imgBase64) {
+            ret = jv.file2Base64Data(file)
+        } else {
+            ret = Promise.resolve(imgBase64);
+        }
+
+
+        ret = ret
+            .then(imgBase64 => jv.compressImage({
+                imageData: imgBase64,
+                fileName: fileName,
+                maxWidth: maxWidth,
+                filter: function (image) {
+                    //如果图片 <= 256 ,则不处理.
+                    if (image.naturalWidth <= maxWidth) {
+                        return false;
+                    }
                 }
-            }
-        }).then(imageData => {
-            return doWork(imageData);
-        });
+            }));
     }
 
-    return doWork(imgBase64);
+
+    return ret
+        .then(imgBase64 => {
+            if (imgBase64) {
+                return jv.base64Data2File(imgBase64)
+            }
+            return file;
+        }).then(file => {
+            return doWork(file)
+        });
 };
 
 

@@ -47,7 +47,7 @@ Object.defineProperty(Number.prototype, "toDateString", {
         }
 
 
-        return format.replace(/yyyy|yy|MM|dd|HH|mm|ss|fff/g, function (a) {
+        return format.replace(/yyyy|yy|MM|dd|HH|mm|ss|fff/g, (a) => {
             switch (a) {
                 case 'yyyy':
                     return (year + "");

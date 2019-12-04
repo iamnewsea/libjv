@@ -1,14 +1,13 @@
-
 //时间按 UTC 处理.
 
-Date.from = function (year, dates) {
+Date.from = (year, dates) => {
     if (!year && !dates) return new Date();
 
     if (year.Type == "string" && !dates) {
-        var isoFormat = year.replace(/\//g,'-').trim();
-        if( isoFormat.IsDateTimeFormat()){
-            isoFormat = isoFormat.replace(" ","T");
-            if(!isoFormat.endsWith("Z")){
+        var isoFormat = year.replace(/\//g, '-').trim();
+        if (isoFormat.IsDateTimeFormat()) {
+            isoFormat = isoFormat.replace(" ", "T");
+            if (!isoFormat.endsWith("Z")) {
                 isoFormat += "Z";
             }
         }
@@ -18,7 +17,7 @@ Date.from = function (year, dates) {
     return new Date(new Date(year + "-01-01T00:00:00Z").valueOf() + (dates - 1) * 86400000);
 };
 
-Date.today = function () {
+Date.today = () => {
     var now = new Date();
     var time = now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + n.getUTCSeconds();
     return new Date(now.valueOf() - time * 1000);
@@ -33,8 +32,8 @@ Date.today = function () {
 // });
 
 Object.defineProperty(Date.prototype, "toDateString", {
-    value(format,timezone) {
-        return this.valueOf().toDateString(format,timezone);
+    value(format, timezone) {
+        return this.valueOf().toDateString(format, timezone);
     }, enumerable: false
 });
 

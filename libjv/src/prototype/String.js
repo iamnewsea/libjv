@@ -2,7 +2,7 @@
  * "@$<li>ok</li>$@".trimPairs("<li>,</li>".split(",") , "<div>,</div>".split(",") ,"$" ,"@" )
  */
 Object.defineProperty(String.prototype, 'trimPairs', {
-    value: function value() {
+    value () {
         var ps = arguments;
 
         var value = this.trim();

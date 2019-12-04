@@ -26,7 +26,8 @@ var JvObject = (function () {
 
 jv = new JvObject();
 jv.prototype = JvObject.prototype;
-jv.noop = () => {};
+jv.noop = () => {
+};
 
 jv.info = console.info;
 jv.error = console.error;
@@ -169,13 +170,13 @@ function JvEnum(typeName, json) {
         return {name: key, index: index++, remark: json[key]}
     });
 
-    this.getData = function (key) {
+    this.getData = (key) => {
         if (!jv.IsNull(key)) {
             return this.list.filter(it => it.name == key)[0] || {};
         }
         return this.list;
     };
-    this.fillRes = function (obj, key) {
+    this.fillRes = (obj, key) => {
         if (key in obj == false) {
             return;
         }
@@ -194,7 +195,7 @@ function JvEnum(typeName, json) {
 }
 
 // 判断是 null or defined
-jv.IsNull = function (value) {
+jv.IsNull = (value) => {
     var type = typeof (value)
     if (type == "undefined") return true;
     return value === null;
@@ -214,7 +215,7 @@ jv.IsNull = function (value) {
  * @param json
  * @param eachJsonItemCallback 参数：key,value,object,deepth
  */
-jv.recursionJson = function (json, eachJsonItemCallback, deepth) {
+jv.recursionJson = (json, eachJsonItemCallback, deepth) => {
     if (!json) {
         return;
     }
@@ -247,7 +248,7 @@ jv.recursionJson = function (json, eachJsonItemCallback, deepth) {
 定义枚举, 生成 jv.枚举 = {}
 使用 对象.Enumer(键,jv.枚举)  对对象的key进行枚举化。
  */
-jv.defEnum = function (typeName, json) {
+jv.defEnum = (typeName, json) => {
     jv[typeName] = new JvEnum(typeName, json);
 };
 
@@ -267,7 +268,7 @@ jv.defEnum = function (typeName, json) {
  * @param args
  * @param ignoreResTypes:  表示要忽略的Res类型：boolean,date ,是一个数组。
  */
-jv.fillRes = function (obj, key, args, ignoreResTypes) {
+jv.fillRes = (obj, key, args, ignoreResTypes) => {
     if (!obj) {
         console.log("jv.fillRes 的 obj为空！");
         return;
@@ -278,7 +279,7 @@ jv.fillRes = function (obj, key, args, ignoreResTypes) {
 
     if (ignoreBoolean && ignoreDate) return;
 
-    var res1 = function (key1, value, target, args1) {
+    var res1 = (key1, value, target, args1) => {
         if (!target) {
             return;
         }
@@ -340,7 +341,7 @@ jv.fillRes = function (obj, key, args, ignoreResTypes) {
 objectEqualField 指定比较对象的id字段，如果该字段有值且相同，认为两个对象是相等的。
 忽略String,Number类型差异，忽略null,undefined差异， 简单值比较都使用 String 进行比较
 */
-jv.dataEquals = function (a, b, objectEqualField) {
+jv.dataEquals = (a, b, objectEqualField) => {
     objectEqualField = objectEqualField || "";
 
     if (jv.IsNull(a) && jv.IsNull(b)) {
@@ -426,7 +427,7 @@ jv.dataEquals = function (a, b, objectEqualField) {
     return a == b;
 };
 
-jv.isPlainObject = function (obj) {
+jv.isPlainObject = (obj) => {
     if (!obj) return false;
     return obj.ObjectType;
     // Detect obvious negatives
@@ -437,7 +438,7 @@ jv.isPlainObject = function (obj) {
     // return true;
 };
 
-jv.random = function (min, max) {
+jv.random = (min, max) => {
     if (!min && !max) {
         return "r" + Math.random().toString(36).slice(3);
     }
@@ -456,8 +457,8 @@ jv.random = function (min, max) {
  * @param times      最多循环次数， 默认为 100
  * @returns {*}
  */
-jv.await = function (delayTime, times, action) {
-    times = times || 0
+jv.await = (delayTime, times, action) => {
+    times = times || 0;
     if (!times) {
         return;
     }
@@ -505,7 +506,7 @@ jv.await = function (delayTime, times, action) {
  * @param obj
  */
 
-jv.param_jmap = function (obj) {
+jv.param_jmap = (obj) => {
     // var objType = typeof(obj);
     // if (objType == "string") {
     //   return obj;
@@ -524,7 +525,7 @@ jv.param_jmap = function (obj) {
         if (value === undefined) return;
         if (value === null) return;
 
-        var isMap = function (mapObject, objType) {
+        var isMap =   (mapObject, objType) =>{
             var isMapValue = objType == "map";
             if (!isMapValue) {
                 if (Object.keys(mapObject).findIndex(it => {
@@ -597,7 +598,7 @@ jv.param_jmap = function (obj) {
 
     return ret;
 }
-jv.param = function (obj) {
+jv.param =   (obj) => {
     var ret = jv.param_jmap(obj);
     return Object.keys(ret).map(it => {
         return encodeURIComponent(it) + "=" + encodeURIComponent(ret[it])
@@ -606,7 +607,7 @@ jv.param = function (obj) {
 
 //用法： jv.evalExpression({a:{b:[{c:1}]}} , "a.b[0].c")
 //返回: {value: 1 , ok: true }
-jv.evalExpression = function (obj, path) {
+jv.evalExpression =   (obj, path) =>{
     if (!path) return obj;
     var random = "_eval_expression_" + jv.random();
     jv[random] = obj;

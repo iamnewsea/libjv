@@ -1,7 +1,7 @@
 import "spark-md5"
 import jv from './libjv'
 
-jv.getFileMd5 = function (file) {
+jv.getFileMd5 = (file) => {
     return new Promise((resole, reject) => {
 
         var blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
@@ -9,21 +9,25 @@ jv.getFileMd5 = function (file) {
             chunks = Math.ceil(file.size / chunkSize),
             currentChunk = 0;
         var spark = new SparkMD5.ArrayBuffer();
-        var frOnload = function (e) {
-                spark.append(e.target.result); // append array buffer
-                currentChunk++;
-                if (currentChunk < chunks)
-                    loadNext();
-                else {
-                    var d = "";
-                    resole(spark.end());
-                }
-            },
-            frOnerror = function () {
-                reject(false);
-            };
 
-        function loadNext() {
+
+        var frOnload, frOnerror, loadNext;
+        frOnload = (e) => {
+            spark.append(e.target.result); // append array buffer
+            currentChunk++;
+            if (currentChunk < chunks)
+                loadNext();
+            else {
+                var d = "";
+                resole(spark.end());
+            }
+        };
+
+        frOnerror = () => {
+            reject(false);
+        };
+
+        loadNext = () => {
             var fileReader = new FileReader();
             fileReader.onload = frOnload;
             fileReader.onerror = frOnerror;
@@ -32,12 +36,13 @@ jv.getFileMd5 = function (file) {
             fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
         };
 
+
         loadNext();
     });
 }
 
 //base64的字符串内容 转为 file 对象
-jv.base64Data2File = function (base64Data, fileName) {
+jv.base64Data2File = (base64Data, fileName) => {
     var arr = base64Data.split(','), mime = arr[0].match(/:(.*?);/)[1],
         bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
     while (n--) {
@@ -49,7 +54,7 @@ jv.base64Data2File = function (base64Data, fileName) {
 };
 
 //file对象 转为 base64字符串内容,返回 Promise 对象。
-jv.file2Base64Data = function (file) {
+jv.file2Base64Data = (file) => {
     return new Promise((r, e) => {
         var reader = new FileReader();
         reader.onload = () => {
@@ -60,7 +65,7 @@ jv.file2Base64Data = function (file) {
 };
 
 
-jv.toByteUnit = function (value) {
+jv.toByteUnit = (value) => {
     if (!value) return 0;
     value = value.toString().toUpperCase();
 
@@ -100,17 +105,15 @@ jv.toByteUnit = function (value) {
 }
 
 
-jv.compressImage = function (op) {
+jv.compressImage = (op) => {
     var imgDataBase64 = op.imageData,
         maxWidth = op.maxWidth,
         fileName = op.fileName || "",
-        filter = op.filter || function () {
-            return true;
-        }, //是否压缩的回调
+        filter = op.filter || (() => true), //是否压缩的回调
         quality = op.quality || 0.8;
 
 
-    var getImageContextTypeByExtName = function (fileNameExt) {
+    var getImageContextTypeByExtName = (fileNameExt) => {
         return 'image/' + ((fileNameExt.match(/png|jpeg|bmp|gif/ig) || []) [0] || "jpeg");
     };
 
@@ -122,7 +125,7 @@ jv.compressImage = function (op) {
 
         var image = new Image();
         image.crossOrigin = "anonymous";
-        image.onload = function () {
+        image.onload = () => {
             if (!image.naturalWidth) {
                 reject("未能加载图片：" + fileName)
                 return;
@@ -159,9 +162,9 @@ jv.compressImage = function (op) {
         }
         image.src = imgDataBase64;
     });
-}
+};
 
-jv.uploadFileAjaxPost = function (file, axios, post_param, percentCallback) {
+jv.uploadFileAjaxPost = (file, axios, post_param, percentCallback) => {
 
     const formData = new FormData();
     formData.append(file.name.split("/").last(), file);
@@ -176,8 +179,9 @@ jv.uploadFileAjaxPost = function (file, axios, post_param, percentCallback) {
             }
             percentCallback(e.percent + 10);
         }
-    },{
-        "Content-Type":"multipart/form-data"
+    }, {
+        // "Content-Type": "multipart/form-data",  //文件上传不用添加。
+        timeout: 1200000
     }).then(res => {
         percentCallback(100);
         return res;
@@ -195,13 +199,13 @@ jv.uploadFileAjaxPost = function (file, axios, post_param, percentCallback) {
  * maxWidth: 压缩使用。
  *
  */
-jv.doUploadFile = function (option) {
+jv.doUploadFile = option => {
     option = option || {};
     var imgBase64 = option.imageBase64,
         file = option.file,   // imgBase64 和 file ,优先使用 file , 如果 file 为空，则使用 imgBase64
         fileName = option.fileName || "file",
-        process_callback = option.processCallback || function () {
-        },
+        process_callback = option.processCallback || (() => {
+        }),
         post_param = option.postParam || {},
         axios = option.axios,
         maxWidth = option.maxWidth;
@@ -217,7 +221,7 @@ jv.doUploadFile = function (option) {
     // }
 
     //真正上传从 10% 开始。
-    var doWork = function (file) {
+    var doWork = file => {
         return jv.getFileMd5(file)
             .then(md5 => {
                 process_callback(5);
@@ -236,7 +240,7 @@ jv.doUploadFile = function (option) {
                         var data = res.data.data;
                         if (data && data.id) {
                             process_callback(100);
-                            return Promise.resolve(res);
+                            return res;
                         } else {
                             return jv.uploadFileAjaxPost(file, axios, post_param, process_callback)
                         }
@@ -247,6 +251,7 @@ jv.doUploadFile = function (option) {
     };
 
 
+    process_callback(1);
     var ret = Promise.resolve(imgBase64);
 
     if (maxWidth) {
@@ -262,7 +267,8 @@ jv.doUploadFile = function (option) {
                 imageData: imgBase64,
                 fileName: fileName,
                 maxWidth: maxWidth,
-                filter: function (image) {
+                filter: (image) => {
+                    process_callback(2);
                     //如果图片 <= 256 ,则不处理.
                     if (image.naturalWidth <= maxWidth) {
                         return false;
@@ -279,6 +285,7 @@ jv.doUploadFile = function (option) {
             }
             return file;
         }).then(file => {
+            process_callback(3);
             return doWork(file)
         });
 };

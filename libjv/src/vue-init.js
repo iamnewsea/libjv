@@ -3,8 +3,6 @@ import jv from "./libjv"
 //默认实现。
 
 
-
-
 //init router permission
 // jv.initRouter = function (router) {
 // //规则：如果没有定义，按上级配置。 如果最上级没有配置，按false
@@ -85,7 +83,7 @@ import jv from "./libjv"
 //     return ret;
 // }
 
-jv.initApp = function (vue) {
+jv.initApp = (vue) => {
     jv.Vue = vue;
     //关闭环境给出的提示.
     // vue.config.productionTip = false;
@@ -256,7 +254,13 @@ jv.initAxios = function (axios, ignoreJavaBooleanKey, ignoreResType) {
         return response;
     }, (error) => {
         if (!error.response) {
-            jv.error("错误:" + JSON.stringify(error), "", "ajax");
+            var msg = "";
+            try {
+                msg = (error.message || "网络错误") + ":" + error.config.url;
+            } catch(e) {
+                msg = "网络错误"
+            }
+            jv.error(msg, "", "ajax");
             return Promise.reject(error);
         }
         var resp = error.response;

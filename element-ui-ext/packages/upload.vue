@@ -272,6 +272,10 @@
                     maxWidth: 0,
                     processCallback: p => this.percentage = p
                 }).then(res=>{
+                    if( !res){
+                        console.log("上传文件错误")
+                        return res;
+                    }
                     this.emit(res.data.data, "add");
                     return res;
                 });

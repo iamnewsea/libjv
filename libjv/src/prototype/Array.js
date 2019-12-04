@@ -4,7 +4,7 @@ Object.defineProperty(Array.prototype, "spliceDate", {
         if (this.length == 0) return [];
         return this.map(it => {
             if (!it) return it;
-            return it.valueOf().toDateString(null,"local");
+            return it.valueOf().toDateString(null, "local");
         });
     }
     , enumerable: false
@@ -15,14 +15,12 @@ Object.defineProperty(Array.prototype, "last", {
     value(filter) {
         if (!this.length) return null;
         if (!filter) {
-            filter = function () {
-                return true;
-            }
+            filter = () => true
         }
 
         for (var i = this.length - 1; i > -1; i--) {
             var item = this[i];
-            if (filter(item,i)) return item;
+            if (filter(item, i)) return item;
         }
         return null;
     }, enumerable: false
@@ -59,9 +57,7 @@ Object.defineProperty(Array.prototype, "ForEach", {
 Object.defineProperty(Array.prototype, "putDistinct", {
     value(val, eqFunc) {
         if (!eqFunc) {
-            eqFunc = function (a, b) {
-                return a == b
-            };
+            eqFunc = (a, b) => a == b
         }
 
         if (this.findIndex(it => eqFunc(it, val)) >= 0) {
@@ -79,9 +75,7 @@ Object.defineProperty(Array.prototype, "distinct", {
     value(eqFunc) {
         var ret = [];
         if (!eqFunc) {
-            eqFunc = function (a, b) {
-                return a == b
-            }
+            eqFunc = (a, b) => a == b
         }
 
         this.forEach(it => {
@@ -139,14 +133,14 @@ Object.defineProperty(Array.prototype, "recursion", {
 Object.defineProperty(Array.prototype, "minus", {
     value(other, eqFunc) {
         if (jv.IsNull(other)) return this;
-        if (!other.length ) return this;
+        if (!other.length) return this;
 
         eqFunc = eqFunc || ((a, b) => a == b);
         var ret = [];
 
         for (var i = 0, len = this.length; i < len; i++) {
             var one = this[i];
-            var two = other.findIndex(it=>eqFunc(one,it));
+            var two = other.findIndex(it => eqFunc(one, it));
             if (two < 0) {
                 ret.push(one);
             }
@@ -161,9 +155,7 @@ Object.defineProperty(Array.prototype, "intersect", {
     value(other, eqFunc) {
         var ret = []
         if (!eqFunc) {
-            eqFunc = function (a, b) {
-                return a == b
-            };
+            eqFunc = (a, b) => a == b
         }
         if (!other) return ret;
         other = Array.from(other);

@@ -7,7 +7,9 @@
         <video v-else-if="item.fileType=='video'" :src="item.fullUrl" class="avatar-uploader-icon"
                controls="controls"></video>
         <div v-else class="avatar-uploader-icon upload-fill el-icon-document"
-             :class="'upload-icon-'+ item.fileType"></div>
+             :class="'upload-icon-'+ item.fileType">
+          {{item.showName}}
+        </div>
         <div class="el-upload-bg">
         </div>
         <div class="el-upload-icon confirm-icon">
@@ -31,12 +33,13 @@
       <!--      <div v-if="withRemark" class="withRemark">-->
       <!--        {{item.remark}}-->
       <!--      </div>-->
-    </div>
-    <el-progress type="circle" :percentage="percentage" v-if="percentage"></el-progress>
-    <input type="file" name="file" style="display: none" @change="file_change" @click="file_click" v-bind="fileAttr">
-    <div class="el-upload" @click="upload_Click"
-         v-if="!myValue || (myValue.length < maxCount && !percentage)">
 
+      <el-progress type="circle" :percentage="item.percentage" v-else-if="item.percentage<100"></el-progress>
+    </div>
+
+    <input type="file" name="file" style="display: none" @change="file_change" @click="file_click" v-bind="fileAttr">
+
+    <div class="el-upload" @click="upload_Click" v-if="!myValue ||  myValue.length < maxCount">
       <div class="el-upload-preview">
         <slot>
           <i class="el-icon-plus avatar-uploader-icon"></i></slot>
@@ -72,7 +75,6 @@
         data() {
             return {
                 myValue: [],
-                percentage: 0,
                 fileAttr: {},
                 // imageRemark: "", //添加时使用.添加的图片文字
                 scales_value: this.scales
@@ -111,6 +113,11 @@
             }
         },
         methods: {
+            setItem(fileItemData) {
+                delete fileItemData.percentage;
+                fileItemData.fileType = this.getFileType(fileItemData.url).type;
+                fileItemData.showName = (fileItemData.name || fileItemData.url.split("/").last()).slice(-7);
+            },
             setMyValue(v) {
                 if (this.maxCount == 1) {
                     if (v.Type == "array" && v.default) {
@@ -122,8 +129,9 @@
                     }
 
                     this.myValue = [Object.assign({}, v)].filter(it => it.id).map(it => {
-                        v.fileType = this.getFileType(it.url).type;
-                        return v;
+                        this.setItem(it);
+                        // v.fileType = this.getFileType(it.url).type;
+                        return it;
                     });
                     return;
                 }
@@ -141,7 +149,7 @@
                 this.myValue = v.map(it => {
                     var v = Object.assign({}, it || {});
 
-                    v.fileType = this.getFileType(v.url).type;
+                    this.setItem(v);
                     return v;
                 });
             },
@@ -174,7 +182,6 @@
                 }
             },
             file_change(e) {
-                this.percentage = 0;
                 var files = e.target.files;
                 if (files.length + this.myValue.length > this.maxCount) {
                     jv.error("最多只能上传: " + this.maxCount + "个！");
@@ -219,11 +226,14 @@
 
                 var fileName = rawFile.name, fileType = this.getFileType(fileName).type;
 
+                var item = {percentage: 0};
+                this.myValue.push(item);
+
                 if (fileType.type == "img" && this.scales_value.length == 0 && this.maxWidth > 0) {
-                    return this.doUpload(rawFile, null, fileName, this.maxWidth);
+                    return this.doUpload(rawFile, null, fileName, this.maxWidth, item);
                 } else if (fileType.type == "img" && this.scales_value.length) {
                 } else {
-                    return this.doUpload(rawFile, null, fileName);
+                    return this.doUpload(rawFile, null, fileName, item);
                 }
 
                 return jv.file2Base64Data(rawFile).then(base64 => {
@@ -239,7 +249,7 @@
                             }
                             // this.imageRemark = imageRemark;
 
-                            return this.doUpload(null, imageData, fileName, this.maxWidth);
+                            return this.doUpload(null, imageData, fileName, this.maxWidth, item);
                         }
                     });
                 });
@@ -263,78 +273,25 @@
                 return {type: ""};
             },
             //7.检查Md5,上传
-            doUpload(file, imgBase64, fileName) {
+            doUpload(file, imgBase64, fileName, item) {
                 return jv.doUploadFile({
                     file: file,
                     imageBase64: imgBase64,
                     fileName: fileName,
                     axios: this.$http,
                     maxWidth: 0,
-                    processCallback: p => this.percentage = p
-                }).then(res=>{
-                    if( !res){
-                        console.log("上传文件错误")
+                    processCallback: p => item.percentage = p
+                }).then(res => {
+                    if (!res) {
+                        console.log("上传文件错误");
+                        item.percentage = 0;
                         return res;
                     }
-                    this.emit(res.data.data, "add");
+                    Object.assign(item, res.data.data);
+                    this.emit(item, "add");
                     return res;
                 });
-                // this.percentage = 4;
-                // var file = jv.base64Data2File(imgBase64, fileName);
-                //
-                // if (file.length > this.maxSize) {
-                //     this.percentage = 0;
-                //     jv.error("文件太大，超出许可范围！");
-                //     return;
-                // }
-                //
-                // //真正上传从 10% 开始。
-                // jv.getFileMd5(file).then(md5 => {
-                //     this.percentage = 6;
-                //     var param = {md5: md5};
-                //     // if (this.proxy && this.proxyCorpId) {
-                //     //   param["Corp-Id"] = this.proxyCorpId
-                //     // }
-                //     //8.检查服务器文件的 Md5值。
-                //     this.$http.post("/sys/check_upload", param).then(res => {
-                //
-                //         this.percentage = 8;
-                //         //8.1 如果服务器存在该文件，返回
-                //         var data = res.data.data;
-                //         if (data && data.id) {
-                //             this.percentage = 100;
-                //             this.emit(data, "add");
-                //             return;
-                //         } else {
-                //             this.post(file);
-                //         }
-                //     }, error => {
-                //         this.percentage = 0;
-                //     });
-                // }, error => {
-                //     this.percentage = 0;
-                // });
             },
-            // post(processedFile) {
-            //     var file = processedFile || this.$el.querySelector("input");
-            //
-            //     const formData = new FormData();
-            //     formData.append(file.name.split("/").last(), file);
-            //
-            //     this.$http.post(window.Server_Host + "/sys/upload", formData, {
-            //         onUploadProgress: e => {
-            //             if (e.total > 0) {
-            //                 e.percent = parseInt(e.loaded / e.total * 90);
-            //             }
-            //             this.percentage = e.percent + 10;
-            //         }
-            //     }).then(res => {
-            //         this.emit(res.data.data, "add");
-            //     }).catch(e => {
-            //         this.percentage = 0;
-            //         jv.error(e);
-            //     });
-            // },
             move_left(index) {
                 if (!index) return;
 
@@ -351,25 +308,57 @@
                 } catch (e) {
                 }
             },
-            emit(json, action, para) {
-                this.percentage = 0;
-                if (json) {
-                    if (this.myValue.length > this.maxCount - 1) {
-                        this.myValue.splice(0, this.myValue.length - this.maxCount + 1);
-                    }
 
-                    if (!("fileType" in json)) {
-                        json.fileType = this.getFileType(json.url).type;
-                    }
-                    this.myValue.push(json);
+            //单文件的时候，设置文件
+            // set1(json) {
+            //     if (this.maxCount != 1) return;
+            //
+            //
+            //     this.$el.querySelector("input").value = "";
+            //     this.myValue.splice(0, this.myValue.length, json);
+            //
+            //     var value = Object.assign({id: "", url: ""}, json).RemoveKeys("percentage", "fullUrl", "fileType","logoSize","showName");
+            //
+            //
+            //     if (this.db && this.uid) {
+            //         var param = {
+            //             db: this.db,
+            //             id: this.uid,
+            //             image: value
+            //         };
+            //         this.$http.post("/image/set", param).then(res => {
+            //             this.$emit("input", value);
+            //             this.$emit("changed", value, this.uid);
+            //         });
+            //     } else {
+            //         this.$emit("input", value);
+            //         this.$emit("changed", value, this.uid);
+            //     }
+            // },
+
+            /**
+             *
+             * @param json 要添加的数据
+             * @param action 动作： add,remove,swap
+             * @param para 参数：当前数据
+             */
+            emit(json, action, para) {
+                if (json) {
+                    this.setItem(json);
+                    // if (!("fileType" in json)) {
+                    //     json.fileType = this.getFileType(json.url).type;
+                    // }
+                    // this.myValue.push(json);
                 }
 
                 this.$el.querySelector("input").value = "";
 
                 if (this.maxCount == 1) {
-                    var value = Object.assign({id: "", url: ""}, this.myValue[0]);
+                    var value = Object.assign({
+                        id: "",
+                        url: ""
+                    }, json).RemoveKeys("percentage", "fullUrl", "fileType", "logoSize", "showName");
 
-                    this.$emit("input", value);
 
                     if (this.db && this.uid) {
                         var param = {
@@ -378,13 +367,14 @@
                             image: value
                         };
                         this.$http.post("/image/set", param).then(res => {
+                            this.$emit("input", value);
                             this.$emit("changed", value, this.uid);
                         });
                     } else {
+                        this.$emit("input", value);
                         this.$emit("changed", value, this.uid);
                     }
                 } else {
-                    this.$emit("input", this.myValue);
 
 
                     if (action == "add") {
@@ -403,14 +393,24 @@
                             index1: para.index1 || 0,
                             index2: para.index2 || 0
                         };
-                        this.$http.post("/image/change", param).then(res => {
-                            this.$emit("changed", this.myValue, action, para, this.uid);
-                        });
+
+                        //全部上传完一次性 change .
+                        if (this.myValue.every(it => it.id)) {
+                            this.$http.post("/image/change", param).then(res => {
+                                this.$emit("input", this.myValue);
+                                this.$emit("changed", this.myValue, action, para, this.uid);
+                            });
+                        }
                     } else {
-                        this.$emit("changed", this.myValue, action, para, this.uid);
+                        if (this.myValue.every(it => it.id)) {
+                            this.$emit("input", this.myValue);
+                            this.$emit("changed", this.myValue, action, para, this.uid);
+                        }
                     }
                 }
             },
+
+
             onRemove(index, e) {
                 e.target.closest(".avatar-uploader").classList.remove("deleting");
 
@@ -467,7 +467,7 @@
     border: 1px dashed #d9d9d9;
     border-radius: 6px;
     vertical-align: top;
-    font-size: 28px;
+    font-size: 14px;
     color: #8c939d;
     width: 146px;
     text-align: center;
@@ -475,12 +475,22 @@
     min-height: 120px;
   }
 
+  .avatar-uploader .el-icon-plus {
+    display: flex;
+    justify-items: center;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+  }
+
   .avatar-uploader .avatar-uploader-icon:before {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 140px;
-    height: 140px;
+    /*width: 140px;*/
+    /*height: 140px;*/
+    margin: 10px;
   }
 
   .el-upload .el-icon-document:before {
@@ -500,6 +510,7 @@
 
   .avatar-uploader .el-upload-preview > div {
     display: none;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
@@ -507,7 +518,12 @@
   }
 
   .avatar-uploader .el-upload-preview .upload-fill {
-    display: block;
+    position: relative;
+    display: flex;
+    justify-items: center;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
 
   .avatar-uploader .el-upload-preview .el-upload-bg {

@@ -506,7 +506,7 @@ jv.await = (delayTime, times, action) => {
  * @param obj
  */
 
-jv.param_jmap = (obj) => {
+let param_jmap = (obj) => {
     // var objType = typeof(obj);
     // if (objType == "string") {
     //   return obj;
@@ -559,7 +559,7 @@ jv.param_jmap = (obj) => {
                 if (!item) continue;
                 var objType = item.ObjectType;
                 if (objType) {
-                    var m = jv.param_jmap(item);
+                    var m = param_jmap(item);
                     var keys = Object.keys(m);
 
                     if (isMap(item, objType)) {
@@ -574,9 +574,9 @@ jv.param_jmap = (obj) => {
                 }
             }
         } else {
-            var objType = item.ObjectType;
+            var objType = value.ObjectType;
             if (objType) {
-                var m = jv.param_jmap(value);
+                var m = param_jmap(value);
                 var keys = Object.keys(m);
 
                 if (isMap(value, objType)) {
@@ -597,13 +597,46 @@ jv.param_jmap = (obj) => {
     });
 
     return ret;
-}
+};
+
+/**
+ * 把 JSON 转换为 URL 格式。
+ * @param obj
+ * @returns {string}
+ */
 jv.param =   (obj) => {
-    var ret = jv.param_jmap(obj);
+    var ret = param_jmap(obj);
     return Object.keys(ret).map(it => {
         return encodeURIComponent(it) + "=" + encodeURIComponent(ret[it])
     }).join("&");
-}
+};
+
+
+jv.query2Json = (query) => {
+    query = query || location.search.slice(1);
+    let ret = {};
+    query.split("&").forEach((it) => {
+        var sects = it.split("=");
+        if (sects.length == 2) {
+            var key = sects[0];
+            var value = decodeURIComponent(sects[1]);
+            if (key in ret) {
+                var oriValue = ret[key];
+                if (oriValue.Type == "array") {
+                    oriValue.push(value);
+                } else {
+                    oriValue = [oriValue];
+                    oriValue.push(value);
+                }
+                ret[key] = oriValue;
+            } else {
+                ret[key] = value;
+            }
+        }
+    });
+    return ret;
+};
+
 
 //用法： jv.evalExpression({a:{b:[{c:1}]}} , "a.b[0].c")
 //返回: {value: 1 , ok: true }

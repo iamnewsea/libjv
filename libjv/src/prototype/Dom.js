@@ -1,11 +1,11 @@
-(  () =>{
+(() => {
     //如果不是浏览器环境,则退出
     if (typeof (document) === "undefined") return;
 
     //避免多次执行
     // if (location.json) return;
 
-    document.cookieJson = (  () =>{
+    document.cookieJson = (() => {
         // http://blog.csdn.net/lvjin110/article/details/37663067
         let language = navigator.language || navigator.browserLanguage;
         navigator.languageCode = "cn";
@@ -45,55 +45,29 @@
         };
     })();
 
-    location.query2Json =   (query)=> {
-        query = query || location.search.slice(1);
-        let ret = {};
-        query.split("&").forEach(  (it)=> {
-            var sects = it.split("=");
-            if (sects.length == 2) {
-                var key = sects[0];
-                var value = decodeURIComponent(sects[1]);
-                if (key in ret) {
-                    var oriValue = ret[key];
-                    if (oriValue.Type == "array") {
-                        oriValue.push(value);
-                    } else {
-                        oriValue = [oriValue];
-                        oriValue.push(value);
-                    }
-                    ret[key] = oriValue;
-                } else {
-                    ret[key] = value;
-                }
-            }
-        });
-        return ret;
-    };
-
-
     //使用 json 替代 location.json
-    location.json2search =   (json)=> {
-        json = json || location.json;
-        var ret = Object.keys(json).map(it => {
-            var v = json[it];
-            if (jv.IsNull(v)) {
-                return "";
-            }
+    // location.json2search = (json) => {
+    //     json = json || location.json;
+    //     var ret = Object.keys(json).map(it => {
+    //         var v = json[it];
+    //         if (jv.IsNull(v)) {
+    //             return "";
+    //         }
+    //
+    //         if (v.Type == "array") {
+    //             return v.map(m => it + "=" + encodeURIComponent(m)).join("&")
+    //         }
+    //
+    //         return it + "=" + encodeURIComponent(v)
+    //     }).join("&");
+    //
+    //     if (ret) {
+    //         return "?" + ret;
+    //     }
+    //     return ret;
+    // };
 
-            if (v.Type == "array") {
-                return v.map(m => it + "=" + encodeURIComponent(m)).join("&")
-            }
-
-            return it + "=" + encodeURIComponent(v)
-        }).join("&");
-
-        if (ret) {
-            return "?" + ret;
-        }
-        return ret;
-    };
-
-    location.getHost =   (url)=> {
+    location.getHost = (url) => {
         var r;
         if (url.startsWith("//")) {
             r = /^\/\/([^/\\]+)/i.exec(url)
@@ -114,27 +88,27 @@
     // }();
     // http://blog.csdn.net/lvjin110/article/details/37663067
 
-    let loadQueryJson =   ()=> {
-        location.json = location.query2Json(location.search.slice(1));
+    let loadQueryJson = () => {
+        location.json = jv.query2Json(location.search.slice(1));
         var tail = location.search + location.hash;
         if (tail) {
             location.fullPath = location.href.slice(0, 0 - tail.length);
         } else {
             location.fullPath = location.href;
         }
-    }
+    };
 
-    let loadLocationHashJson =   ()=> {
+    let loadLocationHashJson = () => {
         let index = location.hash.indexOf("?");
         if (index < 0) {
             location.hashJson = {};
             return;
         }
-        location.hashJson = location.query2Json(location.hash.slice(index + 1));
+        location.hashJson = jv.query2Json(location.hash.slice(index + 1));
     };
 
 
-    let loadAllJson =   ()=> {
+    let loadAllJson = () => {
         loadQueryJson();
         loadLocationHashJson();
 
@@ -143,25 +117,26 @@
         }
     };
 
-    loadAllJson();
-
-
-    window.removeEventListener("hashchange", loadLocationHashJson);
-    window.addEventListener("hashchange", loadLocationHashJson);
-
-
-    //vue 使用了 pushState
-    let pushState_ori = history.pushState
-    history.pushState =   ()  =>{
+    if( document.readyState == "complete"){
         loadAllJson();
-        return pushState_ori.apply(null, arguments);
-    };
+    }
+    else {
+        document.addEventListener("DOMContentLoaded",loadAllJson);
+    }
 
-    window.removeEventListener("popstate", loadAllJson);
-    window.addEventListener("popstate", loadAllJson);
-
-
-
+    // window.removeEventListener("hashchange", loadLocationHashJson);
+    // window.addEventListener("hashchange", loadLocationHashJson);
+    //
+    //
+    // //vue 使用了 pushState
+    // let pushState_ori = history.pushState
+    // history.pushState = () => {
+    //     loadAllJson();
+    //     return pushState_ori.apply(null, arguments);
+    // };
+    //
+    // window.removeEventListener("popstate", loadAllJson);
+    // window.addEventListener("popstate", loadAllJson);
 })();
 
 //-----------------------------------------------------------------
@@ -188,7 +163,7 @@ Object.defineProperty(Node.prototype, "offset_pdom", {
         var x = 0, y = 0;
         var ppdom = pdom.offsetParent;
 
-        var getP =   (dom)=> {
+        var getP = (dom) => {
             if (!dom) return;
             if (dom == pdom) {
                 return true;

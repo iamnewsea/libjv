@@ -33,6 +33,137 @@ jv.info = console.info;
 jv.error = console.error;
 jv.warn = console.warn;
 
+
+(() => {
+    //如果不是浏览器环境,则退出
+    if (typeof (document) === "undefined") return;
+
+    //避免多次执行
+    // if (location.json) return;
+
+    document.cookieJson = (() => {
+        // http://blog.csdn.net/lvjin110/article/details/37663067
+        let language = navigator.language || navigator.browserLanguage;
+        navigator.languageCode = "cn";
+
+        if (language.indexOf("zh") < 0) {
+            navigator.languageCode = "en";
+        }
+
+        let db = {};
+
+        (document.cookie || "").split(";").forEach(it => {
+            var sect = it.split("=");
+            db[sect[0].trim()] = decodeURIComponent((sect[1] || "").trim());
+        });
+
+        return {
+            get(key) {
+                if (!key) return db;
+                return db[key];
+            }
+            , set(key, value, cacheTime) {
+                key = key.trim();
+                value = encodeURIComponent(value.trim() || "");
+                db[key] = value;
+
+                var expires = "";
+                if (cacheTime) {
+                    var exp = new Date();
+                    exp.setTime(exp.getTime() + cacheTime * 1000);
+                    expires = ";expires=" + exp.toGMTString()
+                }
+                document.cookie = key + "=" + value + ";path=/" + expires;
+            }
+            , remove(key) {
+                this.set(key, "", -1);
+            }
+        };
+    })();
+
+
+    location.getHost = (url) => {
+        var r;
+        if (url.startsWith("//")) {
+            r = /^\/\/([^/\\]+)/i.exec(url)
+        } else {
+            r = /^http[s]*\:\/\/([^/\\]+)/i.exec(url)
+        }
+
+        if (r) {
+            return r[1];
+        }
+        return "";
+    };
+
+
+    let loadQueryJson = (url) => {
+
+        // var tail = location.search + location.hash;
+        // if (tail) {
+        //     location.fullPath = location.href.slice(0, 0 - tail.length);
+        // } else {
+        //     location.fullPath = location.href;
+        // }
+    };
+
+    // let loadLocationHashJson = () => {
+    //     let index = location.hash.indexOf("?");
+    //     if (index < 0) {
+    //         location.hashJson = {};
+    //         return;
+    //     }
+    //     location.hashJson = jv.query2Json(location.hash.slice(index + 1));
+    // };
+
+
+    jv.loadAllJson = (url) => {
+        var search = "", hash = "";
+        if (url && url.Type == "string") {
+            var hash_index = url.lastIndexOf("#");
+            if (hash_index >= 0) {
+                hash = url.slice(url.slice(hash_index + 1));
+                url = url.splice(0, hash_index);
+            }
+
+            var search_index = url.indexOf("?");
+            if (search_index >= 0) {
+                search = url.slice(search_index)
+            }
+        } else {
+            search = location.search;
+            hash = location.hash;
+        }
+
+
+        location.json = jv.query2Json(search.slice(1));
+
+        let hash_search_index = hash.indexOf("?");
+        if (hash_search_index >= 0) {
+            location.hashJson = jv.query2Json(hash.slice(hash_search_index + 1));
+        }
+    };
+
+    if (document.readyState == "complete") {
+        jv.loadAllJson();
+    } else {
+        document.addEventListener("DOMContentLoaded", jv.loadAllJson);
+    }
+
+    // window.removeEventListener("hashchange", loadLocationHashJson);
+    // window.addEventListener("hashchange", loadLocationHashJson);
+    //
+    //
+    //vue 使用了 pushState
+    // let pushState_ori = history.pushState
+    // history.pushState = () => {
+    //     jv.loadAllJson();
+    //     return pushState_ori.apply(null, arguments);
+    // };
+    //
+    // window.addEventListener("popstate", loadAllJson);
+})();
+
 //---------------------------------------------
 
 //提供 基于 localStorage的缓存数据，增加过期时间机制。额外多保存一个 key ，默认有效期是4个小时。
@@ -525,7 +656,7 @@ let param_jmap = (obj) => {
         if (value === undefined) return;
         if (value === null) return;
 
-        var isMap =   (mapObject, objType) =>{
+        var isMap = (mapObject, objType) => {
             var isMapValue = objType == "map";
             if (!isMapValue) {
                 if (Object.keys(mapObject).findIndex(it => {
@@ -604,7 +735,7 @@ let param_jmap = (obj) => {
  * @param obj
  * @returns {string}
  */
-jv.param =   (obj) => {
+jv.param = (obj) => {
     var ret = param_jmap(obj);
     return Object.keys(ret).map(it => {
         return encodeURIComponent(it) + "=" + encodeURIComponent(ret[it])
@@ -613,7 +744,7 @@ jv.param =   (obj) => {
 
 
 jv.query2Json = (query) => {
-    query = query || location.search.slice(1);
+
     let ret = {};
     query.split("&").forEach((it) => {
         var sects = it.split("=");
@@ -640,7 +771,7 @@ jv.query2Json = (query) => {
 
 //用法： jv.evalExpression({a:{b:[{c:1}]}} , "a.b[0].c")
 //返回: {value: 1 , ok: true }
-jv.evalExpression =   (obj, path) =>{
+jv.evalExpression = (obj, path) => {
     if (!path) return obj;
     var random = "_eval_expression_" + jv.random();
     jv[random] = obj;

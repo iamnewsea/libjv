@@ -83,7 +83,15 @@ import jv from "./libjv"
 //     return ret;
 // }
 
-jv.initApp = (vue) => {
+/**
+ *
+ * @param setting
+ * @returns {value|boolean|*}
+ ajaxIgnoreJavaBooleanKey ：默认为false , 是否处理 Java Boolean的Key，如：接口返回 admin:true , 转化为： isAdmin: true
+ ajaxIgnoreResType ： 默认为false , 系统默认对 boolean,date添加 _res 额外键，设置这个字段，会忽略指定的类型。该值是逗号分隔的字符串，有如下值：boolean,date
+ */
+jv.initVue = (setting) => {
+    var {vue, axios, router, ajaxIgnoreJavaBooleanKey, ajaxIgnoreResType} = setting;
     jv.Vue = vue;
     //关闭环境给出的提示.
     // vue.config.productionTip = false;
@@ -130,36 +138,12 @@ jv.initApp = (vue) => {
             }
         }, enumerable: false
     });
-};
 
-// jv.getAjaxCacheKey = function (config) {
-//     if (!config || !config.cache || !config.url) {
-//         return "";
-//     }
-//
-//     var type = (config.data || {}).Type;
-//     if (type == "formData") {
-//         return "";
-//     }
-//
-//     var data_string = config.data;
-//     if (type != "string") {
-//         data_string = JSON.stringify(config.data);
-//     }
-//     return config.method + ":" + config.url + "!" + data_string;
-// };
-
-/**
- *
- * @param axios
- * @param ignoreJavaBooleanKey ：默认为false , 是否处理 Java Boolean的Key，如：接口返回 admin:true , 转化为： isAdmin: true
- * @param ignoreResType ： 默认为false , 系统默认对 boolean,date添加 _res 额外键，设置这个字段，会忽略指定的类型。该值是逗号分隔的字符串，有如下值：boolean,date
- */
-jv.initAxios = function (axios, ignoreJavaBooleanKey, ignoreResType) {
+    //----------------------------------- axios
 
     jv.ajax = axios;
-    axios.defaults.ignoreJavaBooleanKey = ignoreJavaBooleanKey;
-    axios.defaults.ignoreResType = ignoreResType;
+    axios.defaults.ignoreJavaBooleanKey = ajaxIgnoreJavaBooleanKey;
+    axios.defaults.ignoreResType = ajaxIgnoreResType;
 
     axios.defaults.baseURL = window.Server_Host;
     axios.defaults.withCredentials = true;
@@ -249,7 +233,7 @@ jv.initAxios = function (axios, ignoreJavaBooleanKey, ignoreResType) {
             });
         }
 
-        jv.fillRes(json, null, null, ignoreResType);
+        jv.fillRes(json, null, null, response.config.ignoreResType);
 
         return response;
     }, (error) => {
@@ -257,7 +241,7 @@ jv.initAxios = function (axios, ignoreJavaBooleanKey, ignoreResType) {
             var msg = "";
             try {
                 msg = (error.message || "网络错误") + ":" + error.config.url;
-            } catch(e) {
+            } catch (e) {
                 msg = "网络错误"
             }
             jv.error(msg, "", "ajax");
@@ -285,6 +269,32 @@ jv.initAxios = function (axios, ignoreJavaBooleanKey, ignoreResType) {
         return Promise.reject(error);
     });
 
+
+    //----------------------router
+
+
+    router.afterEach((to, from, next) => {
+        jv.loadAllJson(to.fullPath);
+    });
 };
+
+
+// jv.getAjaxCacheKey = function (config) {
+//     if (!config || !config.cache || !config.url) {
+//         return "";
+//     }
+//
+//     var type = (config.data || {}).Type;
+//     if (type == "formData") {
+//         return "";
+//     }
+//
+//     var data_string = config.data;
+//     if (type != "string") {
+//         data_string = JSON.stringify(config.data);
+//     }
+//     return config.method + ":" + config.url + "!" + data_string;
+// };
+
 
 export default jv;

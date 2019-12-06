@@ -15,8 +15,7 @@ import jv from "libjv"
 (function (jv) {
   window.jv = jv;
 
-  jv.initApp(Vue.prototype)
-  jv.initAxios(axios);
+  jv.initVue({vue:Vue,axios:axios,router:router});
 
   /*Vue.config.productionTip = false;*/
   Vue.use(ElementUI);

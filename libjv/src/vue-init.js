@@ -84,7 +84,7 @@ import jv from "./libjv"
 // }
 
 /**
- *
+ * jv.initVue({vue:Vue,axios:axios,router:router});
  * @param setting
  * @returns {value|boolean|*}
  ajaxIgnoreJavaBooleanKey ：默认为false , 是否处理 Java Boolean的Key，如：接口返回 admin:true , 转化为： isAdmin: true

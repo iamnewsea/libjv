@@ -3,6 +3,7 @@
 import c from '../packages/c.vue';
 import e from '../packages/e.vue';
 import kv from '../packages/kv.vue';
+import selector from '../packages/selector.vue';
 import my_list from '../packages/my-list.vue';
 import my_ref from '../packages/my-ref.vue';
 
@@ -18,6 +19,7 @@ import image_edit from '../packages/image-edit.vue';
 const components = [
   c, e,
   kv,
+  selector,
   my_list, my_ref,
   // Upload1,
   upload,

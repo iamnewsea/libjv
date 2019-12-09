@@ -439,7 +439,7 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
             target[key1 + "_res"] = stringValue;
 
             return true;
-        } else if (ignoreDate && (type == "string")) {
+        } else if (!ignoreDate && (type == "string")) {
             if (value.IsDateFormat()) {
                 target[key1 + "_res"] = value;
                 return true;

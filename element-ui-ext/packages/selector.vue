@@ -65,7 +65,7 @@
             var fields = (this.field || "").split(",")
             this.keyField = fields[0];
             this.valueField = fields[1];
-
+            this.value2 = this.value;
             this.setData();
 
         }, methods: {

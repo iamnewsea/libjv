@@ -109,19 +109,19 @@ jv.initVue = (setting) => {
     //创建简单的 store
     vueProtype.$store = {
         setGlobalJson(data) {
-            jv.store.setJson("global", Object.assign({}, this.getGlobal(), data) );
+            jv.store.setJson("global", Object.assign({}, this.getGlobal(), data));
         },
         getGlobalJson() {
             return jv.store.getJson("global") || {};
         },
-        resetGlobalJson(data){
+        resetGlobalJson(data) {
             jv.store.setJson("global", data);
         },
         setJson(data) {
             jv.store.setJson(jv.main.$route.fullPath, Object.assign({}, this.getJson(), data));
         },
         getJson() {
-            return jv.store.getJson(jv.main.$route.fullPath);
+            return jv.store.getJson(jv.main.$route.fullPath) || {};
         },
         resetJson(data) {
             jv.store.setJson(jv.main.$route.fullPath, data);

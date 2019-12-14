@@ -9,11 +9,12 @@
 path 添加 python2
 > set path=%path%;C:\Python27
 > copy c:\python27\python.exe c:\python27\python2.exe
-
-------以上不需要。
-
-> npm i -g node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
 > npm install -g  node-sass --registry=https://registry.npm.taobao.org
+>
+------以上方法是下载后编译，比较慢。
+
+---- 使用以下方法下载编译后版本，比较快。
+> npm i -g node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
 > npm i --registry=https://registry.npm.taobao.org
 
 >作者 imnewsea

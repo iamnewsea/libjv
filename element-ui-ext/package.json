@@ -31,7 +31,6 @@
     "css-loader": "^1.0.1",
     "style-loader": "^1.0.0",
     "element-ui": "^2.4.7",
-    "es-jcrop": "latest",
     "file-loader": "^1.1.11",
     "libjv": "^0.8.49",
     "raw-loader": "^0.5.1",

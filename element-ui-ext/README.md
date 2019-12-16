@@ -15,10 +15,5 @@ vue cli 3.0 用法:
 
 ## 插件:
 
-> upload1
-* 事件: clicking , 点击时解发. 参数:  {data: this.myValue, returnValue: null } , 回调时, 设置 returnValue = false , 取消上传.
-
-
-> upload_multi
-* 事件: clicking , 点击时解发. 参数:  {data: this.myValue, returnValue: null } , 回调时, 设置 returnValue = false , 取消上传.
-
+> upload
+> image-edit 使用 vue-cropperjs 进行裁剪。

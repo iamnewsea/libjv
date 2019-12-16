@@ -159,7 +159,7 @@ Object.defineProperty(Number.prototype, 'getEachBitValue', {
 Object.defineProperty(Number.prototype, 'ToRound', {
     value(dotLength) {
         var n = Math.pow(10, dotLength);
-        return Math.round(this * n) / 100;
+        return Math.round(this * n) / n;
     }, enumerable: false
 });
 

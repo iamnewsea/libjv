@@ -92,7 +92,6 @@ Object.defineProperty(Number.prototype, 'format', {
         var zero1Index = formatValue.indexOf("0");
         if (zero1Index < 0) {
             return this.toString();
-            ;
         } else if (zero1Index == 0) {
             dotIndex = formatValue.indexOf(".");
 
@@ -152,6 +151,15 @@ Object.defineProperty(Number.prototype, 'EachBitValue', {
             position++;
         }
         return ret;
+    }, enumerable: false
+});
+
+/* 保留小数位 , 使用 Math.round 方法。  .toFixed是银行家算法。
+ */
+Object.defineProperty(Number.prototype, 'ToRound', {
+    get(dotLength) {
+        var n = Math.pow(10, dotLength);
+        return Math.round(this * n) / 100;
     }, enumerable: false
 });
 

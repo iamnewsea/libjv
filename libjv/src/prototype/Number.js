@@ -136,8 +136,8 @@ Object.defineProperty(Number.prototype, 'format', {
 
 
 //获取整数的每一个二进制位的值。
-Object.defineProperty(Number.prototype, 'EachBitValue', {
-    get() {
+Object.defineProperty(Number.prototype, 'getEachBitValue', {
+    value() {
         var ret = [];
         var value = parseInt(this);
         var position = 0;
@@ -157,7 +157,7 @@ Object.defineProperty(Number.prototype, 'EachBitValue', {
 /* 保留小数位 , 使用 Math.round 方法。  .toFixed是银行家算法。
  */
 Object.defineProperty(Number.prototype, 'ToRound', {
-    get(dotLength) {
+    value(dotLength) {
         var n = Math.pow(10, dotLength);
         return Math.round(this * n) / 100;
     }, enumerable: false

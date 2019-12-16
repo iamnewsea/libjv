@@ -742,11 +742,14 @@ jv.param = (obj) => {
     }).join("&");
 };
 
-
+/**
+ * 如果 query 里有 ？，则截断，取问号后面的部分。
+ * @param query
+ * @returns {{}}
+ */
 jv.query2Json = (query) => {
-
     let ret = {};
-    query.split("&").forEach((it) => {
+    query.split("?").last().split("&").forEach((it) => {
         var sects = it.split("=");
         if (sects.length == 2) {
             var key = sects[0];

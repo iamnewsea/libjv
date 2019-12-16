@@ -83,3 +83,15 @@ Object.defineProperty(Object.prototype, "RemoveKeys", {
     }, enumerable: false
 });
 
+/**
+ * 链式调用的判断
+ */
+Object.defineProperty(Object.prototype, "Run", {
+    value(callback) {
+        if(callback){
+            return callback.apply(this);
+        }
+        return this;
+    }, enumerable: false
+});
+

@@ -51,6 +51,8 @@ Object.defineProperty(Array.prototype, "ForEach", {
     }, enumerable: false
 });
 
+
+
 /**
  * eqFunc = function(a,b){ a == b } ;
  */

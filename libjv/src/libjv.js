@@ -12,23 +12,26 @@ var JvObject = (function () {
             if (!jv) {
                 jv = this;
             }
-
-            // this[db] = {id:1};
             return jv;
         }
-
-        // get db(){
-        //   return this[db];
-        // }
     }
 
     return JvObject;
 })();
 
 jv = new JvObject();
+jv.root =  typeof self == 'object' && self.self === self && self ||
+    typeof global == 'object' && global.global === global && global ||
+    this ||
+    {};
 jv.prototype = JvObject.prototype;
+
 jv.noop = () => {
 };
+
+
+
+
 
 jv.info = console.info;
 jv.error = console.error;
@@ -54,7 +57,20 @@ jv.getFileType = function (fileName) {
     return {type: "", ext: ext};
 };
 
+
+(()=>{
+    class Radio{}
+    class Check{}
+
+    jv.root.Radio = Radio;
+    jv.root.Check = Check;
+})();
+
+
 (() => {
+
+
+
     //如果不是浏览器环境,则退出
     if (typeof (document) === "undefined") return;
 

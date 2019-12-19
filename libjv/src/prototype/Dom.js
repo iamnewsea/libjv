@@ -1,7 +1,7 @@
 //-----------------------------------------------------------------
 (function () {
     // Node环境需要
-    if (typeof window === 'undefined' ) {
+    if (typeof document === 'undefined' ) {
         return;
     }
     if (!Node.prototype.addEventListener && Node.prototype.attachEvent) {

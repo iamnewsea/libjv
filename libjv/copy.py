@@ -22,7 +22,6 @@ def cp(fromPath,toPath):
 def mycp(source,toPath):
       cp( os.path.join( source,"lib"), os.path.join(toPath ,"node_modules/libjv/lib"))
       cp( os.path.join( source,"src"), os.path.join(toPath ,"node_modules/libjv/src"))
-      shutil.copyfile( os.path.join( source,"index.js"), os.path.join(toPath ,"node_modules/libjv/index.js"))
 
 
 if __name__=='__main__':

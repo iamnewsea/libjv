@@ -25,17 +25,16 @@ const install = function (Vue, opts = {}) {
     Vue.component(component.name, component);
   });
 
-
-  const ELEMENT = {};
-  ELEMENT.size = opts.size || '';
 };
 
 /* istanbul ignore if */
 if (typeof window !== 'undefined' && window.Vue) {
   install(window.Vue);
 }
-;
 
-components_export["install"] = install;
-module.exports = components_export;
-module.exports.default = module.exports;
+
+// components_export["install"] = install;
+// module.exports = components_export;
+// module.exports.default = module.exports;
+
+export default install

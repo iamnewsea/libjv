@@ -6,10 +6,6 @@ import sys
 import shutil
 from sys import argv
 
-base_path =  os.path.abspath( os.path.join( __file__ ,"../" ) ) +"/"
-
-os.chdir( base_path )
-print("当前文件夹" + base_path);
 
 def rm(path):
     if  os.path.exists( base_path + path) :
@@ -22,22 +18,26 @@ def cp(fromPath,toPath):
 
   shutil.copytree(fromPath,toPath)
 
-def mycp(toPath):
-      cp("lib", toPath +"/node_modules/libjv/lib")
-      cp("src", toPath +"/node_modules/libjv/src")
-      shutil.copyfile("index.js",toPath +"/node_modules/libjv/index.js")
+def mycp(source,toPath):
+      cp( os.path.join( source,"lib"), os.path.join(toPath ,"/node_modules/libjv/lib"))
+      cp( os.path.join( source,"src"), os.path.join(toPath ,"/node_modules/libjv/src"))
+      shutil.copyfile( os.path.join( source,"index.js"), os.path.join(toPath ,"/node_modules/libjv/index.js"))
+
 
 if __name__=='__main__':
-    print("目标文件夹：" + argv[1])
-    if not os.path.exists( argv[1] + "/node_modules"):
-        print("找不到 node_modules 文件夹，请检查目标文件夹")
-        sys.exit();
-
-    os.system('''npm run build''')
+    source = os.path.abspath( os.path.join( __file__ ,"../" ) )
+    target = os.path.abspath( argv[1] )
+    print("源地址："+ source + " ---> 目标地址：" + target)
     print("-----------------------------------")
 
-    print(argv[1]);
-    mycp(argv[1])
+    if not os.path.exists( target + "/node_modules"):
+        print("找不到 node_modules 文件夹，请检查目标文件夹")
+        sys.exit(1)
+
+    os.system(("npm --prefix=%s run build" ) % ( source ) )
+    print("-----------------------------------")
+
+    mycp(source,target)
 
     print("完成")
 

@@ -1,5 +1,5 @@
 import "spark-md5"
-import jv from './libjv'
+import jv from './vue-chk'
 
 jv.getFileMd5 = (file) => {
     return new Promise((resole, reject) => {
@@ -41,7 +41,13 @@ jv.getFileMd5 = (file) => {
     });
 }
 
-//base64的字符串内容 转为 file 对象
+
+/**
+ * base64的字符串内容 转为 file 对象
+ * @param base64Data
+ * @param fileName
+ * @returns {Blob}
+ */
 jv.base64Data2File = (base64Data, fileName) => {
     var arr = base64Data.split(','), mime = arr[0].match(/:(.*?);/)[1],
         bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
@@ -136,7 +142,7 @@ jv.compressImage = (op) => {
                 return;
             }
 
-            //5.1 分支流程:如果图片宽度大于设置的最大宽度，则进行压缩，Md5,上传
+            // 5.1 分支流程:如果图片宽度大于设置的最大宽度，则进行压缩，Md5,上传
             if (image.naturalWidth > maxWidth) {
                 var canvas = document.createElement("canvas"),
                     ctx = canvas.getContext('2d'),
@@ -148,13 +154,13 @@ jv.compressImage = (op) => {
 
                 ctx.drawImage(image, 0, 0, srcWidth, srcHeight, 0, 0, canvas.width, canvas.height);
 
-                //6.检查Md5,上传
+                // 6.检查Md5,上传
                 var ext = fileName.split('.').slice(1).last() || "png";
                 resolve(canvas.toDataURL(getImageContextTypeByExtName(ext), quality));
                 image = null;
                 return;
             }
-            //5.2 分支流程：如果是小图，则进行Md5,再上传
+            // 5.2 分支流程：如果是小图，则进行Md5,再上传
             else {
                 resolve(imgDataBase64);
                 return;
@@ -232,11 +238,11 @@ jv.doUploadFile = option => {
                 //   param["_corp_id_"] = this.proxyCorpId
                 // }
 
-                //8.检查服务器文件的 Md5值。
+                // 8.检查服务器文件的 Md5值。
                 return axios.post("/sys/check_upload", param)
                     .then(res => {
                         process_callback(10);
-                        //8.1 如果服务器存在该文件，返回 data 属性，且 data 属性有 id
+                        // 8.1 如果服务器存在该文件，返回 data 属性，且 data 属性有 id
                         var data = res.data.data;
                         if (data && data.id) {
                             process_callback(100);

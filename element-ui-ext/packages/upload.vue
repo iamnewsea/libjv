@@ -115,7 +115,7 @@
         methods: {
             setItem(fileItemData) {
                 delete fileItemData.percentage;
-                fileItemData.fileType = this.getFileType(fileItemData.url).type;
+                fileItemData.fileType = jv.getFileType(fileItemData.url).type;
                 fileItemData.showName = (fileItemData.name || fileItemData.url.split("/").last()).slice(-7);
             },
             setMyValue(v) {
@@ -192,9 +192,10 @@
                 if (this.fileType != "*") {
                     var errorFileType = Array.from(files).some((rawFile, index) => {
                         var fileName = rawFile.name;
-                        var chkItem = this.getFileType(fileName);
+                        var chkItem = jv.getFileType(fileName);
                         if (chkItem.type != this.fileType) {
-                            jv.error("第" + (index + 1) + "个文件类型不允许，只能上传: " + chkItem.remark + "类型！");
+                            var needType = (jv.fileTypes[this.fileType] || {}).remark || this.fileType;
+                            jv.error(`第 ${index + 1} 个文件类型 ${chkItem.remark || chkItem.ext} 不允许，需要 ${needType} 类型！`);
                             return true;
                         }
                     });
@@ -224,7 +225,7 @@
                 //     });
                 // };
 
-                var fileName = rawFile.name, fileType = this.getFileType(fileName).type;
+                var fileName = rawFile.name, fileType = jv.getFileType(fileName);
 
                 var item = {percentage: 0};
                 this.myValue.push(item);
@@ -236,7 +237,7 @@
                     return this.doUpload(rawFile, null, fileName, item);
                 }
 
-                return jv.file2Base64Data(rawFile).then(base64 => {
+                return jv.file2Base64Data(rawFile).then(base64Data => {
                     jv.EditImage({
                         image: base64Data,
                         scales: this.scales_value,
@@ -250,28 +251,14 @@
                             // this.imageRemark = imageRemark;
 
                             return this.doUpload(null, imageData, fileName, this.maxWidth, item);
+                        },
+                        cancel: () => {
+                            this.myValue.splice(this.myValue.length - 1, 1);
                         }
                     });
                 });
             },
-            getFileType(fileName) {
-                var dotIndex = fileName.lastIndexOf('.');
-                if (dotIndex < 0) return false;
 
-                var ext = fileName.slice(dotIndex + 1).toLowerCase();
-
-                var typeDict = {};
-                typeDict["img"] = {type: "img", exts: "png,jpg,gif,bmp,ico,icon".split(","), remark: "图片文件"};
-                typeDict["doc"] = {type: "doc", exts: "doc,docx,xls,xlsx,pdf".split(","), remark: "office文档"};
-                typeDict["video"] = {type: "video", exts: "mp4,avi,webm,ogg,mov".split(","), remark: "视频文件"};
-
-                var findKey = Object.keys(typeDict).last(key => typeDict[key].exts.includes(ext));
-                if (findKey) {
-                    return typeDict[findKey];
-                }
-
-                return {type: ""};
-            },
             //7.检查Md5,上传
             doUpload(file, imgBase64, fileName, item) {
                 return jv.doUploadFile({

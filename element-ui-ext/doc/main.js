@@ -12,7 +12,7 @@ Vue.config.productionTip = false
 
 // window.Server_Host = "http://172.16.3.199:8081";
 window.Server_Host = "http://59.110.157.64:8130";
-//window.Server_Host = "http://localhost:8130";
+// window.Server_Host = "http://localhost:8130";
 
 (function (jv) {
     window.jv = jv;

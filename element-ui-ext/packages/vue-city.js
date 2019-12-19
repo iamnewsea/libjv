@@ -1,4 +1,4 @@
-import jv from './libjv'
+import jv from "libjv"
 
 jv.citys = [{
   c: 110100,
@@ -87,7 +87,7 @@ jv.citys.getLevel = function (code) {
 jv.citys.findByCode = function (code) {
   if (!code) return;
   code = parseInt(code);
-  //由于1级码可能是直辖市，所以.
+  // 由于1级码可能是直辖市，所以.
   // var level2Code = parseInt(code / 100) * 100;
 
   var findSubOne = function (datas, code, level, maxLevel) {

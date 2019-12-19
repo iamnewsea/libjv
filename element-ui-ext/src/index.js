@@ -15,6 +15,7 @@ import number_range from '../packages/number-range.vue';
 
 import image_edit from '../packages/image-edit.vue';
 
+// import jv from "./jv_vue"
 
 const components = [
   c, e,
@@ -24,7 +25,7 @@ const components = [
   // Upload1,
   upload,
   my_city,
-  number_input,number_range,
+  number_input, number_range,
   image_edit
 ];
 
@@ -35,10 +36,6 @@ const install = function (Vue, opts = {}) {
     components_export[component.name] = component;
     Vue.component(component.name, component);
   });
-
-
-  const ELEMENT = {};
-  ELEMENT.size = opts.size || '';
 };
 
 /* istanbul ignore if */
@@ -47,6 +44,12 @@ if (typeof window !== 'undefined' && window.Vue) {
 }
 
 // components_export["jv"] = jv;
-components_export["install"] = install;
-module.exports = components_export;
-module.exports.default = module.exports;
+
+// components_export["install"] = install;
+// module.exports = components_export;
+// module.exports.default = module.exports;
+
+export default install
+// export default {install}
+
+

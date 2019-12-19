@@ -138,7 +138,7 @@ Object.defineProperty(String.prototype, 'format', {
         return this
             .replace(new RegExp(config.escape, "g"), String.fromCharCode(7))
             .replace(new RegExp(config.regexp, "g"),
-                //m 是指搜索到的整个部分， "(\\w+)"如： {id} , 而 i  是指 该部分的分组内容 ， 如 id
+                // m 是指搜索到的整个部分， "(\\w+)"如： {id} , 而 i  是指 该部分的分组内容 ， 如 id
                 function (m, key) {
                     var value = m;
                     try {

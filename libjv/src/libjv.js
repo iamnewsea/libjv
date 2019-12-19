@@ -3,6 +3,7 @@ import "./defineProperty"
 //单例.
 var jv;
 var JvObject = (function () {
+    // console.log("new JvObject()")
     //私有字段。
     // var db = Symbol("db");
 
@@ -33,6 +34,25 @@ jv.info = console.info;
 jv.error = console.error;
 jv.warn = console.warn;
 
+jv.fileTypes = {
+    img: {type: "img", exts: "png,jpg,gif,bmp,ico,icon".split(","), remark: "图片文件"},
+    doc: {type: "doc", exts: "doc,docx,xls,xlsx,pdf".split(","), remark: "office文档"},
+    video: {type: "video", exts: "mp4,avi,webm,ogg,mov".split(","), remark: "视频文件"}
+};
+
+jv.getFileType = function (fileName) {
+    var dotIndex = fileName.lastIndexOf('.');
+    if (dotIndex < 0) return {};
+
+    var ext = fileName.slice(dotIndex + 1).toLowerCase();
+
+    var findKey = Object.keys(jv.fileTypes).last(key => jv.fileTypes[key].exts.includes(ext));
+    if (findKey) {
+        return Object.assign({ext: ext}, jv.fileTypes[findKey]);
+    }
+
+    return {type: "", ext: ext};
+};
 
 (() => {
     //如果不是浏览器环境,则退出
@@ -82,7 +102,7 @@ jv.warn = console.warn;
     })();
 
 
-    location.getHost = (url) => {
+    jv.getUrlHost = (url) => {
         var r;
         if (url.startsWith("//")) {
             r = /^\/\/([^/\\]+)/i.exec(url)
@@ -97,15 +117,15 @@ jv.warn = console.warn;
     };
 
 
-    let loadQueryJson = (url) => {
-
-        // var tail = location.search + location.hash;
-        // if (tail) {
-        //     location.fullPath = location.href.slice(0, 0 - tail.length);
-        // } else {
-        //     location.fullPath = location.href;
-        // }
-    };
+    // let loadQueryJson = (url) => {
+    //
+    //     // var tail = location.search + location.hash;
+    //     // if (tail) {
+    //     //     location.fullPath = location.href.slice(0, 0 - tail.length);
+    //     // } else {
+    //     //     location.fullPath = location.href;
+    //     // }
+    // };
 
     // let loadLocationHashJson = () => {
     //     let index = location.hash.indexOf("?");
@@ -116,45 +136,69 @@ jv.warn = console.warn;
     //     location.hashJson = jv.query2Json(location.hash.slice(index + 1));
     // };
 
+    // 去除 hash 部分。
+    Object.defineProperty(location, "fullUrl", {
+        get() {
+            return location.href.slice(0, (0 - location.hash.length) || undefined);
+        }, enumerable: false
+    });
 
-    jv.loadAllJson = (url) => {
-        var search = "", hash = "";
-        if (url && url.Type == "string") {
-            var hash_index = url.lastIndexOf("#");
-            if (hash_index >= 0) {
-                hash = url.slice(url.slice(hash_index + 1));
-                url = url.splice(0, hash_index);
+    Object.defineProperty(location, "json", {
+        get() {
+            return jv.query2Json(location.search.slice(1));
+        }, enumerable: false
+    });
+
+    Object.defineProperty(location, "hashJson", {
+        get() {
+            var hash = location.hash
+            var hash_search_index = hash.indexOf("?");
+            if( hash_search_index >=0){
+                return jv.query2Json(hash.slice(hash_search_index + 1));
             }
+            return {};
+        }, enumerable: false
+    });
 
-            var search_index = url.indexOf("?");
-            if (search_index >= 0) {
-                search = url.slice(search_index)
-            }
-        } else {
-            search = location.search;
-            hash = location.hash;
-        }
-
-
-        location.json = jv.query2Json(search.slice(1));
-
-        let hash_search_index = hash.indexOf("?");
-        if (hash_search_index >= 0) {
-            location.hashJson = jv.query2Json(hash.slice(hash_search_index + 1));
-        }
-    };
-
-    if (document.readyState == "complete") {
-        jv.loadAllJson();
-    } else {
-        document.addEventListener("DOMContentLoaded", jv.loadAllJson);
-    }
+    // jv.loadAllJson = (url) => {
+    //     var search = "", hash = "";
+    //     if (url && url.Type == "string") {
+    //         var hash_index = url.lastIndexOf("#");
+    //         if (hash_index >= 0) {
+    //             hash = url.slice(url.slice(hash_index + 1));
+    //             url = url.splice(0, hash_index);
+    //         }
+    //
+    //         var search_index = url.indexOf("?");
+    //         if (search_index >= 0) {
+    //             search = url.slice(search_index)
+    //         }
+    //     } else {
+    //         search = location.search;
+    //         hash = location.hash;
+    //     }
+    //
+    //
+    //     location.json = jv.query2Json(search.slice(1));
+    //
+    //     let hash_search_index = hash.indexOf("?");
+    //     if (hash_search_index >= 0) {
+    //         location.hashJson = jv.query2Json(hash.slice(hash_search_index + 1));
+    //     }
+    //
+    // };
+    //
+    // if (document.readyState == "complete") {
+    //     jv.loadAllJson();
+    // } else {
+    //     document.addEventListener("DOMContentLoaded", jv.loadAllJson);
+    // }
 
     // window.removeEventListener("hashchange", loadLocationHashJson);
     // window.addEventListener("hashchange", loadLocationHashJson);
     //
     //
-    //vue 使用了 pushState
+    // vue 使用了 pushState
     // let pushState_ori = history.pushState
     // history.pushState = () => {
     //     jv.loadAllJson();

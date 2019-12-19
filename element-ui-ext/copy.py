@@ -13,15 +13,16 @@ def rm(path):
             shutil.rmtree(base_path + path )
 
 def cp(fromPath,toPath):
-  if os.path.exists(toPath) :
+    if os.path.exists(toPath) :
         shutil.rmtree(toPath)
 
-  shutil.copytree(fromPath,toPath)
+    print(fromPath + " ---> " + toPath)
+    shutil.copytree(fromPath,toPath)
 
 def mycp(source,toPath):
-      cp( os.path.join( source,"lib"), os.path.join(toPath ,"/node_modules/element-ui-ext/lib"))
-      cp( os.path.join( source,"src"), os.path.join(toPath ,"/node_modules/element-ui-ext/src"))
-      cp( os.path.join( source,"packages"), os.path.join(toPath ,"/node_modules/element-ui-ext/packages"))
+      cp( os.path.join( source,"lib"), os.path.join(toPath ,"node_modules/element-ui-ext/lib"))
+      cp( os.path.join( source,"src"), os.path.join(toPath ,"node_modules/element-ui-ext/src"))
+      cp( os.path.join( source,"packages"), os.path.join(toPath ,"node_modules/element-ui-ext/packages"))
 
 
 if __name__=='__main__':
@@ -34,7 +35,7 @@ if __name__=='__main__':
         print("找不到 node_modules 文件夹，请检查目标文件夹")
         sys.exit(1)
 
-    os.system(("npm --prefix=%s run compile" ) % ( source ) )
+    os.system(("npm --prefix=%s run lib" ) % ( source ) )
     print("-----------------------------------")
 
     mycp(source,target)

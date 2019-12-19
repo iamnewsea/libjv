@@ -172,7 +172,7 @@
                 }
 
                 var dates = (this.date || []).spliceDate();
-                //skip略过的条数，take每页显示多少条
+                // skip略过的条数，take每页显示多少条
                 if (dates[0]) {
                     this.query.start = dates[0];
                 }

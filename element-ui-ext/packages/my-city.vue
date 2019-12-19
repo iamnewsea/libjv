@@ -8,6 +8,8 @@
   </el-cascader>
 </template>
 <script type="text/javascript">
+  import jv from "./vue-city"
+
   export default {
     name: 'my-city',
     props: {

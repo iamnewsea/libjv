@@ -7,7 +7,7 @@
     </el-dialog>
 
     <el-dialog title="编辑图片" :visible.sync="p.edit_show" @opened="edit_opened" @closed="edit_closed"
-               :close-on-click-modal="false" top="auto" width="auto" :center="true">
+               :close-on-click-modal="false" top="auto" width="80%" :center="true">
       <div style="margin-bottom: 10px;display:flex;justify-content: space-between;">
         <el-radio-group v-model="p.scale" size="medium" @change="Image_Scale_Change">
           <el-radio-button :label="s" v-for="s in p.scales" :key="s">{{s}}裁剪</el-radio-button>
@@ -68,7 +68,6 @@
 <script>
     import VueCropper from 'vue-cropperjs';
     import 'cropperjs/dist/cropper.css';
-
     // import "es-jcrop/js/Jcrop";
     /*
     参数对象{
@@ -217,6 +216,7 @@
             },
             edit_closed() {
                 this.p.url = "";
+                this.p.cancel && this.p.cancel();
             },
             editImageLoaded(e) {
                 // if (jv.edit__Image) {
@@ -272,9 +272,9 @@
 
                 var canvas = document.createElement("canvas"),
                     ctx = canvas.getContext('2d'),
-                    //corpBox = cropperImage.getCropBoxData(),
+                    // corpBox = cropperImage.getCropBoxData(),
                     data = cropperImage.getData();
-                //zoom = data.width / parseInt(corpBox.width);
+                // zoom = data.width / parseInt(corpBox.width);
 
                 // var sect = jv.edit__Image.getSelection();
                 //
@@ -301,7 +301,7 @@
                         extType = (ext.match(/png|jpeg|bmp|gif/) || []) [0] || extType;
                     }
 
-                    this.p.callback(canvas.toDataURL('image/' + extType, 0.7), this.p.remark);
+                    this.p.callback && this.p.callback(canvas.toDataURL('image/' + extType, 0.7), this.p.remark);
                     this.p.edit_show = false;
 
                     canvas = null;

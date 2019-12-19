@@ -19,9 +19,9 @@ def cp(fromPath,toPath):
   shutil.copytree(fromPath,toPath)
 
 def mycp(source,toPath):
-      cp( os.path.join( source,"lib"), os.path.join(toPath ,"/node_modules/element.webpart/lib"))
-      cp( os.path.join( source,"src"), os.path.join(toPath ,"/node_modules/element.webpart/src"))
-      cp( os.path.join( source,"packages"), os.path.join(toPath ,"/node_modules/element.webpart/packages"))
+      cp( os.path.join( source,"lib"), os.path.join(toPath ,"node_modules/element.webpart/lib"))
+      cp( os.path.join( source,"src"), os.path.join(toPath ,"node_modules/element.webpart/src"))
+      cp( os.path.join( source,"packages"), os.path.join(toPath ,"node_modules/element.webpart/packages"))
 
 
 if __name__=='__main__':

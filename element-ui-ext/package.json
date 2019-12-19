@@ -4,47 +4,36 @@
   "description": "基于element-ui的vue扩展",
   "author": "于新海 <13466396863@163.com>",
   "scripts": {
-    "dev": "cross-env NODE_ENV=development webpack-dev-server --open --hot",
-    "compile": "cross-env NODE_ENV=development webpack --progress --hide-modules",
-    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules",
-    "prepublishOnly": "npm run build"
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "lib": "vue-cli-service build --target lib --name element-ui-ext --dest lib src/index.js",
+    "prepublishOnly": "npm run lib"
   },
   "dependencies": {},
-  "peerDependencies": {
-    "vue": "^2.5.17",
-    "element-ui": "^2.4.7",
-    "browser-md5-file": "1.0.0",
-    "libjv": "latest"
-  },
+  "peerDependencies": {},
   "devDependencies": {
-    "autoprefixer": "^8.6.4",
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.5",
-    "babel-plugin-add-module-exports": "^0.2.1",
-    "babel-plugin-module-resolver": "^3.1.0",
-    "babel-plugin-syntax-jsx": "^6.18.0",
-    "babel-plugin-transform-runtime": "^6.23.0",
-    "babel-plugin-transform-vue-jsx": "^3.7.0",
-    "babel-preset-latest": "^6.24.0",
+    "libjv": "latest",
     "browser-md5-file": "1.0.0",
-    "cross-env": "^5.2.0",
-    "css-loader": "^1.0.1",
-    "style-loader": "^1.0.0",
-    "element-ui": "^2.4.7",
+    "element-ui": "^2.13.0",
     "file-loader": "^1.1.11",
-    "libjv": "^0.8.49",
-    "raw-loader": "^0.5.1",
-    "vue": "^2.5.17",
+    "vue": "^2.6.10",
     "vue-cropperjs": "^4.0.1",
-    "vue-loader": "^14.2.3",
-    "vue-template-compiler": "^2.5.17",
-    "webpack": "^3.12.0",
-    "webpack-dev-server": "^3.1.10"
+    "@vue/cli-plugin-babel": "^3.2.0",
+    "@vue/cli-plugin-eslint": "^3.2.0",
+    "@vue/cli-service": "^3.2.0",
+    "@vue/eslint-config-standard": "^4.0.0",
+    "babel-eslint": "^10.0.1",
+    "eslint": "^5.8.0",
+    "eslint-plugin-vue": "^5.0.0-0",
+    "node-sass": "^4.13.0",
+    "sass-loader": "^7.0.1",
+    "vue-template-compiler": "^2.6.10"
   },
-  "main": "lib/index.js",
+  "main": "src/index.js",
   "repository": {
     "type": "Git",
-    "url": "https://gitee.com/imnewsea/element-ui-ext.git"
+    "url": "https://gitee.com/imnewsea/libjv.git"
   },
   "files": [
     "packages",
@@ -59,7 +48,7 @@
   ],
   "license": "ISC",
   "engines": {
-    "node": ">= 8.0.0",
-    "npm": ">= 5.0.0"
+    "node": ">= 10.0.0",
+    "npm": ">= 6.0.0"
   }
 }

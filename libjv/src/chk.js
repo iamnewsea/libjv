@@ -1,4 +1,4 @@
-import jv from "./vue-init"
+import jv from "./libjv"
 
 (function () {
     if (typeof (HTMLElement) === "undefined") return;

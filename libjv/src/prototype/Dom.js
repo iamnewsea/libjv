@@ -1,6 +1,6 @@
 //-----------------------------------------------------------------
 (function () {
-    //Node环境需要
+    // Node环境需要
     if (typeof window === 'undefined' ) {
         return;
     }
@@ -151,7 +151,7 @@
         }, enumerable: false
     });
 
-//targetElement.after(newElement) 返回newElement
+// targetElement.after(newElement) 返回newElement
     Object.defineProperty(Element.prototype, "after", {
         value(newElement) {
             var parent = this.parentNode;

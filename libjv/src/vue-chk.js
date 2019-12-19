@@ -1,4 +1,4 @@
-import jv from "./vue-init"
+import jv from "./libjv"
 
 (function () {
     if (typeof (HTMLElement) === "undefined") return;
@@ -254,7 +254,7 @@ import jv from "./vue-init"
         return {};
     };
 
-    //vueModel = { vnode , value }
+    // vueModel = { vnode , value }
     var chk_item = function (chk_dom) {
 
         var ret = {result: true};
@@ -385,7 +385,7 @@ import jv from "./vue-init"
      * 特殊的chk_type: reg , function
      */
     // Object.defineProperty(jv.Vue.prototype, "chk", {
-    //     //chk_show:如何显示的回调.
+    //     chk_show:如何显示的回调.
     //     value: function (singleShow) {
     jv.chk_vue_dom = function (container, singleShow) {
         var index = 0, ret = true, list = getAllVuesChkDom(container);

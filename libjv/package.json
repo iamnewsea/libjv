@@ -1,12 +1,12 @@
 {
   "name": "libjv",
-  "version": "0.9.45",
+  "version": "0.9.46",
   "description": "Es6的单页应用常用扩展",
-  "main": "src/index.js",
   "scripts": {
     "build": "babel -d lib/ src/ && babel -d lib/prototype src/prototype",
     "prepublishOnly": "npm run build"
   },
+  "main": "lib/index.js",
   "files": [
     "lib",
     "src"

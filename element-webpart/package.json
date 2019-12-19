@@ -1,6 +1,6 @@
 {
   "name": "element-webpart",
-  "version": "0.9.45",
+  "version": "0.3.46",
   "description": "element ui 公共页面 的扩展",
   "author": "于新海 <13466396863@163.com>",
   "scripts": {
@@ -10,6 +10,7 @@
     "lib": "vue-cli-service build --target lib --name element-webpart --dest lib src/index.js",
     "prepublishOnly": "npm run lib"
   },
+  "main": "lib/element-webpart.umd.js",
   "dependencies": {},
   "peerDependencies": {},
   "devDependencies": {
@@ -31,7 +32,6 @@
     "sass-loader": "^7.0.1",
     "vue-template-compiler": "^2.6.10"
   },
-  "main": "src/index.js",
   "repository": {
     "type": "Git",
     "url": "https://gitee.com/imnewsea/libjv.git"

@@ -15,6 +15,9 @@ jv.initVue = (setting) => {
   var vueProtype = vue.prototype;
   vueProtype.jv = jv;
   vueProtype.Server_Host = window.Server_Host;
+
+  jv.initVue_setting = {ajaxIgnoreJavaBooleanKey,ajaxIgnoreResType};
+
   // vueProtype.Upload_Url = window.Server_Host + "/sys/upload";
 
   // Object.defineProperty(vueProtype, "$resetData", {
@@ -154,22 +157,7 @@ jv.initVue = (setting) => {
 
     //处理Java的布尔类型
     if (!response.config.ignoreJavaBooleanKey) {
-      jv.recursionJson(json, (key1, value, target) => {
-        if (value !== false && value !== true) {
-          return;
-        }
-
-        //转为 isUpper 形式。
-        if (key1.length > 2 && (key1.slice(0, 2) == "is" && key1.charCodeAt(2).Between(65, 90))) {
-
-        } else {
-          var key2 = "is" + key1[0].toUpperCase() + key1.slice(1)
-          if (key2 in target == false) {
-            target[key2] = value;
-            delete target[key1];
-          }
-        }
-      });
+      jv.fixJavaBoolField(json);
     }
 
     jv.fillRes(json, null, null, response.config.ignoreResType);

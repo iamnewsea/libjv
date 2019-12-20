@@ -62,6 +62,53 @@
                 this.pageNumber = 1;
                 this.loadData();
             },
+
+            //仅刷新数据,用于更新后，更新某一条。
+            updateData(data, key = "id") {
+                if (!data) return;
+                if (!data[key]) return;
+
+                var row = this.tableData.find(it => it[key] == data[key]);
+                if (!row) return;
+                Object.assign(row, data);
+
+                this.$emit("input", this.tableData);
+            },
+            //仅刷新数据,用于更新后，更新某一条。
+            updateId(id, key = "id") {
+                if (!id) return;
+                var row = this.tableData.find(it => it[key] == id);
+                if(!row) return ;
+
+                this.loading = true;
+
+                var newQuery = {
+                    pageNumber: this.pageNumber,
+                    skip: (this.pageNumber - 1) * this.pageSize,
+                    take: this.pageSize
+                };
+
+                newQuery[key] = id;
+
+                let para = Object.assign({}, this.query, newQuery);
+
+                this.$http.post(this.url, para).then(res => {
+                    var newData = res.data.data[0] || {};
+
+                    this.tableData = this.tableData.map(it=>{
+                       if(it[key] == newData[key]){
+                           return newData;
+                       }
+                       return it;
+                    });
+
+                    res.data.data = this.tableData;
+                    this.$emit("loaded", res, para);
+
+                    this.$emit("input", this.tableData);
+                    this.loading = false;
+                });
+            },
             loadData(pageNumber) {
                 if (pageNumber) {
                     this.pageNumber = pageNumber;
@@ -102,7 +149,7 @@
                             this.total = this.$store.getJson().total;
                         }
                     }
-                    this.$emit("input", res.data);
+                    this.$emit("input", this.tableData);
                     this.loading = false;
                 });
             },

@@ -16,7 +16,7 @@ path 添加 python2
 ---- 使用以下方法下载编译后版本，比较快。
 > npm i -g node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
 > npm i --registry=https://registry.npm.taobao.org
-> npm install -g @vue/cli
+> npm install -g @vue/cli --registry=https://registry.npm.taobao.org
 > 
 >作者 imnewsea
 

@@ -192,7 +192,7 @@ jv.initVue = (setting) => {
     /*{"timestamp":1502603323197,"status":500,"error":"Internal Server Error","exception":"java.lang.Exception","message":"更新条件为空，不允许更新","path":"/sys/synchroMenuAndPermiss"}*/
     var errorMsg = (data && (data.msg || data.message)) || "系统错误:" + JSON.stringify(data);
 
-    jv.error(errorMsg.slice(0, 100), "", "ajax");
+    jv.error(errorMsg.slice(0, 100));
     return Promise.reject(error);
   });
 

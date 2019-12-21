@@ -99,6 +99,7 @@ jv.getFileType = function (fileName) {
             }
             , set(key, value, cacheTime) {
                 key = key.trim();
+                value = value + "";
                 value = encodeURIComponent(value.trim() || "");
                 db[key] = value;
 

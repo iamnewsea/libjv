@@ -32,7 +32,7 @@ jv.initVue = (setting) => {
       jv.store.setJson("global", Object.assign({}, this.getGlobal(), data));
     },
     getGlobalJson() {
-      return jv.store.getJson("global") || {};
+      return jv.store.getJson("global") ;
     },
     resetGlobalJson(data) {
       jv.store.setJson("global", data);
@@ -41,7 +41,7 @@ jv.initVue = (setting) => {
       jv.store.setJson(jv.main.$route.fullPath, Object.assign({}, this.getJson(), data));
     },
     getJson() {
-      return jv.store.getJson(jv.main.$route.fullPath) || {};
+      return jv.store.getJson(jv.main.$route.fullPath) ;
     },
     resetJson(data) {
       jv.store.setJson(jv.main.$route.fullPath, data);

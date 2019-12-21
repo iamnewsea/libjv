@@ -20,7 +20,7 @@ var JvObject = (function () {
 })();
 
 jv = new JvObject();
-jv.root =  typeof self == 'object' && self.self === self && self ||
+jv.root = typeof self == 'object' && self.self === self && self ||
     typeof global == 'object' && global.global === global && global ||
     this ||
     {};
@@ -28,9 +28,6 @@ jv.prototype = JvObject.prototype;
 
 jv.noop = () => {
 };
-
-
-
 
 
 jv.info = console.info;
@@ -58,9 +55,12 @@ jv.getFileType = function (fileName) {
 };
 
 
-(()=>{
-    class Radio{}
-    class Check{}
+(() => {
+    class Radio {
+    }
+
+    class Check {
+    }
 
     jv.root.Radio = Radio;
     jv.root.Check = Check;
@@ -68,7 +68,6 @@ jv.getFileType = function (fileName) {
 
 
 (() => {
-
 
 
     //如果不是浏览器环境,则退出
@@ -169,7 +168,7 @@ jv.getFileType = function (fileName) {
         get() {
             var hash = location.hash
             var hash_search_index = hash.indexOf("?");
-            if( hash_search_index >=0){
+            if (hash_search_index >= 0) {
                 return jv.query2Json(hash.slice(hash_search_index + 1));
             }
             return {};
@@ -230,7 +229,7 @@ jv.getFileType = function (fileName) {
 jv.store = {
     getJson(key) {
         var v = this.get(key);
-        if (!v) return null;
+        if (!v) return {};
         return JSON.parse(v);
     },
     setJson(key, value, cacheSeconds) {
@@ -529,7 +528,7 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
 /**
  * 修复Java布尔类的字段名称。使用 isUdd 字段
  */
-jv.fixJavaBoolField = (json)=>{
+jv.fixJavaBoolField = (json) => {
     jv.recursionJson(json, (key1, value, target) => {
         if (value !== false && value !== true) {
             return;

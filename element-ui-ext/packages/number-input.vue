@@ -1,13 +1,15 @@
 <template>
   <div
     @dragstart.prevent
-    :class="[
+    :class="readOnly? []: [
       'el-input-number',
       inputNumberSize ? 'el-input-number--' + inputNumberSize : '',
       { 'is-disabled': inputNumberDisabled },
       { 'is-without-controls': !controls },
       { 'is-controls-right': controlsAtRight }
     ]">
+    <template v-if="readOnly">{{currentValue}}</template>
+    <template v-else>
     <span
       class="el-input-number__decrease"
       role="button"
@@ -17,38 +19,39 @@
       @keydown.enter="decrease">
       <i :class="`el-icon-${controlsAtRight ? 'arrow-down' : 'minus'}`"></i>
     </span>
-    <span
-      class="el-input-number__increase"
-      role="button"
-      v-if="controls"
-      v-repeat-click="increase"
-      :class="{'is-disabled': maxDisabled}"
-      @keydown.enter="increase">
+      <span
+        class="el-input-number__increase"
+        role="button"
+        v-if="controls"
+        v-repeat-click="increase"
+        :class="{'is-disabled': maxDisabled}"
+        @keydown.enter="increase">
       <i :class="`el-icon-${controlsAtRight ? 'arrow-up' : 'plus'}`"></i>
     </span>
-    <slot :text="currentText" :value="currentValue"></slot>
-    <el-input
-      ref="input"
-      :class="{'my-number-input':true, hideInput: hasSlot}"
-      :value="currentValue"
-      :disabled="inputNumberDisabled"
-      :size="inputNumberSize"
-      :max="max"
-      :min="min"
-      :name="name"
-      :label="label"
-      @keydown.up.native.prevent="increase"
-      @keydown.down.native.prevent="decrease"
-      @blur="handleBlur"
-      @focus="handleFocus"
-      @change="handleInputChange">
-      <template slot="prepend" v-if="$slots.prepend">
-        <slot name="prepend"></slot>
-      </template>
-      <template slot="append" v-if="$slots.append">
-        <slot name="append"></slot>
-      </template>
-    </el-input>
+      <slot :text="currentText" :value="currentValue"></slot>
+      <el-input
+        ref="input"
+        :class="{'my-number-input':true, hideInput: hasSlot}"
+        :value="currentValue"
+        :disabled="inputNumberDisabled"
+        :size="inputNumberSize"
+        :max="max"
+        :min="min"
+        :name="name"
+        :label="label"
+        @keydown.up.native.prevent="increase"
+        @keydown.down.native.prevent="decrease"
+        @blur="handleBlur"
+        @focus="handleFocus"
+        @change="handleInputChange">
+        <template slot="prepend" v-if="$slots.prepend">
+          <slot name="prepend"></slot>
+        </template>
+        <template slot="append" v-if="$slots.append">
+          <slot name="append"></slot>
+        </template>
+      </el-input>
+    </template>
   </div>
 </template>
 <script>
@@ -58,7 +61,7 @@
         extends: inputNumber,
         name: 'my-number-input',
         props: {
-            // readOnly: {type: Boolean, default: false}, //inputNumberDisabled
+            readOnly: {type: Boolean, default: false},
             map: {
                 type: Object
             }
@@ -72,7 +75,6 @@
             }
         },
         mounted() {
-
             this.hasSlot = this.$refs.input && this.$refs.input.$el.previousElementSibling.className != "el-input-number__increase";
         }
     }

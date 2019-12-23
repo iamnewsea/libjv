@@ -22,7 +22,7 @@ def cp(fromPath,toPath):
 def mycp(source,toPath):
       cp( os.path.join( source,"lib"), os.path.join(toPath ,"node_modules/libjv/lib"))
       cp( os.path.join( source,"src"), os.path.join(toPath ,"node_modules/libjv/src"))
-
+      # shutil.copyfile( os.path.join( source,"package.json"), os.path.join(toPath ,"node_modules/libjv/package.json"))
 
 if __name__=='__main__':
     source = os.path.abspath( os.path.join( __file__ ,"../" ) )

@@ -43,6 +43,9 @@
         v-model="p.remark">
       </el-input>
     </el-dialog>
+
+
+    <div style="display:none" ref="download_div"></div>
   </div>
 </template>
 <!--<style>-->
@@ -126,7 +129,7 @@
             var self = this;
             //预览图片,图片前后应该带着文字
             //{ type:['img','video'] , url:'表示全路径的URL信息' }
-            jv.Preview = p => {
+            jv.openPreview = jv.Preview = p => {
                 if (!p || !p.url) {
                     return;
                 }
@@ -139,7 +142,7 @@
 
             //编辑图片,图片前后应该带着文字
             //{ type:['img','video'] , url:'', scales:["16:9"] , scale:"", remark:"", callback:"" }
-            jv.EditImage = p => {
+            jv.openEditImage = jv.EditImage = p => {
                 p.url = p.image || p.url;
                 if (!p || !p.url) {
                     return;
@@ -150,6 +153,14 @@
                         scale: p.scale || p.scales[0]
                     });
             };
+
+            jv.downloadFile = url => {
+                if (!url) return;
+                console.log(url);
+                var div = this.$refs["download_div"];
+                div.innerHTML = "";
+                div.innerHTML = "<iframe src=\"" + url + "\" />";
+            }
         },
         watch: {
             option: {

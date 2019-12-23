@@ -1,6 +1,6 @@
 {
   "name": "element-webpart",
-  "version": "0.3.46",
+  "version": "0.3.47",
   "description": "element ui 公共页面 的扩展",
   "author": "于新海 <13466396863@163.com>",
   "scripts": {
@@ -15,22 +15,23 @@
   "peerDependencies": {},
   "devDependencies": {
     "libjv": "latest",
+    "core-js": "^3.6.0",
     "browser-md5-file": "1.0.0",
     "element-ui": "^2.13.0",
-    "element-ui-ext": "latest",
     "file-loader": "^1.1.11",
     "vue": "^2.6.10",
     "vue-cropperjs": "^4.0.1",
-    "@vue/cli-plugin-babel": "^3.2.0",
-    "@vue/cli-plugin-eslint": "^3.2.0",
-    "@vue/cli-service": "^3.2.0",
+    "@vue/cli-plugin-babel": "^4.1.1",
+    "@vue/cli-plugin-eslint": "^4.1.1",
+    "@vue/cli-service": "^4.1.1",
     "@vue/eslint-config-standard": "^4.0.0",
-    "babel-eslint": "^10.0.1",
-    "eslint": "^5.8.0",
-    "eslint-plugin-vue": "^5.0.0-0",
+    "babel-eslint": "^10.0.3",
+    "eslint": "^5.16.0",
+    "eslint-plugin-vue": "^6.0.1",
     "node-sass": "^4.13.0",
-    "sass-loader": "^7.0.1",
-    "vue-template-compiler": "^2.6.10"
+    "sass-loader": "^8.0.0",
+    "vue-template-compiler": "^2.6.10",
+    "element-ui-ext": "latest"
   },
   "repository": {
     "type": "Git",

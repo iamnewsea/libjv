@@ -1,35 +1,48 @@
 <template>
-  <div class="enum" @dblclick="value2 = ''">
+  <div class="enum" @dblclick="readOnly? null :value2 = ''">
+
+
     <template v-if="mode == 'radio'">
-      <el-radio-group v-model="value2" v-bind="[$props, $attrs]" v-if="Object.keys(data2).length <= enumCount">
-        <el-radio v-for="(value,key) in data2" :label="key"
-                  :key="key">{{value}}
-        </el-radio>
-      </el-radio-group>
-      <el-select v-model="value2" placeholder="请选择" v-else>
-        <el-option
-          v-for="(value,key) in data2"
-          :key="key"
-          :label="value"
-          :value="key">
-        </el-option>
-      </el-select>
+      <template v-if="readOnly">
+        <el-tag :type="tagType">{{data2[value2]}}</el-tag>
+      </template>
+      <template v-else>
+        <el-radio-group v-model="value2" v-bind="[$props, $attrs]" v-if="Object.keys(data2).length <= enumCount" @change="$emit('change',value2)">
+          <el-radio v-for="(value,key) in data2" :label="key"
+                    :key="key">{{value}}
+          </el-radio>
+        </el-radio-group>
+        <el-select v-model="value2" placeholder="请选择" v-else  @change="$emit('change',value2)">
+          <el-option
+            v-for="(value,key) in data2"
+            :key="key"
+            :label="value"
+            :value="key">
+          </el-option>
+        </el-select>
+      </template>
     </template>
     <template v-else>
-      <el-checkbox-group v-model="value2" v-bind="[$props, $attrs]" v-if="Object.keys(data2).length <= enumCount">
-        <el-checkbox v-for="(value,key) in data2" :label="key"
-                     :key="key">{{value}}
-        </el-checkbox>
-      </el-checkbox-group>
-      <el-select v-model="value2" multiple  placeholder="请选择" v-else>
-        <el-option
-          v-for="(value,key) in data2"
-          :key="key"
-          :label="value"
-          :value="key">
-        </el-option>
-      </el-select>
+      <template v-if="readOnly">
+        <el-tag  v-for="item in value2" :key="item" :type="tagType">{{data2[item]}}</el-tag>
+      </template>
+      <template v-else>
+        <el-checkbox-group v-model="value2" v-bind="[$props, $attrs]" v-if="Object.keys(data2).length <= enumCount"  @change="$emit('change',value2)">
+          <el-checkbox v-for="(value,key) in data2" :label="key"
+                       :key="key">{{value}}
+          </el-checkbox>
+        </el-checkbox-group>
+        <el-select v-model="value2" multiple placeholder="请选择" v-else  @change="$emit('change',value2)">
+          <el-option
+            v-for="(value,key) in data2"
+            :key="key"
+            :label="value"
+            :value="key">
+          </el-option>
+        </el-select>
+      </template>
     </template>
+
   </div>
 </template>
 <script>
@@ -38,13 +51,14 @@
         props: {
             url: {type: String, default: ""},
             data: {type: [Object, Array], default: []},
-
+            tagType: {type: String, default: ""},
             //当 data 是 Array的时候，需要指定 field中的两个值 。 当data是Object的时候，指定 一个field 表示显示的值
             field: {
                 type: String, default() {
                     return ""
                 }
             },
+            readOnly: {type: Boolean, default: false},
             enumCount: {type: Number, default: 3}, //使用 enum方式的个数
             mode: {type: String, default: "radio"},
             value: {
@@ -101,6 +115,7 @@
             this.keyField = fields[0];
             this.valueField = fields[1];
             this.value2 = this.value;
+            // this.label2 = ""; // readOnly 显示时用。
             this.init();
 
         }, methods: {
@@ -131,6 +146,7 @@
                 }
 
                 this.data2 = d2;
+                // this.label2 = this.data2[this.value2] || "";
             }
         }
     }

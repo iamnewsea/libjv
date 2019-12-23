@@ -12,7 +12,7 @@
         </div>
         <div class="el-upload-bg">
         </div>
-        <div class="el-upload-icon confirm-icon">
+        <div class="el-upload-icon confirm-icon" v-if="!readOnly">
           <el-tag type="danger" @click="onRemove(index,$event)" style="padding-left:12px;padding-right:12px;">确认删除?
           </el-tag>
         </div>
@@ -21,10 +21,10 @@
             <i class="el-icon-view" @click="file_preview(index)"
                v-if="item.fileType == 'img' || item.fileType == 'video'"></i>
             <i class="el-icon-download" @click="file_download(index)" v-else></i>
-            <i class="el-icon-delete"
+            <i class="el-icon-delete" v-if="!readOnly"
                @click="$event.target.closest('.el-upload-preview').classList.add('deleting')"></i>
           </div>
-          <div v-if="maxCount>1">
+          <div v-if="maxCount>1"  v-if="!readOnly">
             <i class="el-icon-arrow-left" @click="move_left(index)" v-if="index>0"></i>
             <i class="el-icon-arrow-right" @click="move_right(index)" v-if="index < myValue.length -1"></i>
           </div>
@@ -37,15 +37,14 @@
       <el-progress type="circle" :percentage="item.percentage" v-else-if="item.percentage<100"></el-progress>
     </div>
 
-    <input type="file" name="file" style="display: none" @change="file_change" @click="file_click" v-bind="fileAttr">
+    <input type="file" name="file" style="display: none" @change="file_change" @click="file_click" v-bind="fileAttr" v-if="!readOnly">
 
-    <div class="el-upload" @click="upload_Click" v-if="!myValue ||  myValue.length < maxCount">
+    <div class="el-upload" @click="upload_Click" v-if="!readOnly && ( !myValue ||  myValue.length < maxCount )">
       <div class="el-upload-preview">
         <slot>
           <i class="el-icon-plus avatar-uploader-icon"></i></slot>
       </div>
     </div>
-
   </div>
 </template>
 <script>
@@ -59,6 +58,7 @@
                     return ret;
                 }
             },
+            readOnly:{type:Boolean , default:false} ,
             uid: {type: null, default: 0},     // 表示该图片所属的表的行Id.
             db: {type: String, default: ""},   // 表名.列表. 定义了 db ,自动调用服务器Api
             scales: {
@@ -411,7 +411,7 @@
                 jv.Preview({type: this.myValue[index].fileType, url: this.myValue[index].fullUrl});
             },
             file_download(index) {
-                window.open(this.myValue[index].fullUrl, "download")
+                jv.downloadFile(this.myValue[index].fullUrl)
             }
         }
     }

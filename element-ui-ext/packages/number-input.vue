@@ -52,28 +52,30 @@
   </div>
 </template>
 <script>
-  import inputNumber from 'element-ui/lib/input-number'
+    import inputNumber from 'element-ui/lib/input-number'
 
-  export default {
-    extends: inputNumber,
-    name: 'my-number-input',
-    props: {
-      map: {
-        type: Object
-      }
-    },
-    data() {
-      return {hasSlot: false}
-    },
-    computed: {
-      currentText() {
-        return this.map && this.currentValue in this.map ? this.map[this.currentValue] : this.currentValue;
-      }
-    },
-    mounted() {
-      this.hasSlot = this.$refs.input && this.$refs.input.$el.previousElementSibling.className != "el-input-number__increase";
+    export default {
+        extends: inputNumber,
+        name: 'my-number-input',
+        props: {
+            // readOnly: {type: Boolean, default: false}, //inputNumberDisabled
+            map: {
+                type: Object
+            }
+        },
+        data() {
+            return {hasSlot: false}
+        },
+        computed: {
+            currentText() {
+                return this.map && this.currentValue in this.map ? this.map[this.currentValue] : this.currentValue;
+            }
+        },
+        mounted() {
+
+            this.hasSlot = this.$refs.input && this.$refs.input.$el.previousElementSibling.className != "el-input-number__increase";
+        }
     }
-  }
 </script>
 <style>
   .my-number-input.hideInput input, .my-number-input.hideInput input::selection {

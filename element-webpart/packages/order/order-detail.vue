@@ -199,7 +199,7 @@
                 this.deliveryFormVisible = true;
             },
             CheckQualificationClick(e) {
-                window.open(e.target.src);
+                jv.downloadFile(e.target.src);
             },
             setPayed() {
                 this.$http.post('/info/order/setStatus', {

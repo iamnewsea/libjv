@@ -10,12 +10,13 @@
     "lib": "vue-cli-service build --target lib --name element-ui-ext --dest lib src/index.js",
     "prepublishOnly": "npm run lib"
   },
-  "dependencies": {
+  "dependencies": {},
+  "peerDependencies": {
+    "core-js": "^3.6.0"
   },
-  "peerDependencies": {},
   "devDependencies": {
-    "libjv": "latest",
     "core-js": "^3.6.0",
+    "libjv": "latest",
     "browser-md5-file": "1.0.0",
     "element-ui": "^2.13.0",
     "file-loader": "^1.1.11",
@@ -29,7 +30,7 @@
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^6.0.1",
     "node-sass": "^4.13.0",
-    "sass-loader": "^8.0.0",
+    "sass-loader": "^7.3.1",
     "vue-template-compiler": "^2.6.10"
   },
   "main": "lib/element-ui-ext.umd.js",

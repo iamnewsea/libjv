@@ -12,7 +12,9 @@
   },
   "main": "lib/element-webpart.umd.js",
   "dependencies": {},
-  "peerDependencies": {},
+  "peerDependencies": {
+    "core-js": "^3.6.0"
+  },
   "devDependencies": {
     "libjv": "latest",
     "core-js": "^3.6.0",

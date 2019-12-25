@@ -155,9 +155,10 @@ Object.defineProperty(Number.prototype, 'getEachBitValue', {
 });
 
 /* 保留小数位 , 使用 Math.round 方法。  .toFixed是银行家算法。
+* 默认两位小数
  */
 Object.defineProperty(Number.prototype, 'ToRound', {
-    value(dotLength) {
+    value(dotLength = 2) {
         var n = Math.pow(10, dotLength);
         return Math.round(this * n) / n;
     }, enumerable: false

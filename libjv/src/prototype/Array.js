@@ -28,15 +28,21 @@ Object.defineProperty(Array.prototype, "last", {
 
 //增强型ForEach，函数返回 false 退出循环。
 // filter第二个参数是 index
-//返回循环的个数。
+//没有值返回 null , 如果全部执行完，返回true, 否则返回 filter 返回的值false。
 Object.defineProperty(Array.prototype, "ForEach", {
     value(filter, trueAction, falseAction) {
-        var ret = 0;
-        if (!this.length || !filter) return ret;
+        return this.forEachIndexed(filter, trueAction, falseAction)
+    }, enumerable: false
+});
 
-        for (var i = 0, len = this.length; i < len; i++) {
-            var item = this[i];
-            var ret = filter(item, i);
+Object.defineProperty(Array.prototype, "forEachIndexed", {
+    value(filter, trueAction, falseAction) {
+        if (!this.length) return null;
+        if( !filter) return true;
+
+        for (var index = 0, len = this.length; index < len; index++) {
+            var item = this[index];
+            var ret = filter(item, index);
             if (ret === false) {
                 if (falseAction && (falseAction(item, i) !== false)) {
                     continue;
@@ -45,12 +51,10 @@ Object.defineProperty(Array.prototype, "ForEach", {
             } else if (ret === true && trueAction) {
                 trueAction(item, i);
             }
-            ret++;
         }
-        return ret;
+        return true;
     }, enumerable: false
 });
-
 
 
 /**

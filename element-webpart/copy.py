@@ -19,10 +19,10 @@ def cp(fromPath,toPath):
   shutil.copytree(fromPath,toPath)
 
 def mycp(source,toPath):
-      cp( os.path.join( source,"lib"), os.path.join(toPath ,"node_modules/element.webpart/lib"))
-      cp( os.path.join( source,"src"), os.path.join(toPath ,"node_modules/element.webpart/src"))
-      cp( os.path.join( source,"packages"), os.path.join(toPath ,"node_modules/element.webpart/packages"))
-
+    cp( os.path.join( source,"lib"), os.path.join(toPath ,"node_modules/element-webpart/lib"))
+    cp( os.path.join( source,"src"), os.path.join(toPath ,"node_modules/element-webpart/src"))
+    cp( os.path.join( source,"packages"), os.path.join(toPath ,"node_modules/element-webpart/packages"))
+    shutil.copyfile( os.path.join( source,"package.json"), os.path.join(toPath ,"node_modules/element-webpart/package.json"))
 
 if __name__=='__main__':
     source = os.path.abspath( os.path.join( __file__ ,"../" ) )
@@ -34,7 +34,7 @@ if __name__=='__main__':
         print("找不到 node_modules 文件夹，请检查目标文件夹")
         sys.exit(1)
 
-    os.system(("npm --prefix=%s run compile" ) % ( source ) )
+    os.system(("npm --prefix=%s run build" ) % ( source ) )
     print("-----------------------------------")
 
     mycp(source,target)

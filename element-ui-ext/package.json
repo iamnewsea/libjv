@@ -5,10 +5,10 @@
   "author": "于新海 <13466396863@163.com>",
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build_only": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "lib": "vue-cli-service build --target lib --name element-ui-ext --dest lib src/index.js",
-    "prepublishOnly": "npm run lib"
+    "build": "vue-cli-service build --target lib --name element-ui-ext --dest lib src/index.js",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {},
   "peerDependencies": {

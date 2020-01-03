@@ -7,7 +7,7 @@ module.exports = {
     path: path.resolve(__dirname, './lib'),
     publicPath: '/lib/',
     filename: 'index.js',
-    library: 'element.webpart',
+    library: 'element-webpart',
     libraryTarget: 'umd',
     umdNamedDefine: true
   },

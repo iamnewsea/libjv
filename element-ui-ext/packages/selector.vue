@@ -53,7 +53,7 @@
             data: {type: [Object, Array], default: []},
             tagType: {type: String, default: ""},
             //当 data 是 Array的时候，需要指定 field中的两个值 。 当data是Object的时候，指定 一个field 表示显示的值
-            field: {
+            fields: {
                 type: String, default() {
                     return ""
                 }

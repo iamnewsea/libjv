@@ -387,8 +387,7 @@ function JvEnum(typeName, json) {
 
 // 判断是 null or defined
 jv.IsNull = (value) => {
-    var type = typeof (value)
-    if (type == "undefined") return true;
+    if (typeof (value) == "undefined") return true;
     return value === null;
 };
 

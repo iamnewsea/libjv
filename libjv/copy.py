@@ -6,11 +6,12 @@ import sys
 import shutil
 from sys import argv
 
+base_path=os.path.abspath( os.path.join( __file__ ,"../" ) )
 
 def rm(path):
-    if  os.path.exists( base_path + path) :
-            print(base_path + path)
-            shutil.rmtree(base_path + path )
+    if  os.path.exists(  path) :
+            print("delete path:" + path)
+            shutil.rmtree( path )
 
 def cp(fromPath,toPath):
     if os.path.exists(toPath) :
@@ -25,19 +26,22 @@ def mycp(source,toPath):
     shutil.copyfile( os.path.join( source,"package.json"), os.path.join(toPath ,"node_modules/libjv/package.json"))
 
 if __name__=='__main__':
-    source = os.path.abspath( os.path.join( __file__ ,"../" ) )
     target = os.path.abspath( argv[1] )
-    print("源地址："+ source + " ---> 目标地址：" + target)
+    print("源地址："+ base_path + " ---> 目标地址：" + target)
     print("-----------------------------------")
 
     if not os.path.exists( target + "/node_modules"):
         print("找不到 node_modules 文件夹，请检查目标文件夹")
         sys.exit(1)
 
-    os.system(("npm --prefix=%s run build" ) % ( source ) )
+    rm( os.path.abspath(os.path.join( base_path + "./lib") ))
+    os.system(("npm --prefix=%s run build" ) % ( base_path ) )
     print("-----------------------------------")
 
-    mycp(source,target)
+    mycp(base_path,target)
+
+    print("完成")
+
 
     print("完成")
 

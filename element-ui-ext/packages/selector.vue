@@ -9,7 +9,7 @@
       <template v-if="type == 'radio'">
         <el-radio-group v-model="value1" v-if="data2.length <= enumCount"
                         @change="changed">
-          <el-radio v-for="(item,index) in data2" :label="item[keyField]"
+          <el-radio v-for="item in data2" :label="item[keyField]"
                     :key="item[keyField]">{{item[labelField]}}
           </el-radio>
         </el-radio-group>
@@ -26,15 +26,15 @@
       </template>
       <template v-else>
         <el-checkbox-group v-model="value2" v-if="data2.length <= enumCount"
-                           @change="changed">
-          <el-checkbox v-for="(item,index) in data2" :label="item[keyField]"
+                           @change="changed(null)">
+          <el-checkbox v-for="item in data2" :label="item[keyField]"
                        :key="item[keyField]">{{item[labelField]}}
           </el-checkbox>
         </el-checkbox-group>
         <el-select v-model="value2" multiple placeholder="请选择" v-else
                    @change="changed">
           <el-option
-            v-for="(item,index) in data2"
+            v-for=" item in data2"
             :key="item[keyField]"
             :label="item[labelField]"
             :value="item[keyField]">
@@ -54,10 +54,11 @@
             // data 如果是数组，对象深度只能是一级或零级： [{id,name } , ...]  ,["中学","小学",...]
             // 到 data2的时候，全部是一级对象。
             data: {
-                type: [Object, String, Array], default() {
+                type: [Object, Array], default() {
                     return []
                 }
             },
+            enum: {type: String, default: ""},
             tagType: {type: String, default: ""},
             //当data是Array的时候，需要指定 field的两个值,第一个是 key , 第2个是 value
             fields: {
@@ -75,19 +76,18 @@
                     return {};
                 }
             },
-            //默认返回 data 中的整条数据，如果是 json，返回 key.
-            // valueField: {type: String, default: ""}
+            //默认:如果是json，返回 key.如果是 valueArray ["a","b"] ，会返回值。 枚举会返回name,其它情况返回整条数据。
+            //该字段仅对返回整条数据的情况有效,指定返回该条数据的哪个值
+            valueField: {type: String, default: ""}
         },
         watch: {
             url(v) {
-                if (jv.dataEquals(v, this.url)) {
+                if (!v) {
                     return;
                 }
-                if (v) {
-                    this.$http.post(v).then(res => {
-                        this.setData(res.data.data);
-                    });
-                }
+                this.$http.post(v).then(res => {
+                    this.setData(res.data.data);
+                });
             },
             data: {
                 deep: true, handler(v) {
@@ -97,6 +97,9 @@
 
                     this.setData(v);
                 }
+            },
+            enum(v) {
+                this.setData();
             },
             fields(v) {
                 this.setFields()
@@ -144,25 +147,38 @@
                         this.setData(res.data.data);
                     });
                 } else {
-                    this.setData(this.data);
+                    this.setData();
                 }
             },
-            changed() {
+            changed(v) {
                 var ret;
                 if (this.type == "radio") {
-                    if (this.dataIsObject || this.dataIsValueArray) {
-                        ret = this.value1.value;
+                    if( jv.IsNull(v)){
+                        v = this.value1;
+                    }
+
+                    if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
+                        ret = v;
                     } else {
-                        ret = this.data2.find(it => it[this.keyField] == this.value1)
+                        ret = this.data2.find(it => it[this.keyField] == v)
+                        if (this.valueField) {
+                            ret = ret[this.valueField]
+                        }
                     }
                 } else {
-                    if (this.dataIsObject || this.dataIsValueArray) {
-                        ret = this.value2.map(it => it.value);
+                    if( jv.IsNull(v)){
+                        v = this.value2;
+                    }
+                    if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
+                        ret = v;
                     } else {
-                        ret = this.data2.filter(it => this.value2.includes(it[this.keyField]));
+                        ret = this.data2.filter(it => v.includes(it[this.keyField]));
+                        if (this.valueField) {
+                            ret = ret[this.valueField]
+                        }
                     }
                 }
-                this.$emit("input", ret)
+                this.$emit("input", ret);
                 return this.$emit("change", ret)
             },
             dblclick() {
@@ -177,10 +193,13 @@
 
                 if (this.type == "radio") {
                     if (jv.IsNull(v)) {
-                        this.value1 = {};
+                        this.value1 = "";
                         return;
                     }
-                    if (!this.dataIsValueArray) {
+
+                    if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
+                        this.value1 = v;
+                    } else {
                         this.value1 = v[this.keyField];
                         return;
                     }
@@ -195,14 +214,15 @@
                         return;
                     }
 
-                    if (!this.dataIsValueArray) {
+                    if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
+                        this.value2 = v;
+                    } else {
                         this.value2 = v.map(it => it[this.keyField]);
                         return;
                     }
                     this.value2 = v;
                 }
             },
-
             setFields() {
                 var def_fields = "";
                 if (this.dataIsEnum) {
@@ -215,7 +235,17 @@
                 this.labelField = fields[1];
             },
             setData(data) {
-                data = data || this.data;
+                if (this.enum) {
+                    var data2 = jv[this.enum];
+                    if (data2 && data2.Type == "jvEnum") {
+                        this.dataIsEnum = true;
+                        data = data2.getData();
+                        type = data.Type;
+                    }
+                } else {
+                    data = data || this.data;
+                }
+
                 if (jv.IsNull(data)) {
                     this.data2 = [];
                     return;
@@ -223,21 +253,10 @@
 
                 var type = data.Type;
 
-                if (type == "string") {
-                    var data2 = jv[data];
-                    if (data2 && data2.Type == "jvEnum") {
-                        this.dataIsEnum = true;
-                        data = data2.getData();
-                        type = data.Type;
-                    }
-                }
-
-
                 if (["object", "map"].includes(type)) {
                     this.dataIsObject = true;
                 }
-
-                if (["array", "set"].includes(type)) {
+                else if (["array", "set"].includes(type)) {
                     var v0 = data[0];
                     if (jv.IsNull(v0) == false) {
                         this.dataIsValueArray = !v0.ObjectType;

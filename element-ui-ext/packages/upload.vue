@@ -24,7 +24,7 @@
             <i class="el-icon-delete" v-if="!readOnly"
                @click="$event.target.closest('.el-upload-preview').classList.add('deleting')"></i>
           </div>
-          <div v-if="maxCount>1"  v-if="!readOnly">
+          <div v-if="maxCount>1" v-if="!readOnly">
             <i class="el-icon-arrow-left" @click="move_left(index)" v-if="index>0"></i>
             <i class="el-icon-arrow-right" @click="move_right(index)" v-if="index < myValue.length -1"></i>
           </div>
@@ -37,7 +37,8 @@
       <el-progress type="circle" :percentage="item.percentage" v-else-if="item.percentage<100"></el-progress>
     </div>
 
-    <input type="file" name="file" style="display: none" @change="file_change" @click="file_click" v-bind="fileAttr" v-if="!readOnly">
+    <input type="file" name="file" style="display: none" @change="file_change" @click="file_click" v-bind="fileAttr"
+           v-if="!readOnly">
 
     <div class="el-upload" @click="upload_Click" v-if="!readOnly && ( !myValue ||  myValue.length < maxCount )">
       <div class="el-upload-preview">
@@ -58,7 +59,7 @@
                     return ret;
                 }
             },
-            readOnly:{type:Boolean , default:false} ,
+            readOnly: {type: Boolean, default: false},
             uid: {type: null, default: 0},     // 表示该图片所属的表的行Id.
             db: {type: String, default: ""},   // 表名.列表. 定义了 db ,自动调用服务器Api
             scales: {
@@ -90,7 +91,7 @@
                 }
             },
             value: {
-                immediate: true, handler(v) {
+                immediate: true, depth: true, handler(v) {
                     this.setMyValue(v);
                 }
             },
@@ -124,7 +125,7 @@
                         throw new Error("上传1个文件时，value不能是数组");
                     }
 
-                    if (this.myValue[0] && this.myValue[0].id == v.id) {
+                    if (jv.dataEquals(this.myValue[0], v)) {
                         return;
                     }
 
@@ -140,9 +141,7 @@
                     throw new Error("上传多个文件时，value必须是数组。");
                 }
 
-                if (jv.dataEquals(this.myValue, v, (a, b) => {
-                    return a.id == b.id;
-                })) {
+                if (jv.dataEquals(this.myValue, v)) {
                     return;
                 }
 
@@ -275,8 +274,11 @@
                         return res;
                     }
                     Object.assign(item, res.data.data);
+                    this.myValue.pushAll()
                     this.emit(item, "add");
                     return res;
+                }).catch(res => {
+                    this.myValue.splice(this.myValue.length - 1, 1);
                 });
             },
             move_left(index) {
@@ -344,7 +346,7 @@
                     var value = Object.assign({
                         id: "",
                         url: ""
-                    }, json).RemoveKeys("percentage", "fullUrl", "fileType", "logoSize", "showName");
+                    }, json).RemoveKeys("percentage", "fileType", "logoSize", "showName");
 
 
                     if (this.db && this.uid) {
@@ -362,8 +364,6 @@
                         this.$emit("changed", value, this.uid);
                     }
                 } else {
-
-
                     if (action == "add") {
                         para = Object.assign({}, json);//, {remark: this.imageRemark});
                     } else {
@@ -385,13 +385,13 @@
                         if (this.myValue.every(it => it.id)) {
                             this.$http.post("/image/change", param).then(res => {
                                 this.$emit("input", this.myValue);
-                                this.$emit("changed", this.myValue, action, para, this.uid);
+                                this.$emit("changed", this.myValue, this.uid, action, para);
                             });
                         }
                     } else {
                         if (this.myValue.every(it => it.id)) {
                             this.$emit("input", this.myValue);
-                            this.$emit("changed", this.myValue, action, para, this.uid);
+                            this.$emit("changed", this.myValue, this.uid, action, para);
                         }
                     }
                 }

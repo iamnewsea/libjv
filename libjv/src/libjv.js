@@ -557,10 +557,15 @@ objectEqualField 指定比较对象的id字段，如果该字段有值且相同�
 */
 jv.dataEquals = (a, b, objectEqualField) => {
     objectEqualField = objectEqualField || "";
+    var a_nul = jv.IsNull(a) , b_nul=jv.IsNull(b);
 
-    if (jv.IsNull(a) && jv.IsNull(b)) {
+    if (a_nul && b_nul) {
         return true;
     }
+    if( a_nul || b_nul){
+        return false;
+    }
+
     if (a == b) return true;
 
     var a_type = a.Type,

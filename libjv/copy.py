@@ -43,6 +43,3 @@ if __name__=='__main__':
     print("完成")
 
 
-    print("完成")
-
-

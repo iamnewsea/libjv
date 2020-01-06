@@ -6,5 +6,4 @@ test/unit/coverage
 .idea/
 .idea
 dist/
-package-lock.json
 

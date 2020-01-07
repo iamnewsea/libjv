@@ -26,9 +26,10 @@ Object.defineProperty(Number.prototype, "toDateString", {
             ms = t.getUTCMilliseconds();
         }
 
-        if (valueOf <= 0) {
-            return "";
-        }
+        // if (valueOf <= 0) {
+        //     return "";
+        // }
+
         if (!format) {
             format = [];
 

@@ -864,18 +864,16 @@ jv.query2Json = (query) => {
 //返回: {value: 1 , ok: true }
 jv.evalExpression = (obj, path) => {
     if (!path) return obj;
-    var random = "_eval_expression_" + jv.random();
-    jv[random] = obj;
+
     var ret = {};
     try {
-        ret.value = eval("jv['" + random + "']." + path);
+        ret.value = eval("(obj)=>obj." + path)(obj);
         ret.ok = true;
     } catch (e) {
         ret.ok = false;
     }
-    delete jv[random];
     return ret;
-}
+};
 
 
 export default jv;

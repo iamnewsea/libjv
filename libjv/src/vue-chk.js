@@ -264,7 +264,7 @@ import jv from "./libjv"
         chk = chk.trim();
         if (!chk) return ret;
 
-        ret.msg = chk_dom.$attrs.chkMsg;
+        ret.msg = chk_dom.$attrs.chkmsg;
 
         var chk_type_index = getNextNonCharIndex(chk),
             chk_type = chk.slice(0, chk_type_index),

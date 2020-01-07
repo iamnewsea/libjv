@@ -32,17 +32,13 @@ Object.defineProperty(Number.prototype, "toDateString", {
 
         if (!format) {
             format = [];
-
-            if (valueOf > 86400000) {
-                format.push("yyyy-MM-dd");
-            }
+            format.push("yyyy-MM-dd");
 
             if ((hour || minute) && !second) {
                 format.push("HH:mm");
             } else if (hour || minute || second) {
                 format.push("HH:mm:ss");
             }
-
 
             format = format.join(" ");
         }

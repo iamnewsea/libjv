@@ -393,13 +393,19 @@ import jv from "./libjv"
         for (var chk_dom of list) {
             var chk_result = chk_item(chk_dom);
 
-            var chkEvent = new CustomEvent('chked', {
+            var chkEvent, evObj = {
                 detail: {
                     result: chk_result.result,
                     msg: chk_result.msg,
                     detail: chk_result.detail
                 }
-            });
+            };
+            if (jv.msie) {
+                chkEvent = document.createEvent("CustomEvent");
+                chkEvent.initCustomEvent('chked', true, true, evObj);
+            } else {
+                chkEvent = new CustomEvent('chked', evObj);
+            }
 
             var tooltip = getVueTooltipFromUp(chk_dom);
             if (tooltip) {

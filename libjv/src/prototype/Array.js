@@ -10,6 +10,16 @@ Object.defineProperty(Array.prototype, "spliceDate", {
     , enumerable: false
 });
 
+// 初始化指定数量的数组。初始化值不指定，会使用 null 初始化。
+Array.init = (number, value) => {
+    var ret = [];
+    if (!number) return ret;
+    var isNul = jv.IsNull(value);
+    for (var i = 0; i < number; i++) {
+        ret.push(isNul ? null : value);
+    }
+    return ret;
+};
 
 Object.defineProperty(Array.prototype, "last", {
     value(filter) {
@@ -38,7 +48,7 @@ Object.defineProperty(Array.prototype, "ForEach", {
 Object.defineProperty(Array.prototype, "forEachIndexed", {
     value(filter, trueAction, falseAction) {
         if (!this.length) return null;
-        if( !filter) return true;
+        if (!filter) return true;
 
         for (var index = 0, len = this.length; index < len; index++) {
             var item = this[index];
@@ -101,7 +111,7 @@ Object.defineProperty(Array.prototype, "pushAll", {
         if (ary.Type == "set") {
             ary = Array.from(ary);
         }
-        this.splice.apply(this, [this.length,0].concat(ary));
+        this.splice.apply(this, [this.length, 0].concat(ary));
         return this;
     }, enumerable: false
 });

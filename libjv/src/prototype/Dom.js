@@ -1,9 +1,14 @@
 //-----------------------------------------------------------------
+import jv from "../libjv";
+
 (function () {
     // Node环境需要
     if (typeof document === 'undefined' ) {
         return;
     }
+
+    jv.msie = !!window.ActiveXObject || "ActiveXObject" in window;
+
     if (!Node.prototype.addEventListener && Node.prototype.attachEvent) {
         //兼容性添加。
         Object.defineProperty(Node.prototype, "addEventListener", {
@@ -19,7 +24,7 @@
         });
     }
 
-//获取距离父dom的 x,y 距离.
+    //获取距离父dom的 x,y 距离.
     Object.defineProperty(Node.prototype, "offset_pdom", {
         value(pdom) {
             if (this == pdom) return {x: 0, y: 0};
@@ -44,7 +49,7 @@
                 }
 
                 return getP(dom.offsetParent);
-            }
+            };
 
             if (getP(this)) {
                 return {x: x, y: y};
@@ -54,7 +59,7 @@
         , enumerable: false
     });
 
-//触发无素事件.value附加到event上.返回event
+    //触发无素事件.value附加到event上.返回event
     Object.defineProperty(Node.prototype, "trigger", {
         value(event, value) {
             if (Node.prototype.dispatchEvent) {
@@ -164,7 +169,8 @@
             }
         }, enumerable: false
     });
-//只读化.
+
+    //只读化.
     Object.defineProperty(Element.prototype, "nonEdit", {
         value() {
             var tags = Array.from(this.querySelectorAll("input"));
@@ -192,3 +198,5 @@
         }, enumerable: false
     });
 })();
+
+export default jv;

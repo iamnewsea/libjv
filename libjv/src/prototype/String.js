@@ -2,7 +2,7 @@
  * "@$<li>ok</li>$@".trimPairs("<li>,</li>".split(",") , "<div>,</div>".split(",") ,"$" ,"@" )
  */
 Object.defineProperty(String.prototype, 'trimPairs', {
-    value () {
+    value() {
         var ps = arguments;
 
         var value = this.trim();
@@ -162,10 +162,32 @@ Object.defineProperty(String.prototype, 'format', {
     }, enumerable: false
 });
 
-
 Object.defineProperty(String.prototype, "toDateString", {
     value(format, timezone) {
-        if(!this) return "";
+        if (!this) return "";
         return new Date(this).toDateString(format, timezone);
     }, enumerable: false
 });
+
+/**
+ * IE 没有 padStart
+ */
+if (!String.prototype.padStart) {
+    Object.defineProperty(String.prototype, "padStart", {
+        value(length, fillString) {
+            if (this.length >= length) return this;
+            if (jv.IsNull(fillString)) {
+                fillString = ' ';
+            }
+            return Array.init(length - this.length, fillString).join("") + this;
+        }, enumerable: false
+    });
+}
+//兼容IE
+if (!String.prototype.startsWith) {
+    Object.defineProperty(String.prototype, "startsWith", {
+        value(find) {
+            return this.indexOf(find) == 0;
+        }, enumerable: false
+    });
+}

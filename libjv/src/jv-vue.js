@@ -1,4 +1,4 @@
-import jv from "./file-upload"
+import jv from "./libjv"
 
 /**
  * jv.initVue({vue:Vue,axios:axios,router:router});
@@ -168,6 +168,8 @@ jv.initVue = (setting) => {
         try {
             msg = (error.message || "网络错误") + ":" + error.config.url;
         } catch (e) {
+            // eval("debugger")
+            console.error(e);
             msg = "网络错误"
         }
         if (msg) {

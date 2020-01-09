@@ -1,6 +1,3 @@
-import "./defineProperty"
-
-//单例.
 var jv;
 var JvObject = (function () {
     // console.log("new JvObject()")
@@ -19,12 +16,18 @@ var JvObject = (function () {
     return JvObject;
 })();
 
+console.log("jv init!")
 jv = new JvObject();
-jv.root = typeof self == 'object' && self.self === self && self ||
+jv.prototype = JvObject.prototype;
+
+var root = typeof self == 'object' && self.self === self && self ||
     typeof global == 'object' && global.global === global && global ||
     this ||
     {};
-jv.prototype = JvObject.prototype;
+
+jv.root = root;
+root.jv = jv;
+
 
 jv.noop = () => {
 };
@@ -33,6 +36,7 @@ jv.noop = () => {
 jv.info = console.info;
 jv.error = console.error;
 jv.warn = console.warn;
+
 
 jv.fileTypes = {
     img: {type: "img", exts: "png,jpg,gif,bmp,ico,icon".split(","), remark: "图片文件"},
@@ -152,22 +156,22 @@ jv.getFileType = function (fileName) {
     //     location.hashJson = jv.query2Json(location.hash.slice(index + 1));
     // };
 
-    // 去除 hash 部分。
-    Object.defineProperty(location, "fullUrl", {
+    // remove hash。
+    Object.defineProperty(Location.prototype, "fullUrl", {
         get() {
-            return location.href.slice(0, (0 - location.hash.length) || undefined);
+            return this.href.slice(0, (0 - this.hash.length) || undefined);
         }, enumerable: false
     });
 
-    Object.defineProperty(location, "json", {
+    Object.defineProperty(Location.prototype, "json", {
         get() {
-            return jv.query2Json(location.search.slice(1));
+            return jv.query2Json(this.search.slice(1));
         }, enumerable: false
     });
 
-    Object.defineProperty(location, "hashJson", {
+    Object.defineProperty(Location.prototype, "hashJson", {
         get() {
-            var hash = location.hash
+            var hash = this.hash
             var hash_search_index = hash.indexOf("?");
             if (hash_search_index >= 0) {
                 return jv.query2Json(hash.slice(hash_search_index + 1));
@@ -557,12 +561,12 @@ objectEqualField 指定比较对象的id字段，如果该字段有值且相同�
 */
 jv.dataEquals = (a, b, objectEqualField) => {
     objectEqualField = objectEqualField || "";
-    var a_nul = jv.IsNull(a) , b_nul=jv.IsNull(b);
+    var a_nul = jv.IsNull(a), b_nul = jv.IsNull(b);
 
     if (a_nul && b_nul) {
         return true;
     }
-    if( a_nul || b_nul){
+    if (a_nul || b_nul) {
         return false;
     }
 

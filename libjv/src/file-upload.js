@@ -1,5 +1,5 @@
 import "spark-md5"
-import jv from './vue-chk'
+import jv from './libjv'
 
 jv.getFileMd5 = (file) => {
     return new Promise((resole, reject) => {

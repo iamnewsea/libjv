@@ -227,3 +227,13 @@ int[20,79]            //表示是int类型,大于等于20,小于等于79
 写法:
 mobile{value[0]}[1]  //手机号格式,第一位必须是1
 ```
+
+
+# libjv 引用顺序
+
+* libjv
+* defineProperty
+* vue-chk
+* file-upload
+* jv-vue
+* index

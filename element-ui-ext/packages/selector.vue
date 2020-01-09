@@ -72,8 +72,13 @@
             type: {type: String, default: "radio"},
             //如果是多选，是数组， 如果是单选是对象或值。
             value: {
-                type: [String, Array, Object], default() {
-                    return {};
+                type: [String, Array, Boolean, Number, Object], default() {
+                    return "";
+                }
+            },
+            valueIsBoolean: {
+                type: Boolean, default() {
+                    return false
                 }
             },
             //默认:如果是json，返回 key.如果是 valueArray ["a","b"] ，会返回值。 枚举会返回name,其它情况返回整条数据。
@@ -153,7 +158,7 @@
             changed(v) {
                 var ret;
                 if (this.type == "radio") {
-                    if( jv.IsNull(v)){
+                    if (jv.IsNull(v)) {
                         v = this.value1;
                     }
 
@@ -164,9 +169,13 @@
                         if (this.valueField) {
                             ret = ret[this.valueField]
                         }
+
+                        if (this.valueIsBoolean) {
+                            ret = jv.AsBoolean(ret)
+                        }
                     }
                 } else {
-                    if( jv.IsNull(v)){
+                    if (jv.IsNull(v)) {
                         v = this.value2;
                     }
                     if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
@@ -174,7 +183,11 @@
                     } else {
                         ret = this.data2.filter(it => v.includes(it[this.keyField]));
                         if (this.valueField) {
-                            ret = ret[this.valueField]
+                            ret = ret.map(it => it[this.valueField])
+                        }
+
+                        if (this.valueIsBoolean) {
+                            ret = ret.map(it => jv.AsBoolean(this.valueField))
                         }
                     }
                 }
@@ -185,8 +198,12 @@
                 if (this.readOnly) {
                     return;
                 }
-                this.value2 = [];
-                this.value1 = "";
+                if (this.type == "radio") {
+                    this.value1 = "";
+                } else {
+                    this.value2 = [];
+                }
+                this.changed();
             },
             setValue(v) {
                 v = jv.IsNull(v) ? this.value : v;
@@ -198,30 +215,49 @@
                     }
 
                     if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
-                        this.value1 = v;
+                        if (this.valueIsBoolean) {
+                            this.value1 = jv.AsString(v)
+                        } else {
+                            this.value1 = v;
+                        }
+                        return;
+                    }
+                    if (this.valueIsBoolean) {
+                        this.value1 = jv.AsString(v[this.keyField]);
                     } else {
                         this.value1 = v[this.keyField];
-                        return;
                     }
-
-                    this.value1 = v;
-                } else {
-                    if (jv.dataEquals(v, this.value2)) {
-                        return;
-                    }
-                    if (jv.IsNull(v)) {
-                        this.value2 = [];
-                        return;
-                    }
-
-                    if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
-                        this.value2 = v;
-                    } else {
-                        this.value2 = v.map(it => it[this.keyField]);
-                        return;
-                    }
-                    this.value2 = v;
+                    return;
                 }
+                if (v === null) {
+                    v = [];
+                }
+
+                if (jv.dataEquals(v, this.value2)) {
+                    return;
+                }
+                // if (jv.IsNull(v)) {
+                //     this.value2 = [];
+                //     return;
+                // }
+
+
+                //解决 boolean类型问题
+                if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
+                    if (this.valueIsBoolean) {
+                        this.value2 = v.map(it => jv.AsBoolean(it));
+                    } else {
+                        this.value2 = v;
+                    }
+                    return;
+                }
+                this.value2 = v.map(it => {
+                    var rv = it[this.keyField];
+                    if (this.valueIsBoolean) {
+                        return jv.AsBoolean(rv);
+                    }
+                    return rv;
+                });
             },
             setFields() {
                 var def_fields = "";
@@ -255,8 +291,7 @@
 
                 if (["object", "map"].includes(type)) {
                     this.dataIsObject = true;
-                }
-                else if (["array", "set"].includes(type)) {
+                } else if (["array", "set"].includes(type)) {
                     var v0 = data[0];
                     if (jv.IsNull(v0) == false) {
                         this.dataIsValueArray = !v0.ObjectType;

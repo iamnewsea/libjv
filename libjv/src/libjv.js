@@ -395,6 +395,21 @@ jv.IsNull = (value) => {
     return value === null;
 };
 
+jv.AsBoolean = (value) => {
+    if (jv.IsNull(value)) return null;
+    if (value === "false" ||
+        value === 0) return false;
+    if (value === "true" ||
+        value === 1) return true;
+
+    return null;
+}
+
+jv.AsString = (value, format) => {
+    if (jv.IsNull(value)) return "";
+    if (jv.IsNull(format)) return value.toString(format);
+    return value.toString();
+}
 // Object.defineProperty(JvEnum.prototype, "getData", {
 //     value(key) {
 //         if (!jv.IsNull(key)) {

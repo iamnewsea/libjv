@@ -30,12 +30,13 @@ if __name__=='__main__':
     target = os.path.abspath( argv[1] )
     print("源地址："+ base_path + " ---> 目标地址：" + target)
     print("-----------------------------------")
+    target = os.path.abspath(os.path.join( target , "node_modules") )
 
-    if not os.path.exists( target + "/node_modules"):
-        print("找不到 node_modules 文件夹，请检查目标文件夹")
+    if not os.path.exists( target):
+        print("找不到 "+target+" 文件夹，请检查目标文件夹")
         sys.exit(1)
 
-    rm( os.path.abspath(os.path.join( base_path + "./lib") ))
+    rm( os.path.abspath(os.path.join( base_path , "lib") ))
     os.system(("npm --prefix=%s run build" ) % ( base_path ) )
     print("-----------------------------------")
 

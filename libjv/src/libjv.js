@@ -430,18 +430,18 @@ jv.recursionJson = (json, eachJsonItemCallback, deepth) => {
     }
     deepth = deepth || 0;
 
-    var obj = json, type = obj.PrimitiveType;
+    var type = json.PrimitiveType;
     if (type == "array" || type == "set") {
-        return Array.from(obj).ForEach(it => {
+        return Array.from(json).ForEach(it => {
             return jv.recursionJson(it, eachJsonItemCallback, deepth + 1);
         });
-    } else if (!obj.ObjectType) {
+    } else if (!json.ObjectType) {
         return;
     }
 
-    return Object.keys(obj).ForEach(key => {
-        var value = obj[key];
-        if (eachJsonItemCallback(key, value, obj) === false) {
+    return Object.keys(json).ForEach(key => {
+        var value = json[key];
+        if (eachJsonItemCallback(key, value, json, deepth) === false) {
             return false;
         }
 

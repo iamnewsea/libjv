@@ -164,20 +164,22 @@
 
                     if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
                         ret = v;
+
                     } else {
                         ret = this.data2.find(it => it[this.keyField] == v)
                         if (this.valueField) {
                             ret = ret[this.valueField]
                         }
+                    }
 
-                        if (this.valueIsBoolean) {
-                            ret = jv.AsBoolean(ret)
-                        }
+                    if (this.valueIsBoolean) {
+                        ret = jv.AsBoolean(ret)
                     }
                 } else {
                     if (jv.IsNull(v)) {
                         v = this.value2;
                     }
+
                     if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
                         ret = v;
                     } else {
@@ -185,10 +187,10 @@
                         if (this.valueField) {
                             ret = ret.map(it => it[this.valueField])
                         }
+                    }
 
-                        if (this.valueIsBoolean) {
-                            ret = ret.map(it => jv.AsBoolean(this.valueField))
-                        }
+                    if (this.valueIsBoolean) {
+                        ret = ret.map(it => jv.AsBoolean(this.valueField))
                     }
                 }
                 this.$emit("input", ret);

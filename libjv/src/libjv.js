@@ -397,9 +397,15 @@ jv.IsNull = (value) => {
 
 jv.AsBoolean = (value) => {
     if (jv.IsNull(value)) return null;
-    if (value === "false" ||
+    if (value === "null" ||
+        value === "undefined") return null;
+
+    if (value === false ||
+        value === "false" ||
         value === 0) return false;
-    if (value === "true" ||
+
+    if (value === true ||
+        value === "true" ||
         value === 1) return true;
 
     return null;

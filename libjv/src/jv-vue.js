@@ -1,4 +1,4 @@
-import jv from "./libjv"
+import jv from "./file-upload"
 
 /**
  * jv.initVue({vue:Vue,axios:axios,router:router});

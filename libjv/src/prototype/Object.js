@@ -7,7 +7,6 @@
         return;
     }
 
-    console.log("Object")
 
     Object.defineProperty(Object.prototype, "Type", {
         get() {

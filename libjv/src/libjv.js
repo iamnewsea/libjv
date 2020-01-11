@@ -1,3 +1,5 @@
+import "./defineProperty"
+
 var jv;
 var JvObject = (function () {
     // console.log("new JvObject()")
@@ -19,15 +21,13 @@ var JvObject = (function () {
 console.log("jv init!")
 jv = new JvObject();
 jv.prototype = JvObject.prototype;
+jv.inBrowser = typeof window !== 'undefined';
 
-var root = typeof self == 'object' && self.self === self && self ||
-    typeof global == 'object' && global.global === global && global ||
-    this ||
-    {};
+jv.root = window || global;
+;
+jv.root.jv = jv;
 
-jv.root = root;
-root.jv = jv;
-
+jv.msie = jv.inBrowser && (!!window.ActiveXObject || "ActiveXObject" in window);
 
 jv.noop = () => {
 };
@@ -71,162 +71,19 @@ jv.getFileType = function (fileName) {
 })();
 
 
-(() => {
+jv.getUrlHost = (url) => {
+    var r;
+    if (url.startsWith("//")) {
+        r = /^\/\/([^/\\]+)/i.exec(url)
+    } else {
+        r = /^http[s]*\:\/\/([^/\\]+)/i.exec(url)
+    }
 
-
-    //如果不是浏览器环境,则退出
-    if (typeof (document) === "undefined") return;
-
-    //避免多次执行
-    // if (location.json) return;
-
-    document.cookieJson = (() => {
-        // http://blog.csdn.net/lvjin110/article/details/37663067
-        let language = navigator.language || navigator.browserLanguage;
-        navigator.languageCode = "cn";
-
-        if (language.indexOf("zh") < 0) {
-            navigator.languageCode = "en";
-        }
-
-        let db = {};
-
-        (document.cookie || "").split(";").forEach(it => {
-            var sect = it.split("=");
-            db[sect[0].trim()] = decodeURIComponent((sect[1] || "").trim());
-        });
-
-        return {
-            get(key) {
-                if (!key) return db;
-                return db[key];
-            }
-            , set(key, value, cacheTime) {
-                key = key.trim();
-                value = value + "";
-                value = encodeURIComponent(value.trim() || "");
-                db[key] = value;
-
-                var expires = "";
-                if (cacheTime) {
-                    var exp = new Date();
-                    exp.setTime(exp.getTime() + cacheTime * 1000);
-                    expires = ";expires=" + exp.toGMTString()
-                }
-                document.cookie = key + "=" + value + ";path=/" + expires;
-            }
-            , remove(key) {
-                this.set(key, "", -1);
-            }
-        };
-    })();
-
-
-    jv.getUrlHost = (url) => {
-        var r;
-        if (url.startsWith("//")) {
-            r = /^\/\/([^/\\]+)/i.exec(url)
-        } else {
-            r = /^http[s]*\:\/\/([^/\\]+)/i.exec(url)
-        }
-
-        if (r) {
-            return r[1];
-        }
-        return "";
-    };
-
-
-    // let loadQueryJson = (url) => {
-    //
-    //     // var tail = location.search + location.hash;
-    //     // if (tail) {
-    //     //     location.fullPath = location.href.slice(0, 0 - tail.length);
-    //     // } else {
-    //     //     location.fullPath = location.href;
-    //     // }
-    // };
-
-    // let loadLocationHashJson = () => {
-    //     let index = location.hash.indexOf("?");
-    //     if (index < 0) {
-    //         location.hashJson = {};
-    //         return;
-    //     }
-    //     location.hashJson = jv.query2Json(location.hash.slice(index + 1));
-    // };
-
-    // remove hash。
-    Object.defineProperty(Location.prototype, "fullUrl", {
-        get() {
-            return this.href.slice(0, (0 - this.hash.length) || undefined);
-        }, enumerable: false
-    });
-
-    Object.defineProperty(Location.prototype, "json", {
-        get() {
-            return jv.query2Json(this.search.slice(1));
-        }, enumerable: false
-    });
-
-    Object.defineProperty(Location.prototype, "hashJson", {
-        get() {
-            var hash = this.hash
-            var hash_search_index = hash.indexOf("?");
-            if (hash_search_index >= 0) {
-                return jv.query2Json(hash.slice(hash_search_index + 1));
-            }
-            return {};
-        }, enumerable: false
-    });
-
-    // jv.loadAllJson = (url) => {
-    //     var search = "", hash = "";
-    //     if (url && url.Type == "string") {
-    //         var hash_index = url.lastIndexOf("#");
-    //         if (hash_index >= 0) {
-    //             hash = url.slice(url.slice(hash_index + 1));
-    //             url = url.splice(0, hash_index);
-    //         }
-    //
-    //         var search_index = url.indexOf("?");
-    //         if (search_index >= 0) {
-    //             search = url.slice(search_index)
-    //         }
-    //     } else {
-    //         search = location.search;
-    //         hash = location.hash;
-    //     }
-    //
-    //
-    //     location.json = jv.query2Json(search.slice(1));
-    //
-    //     let hash_search_index = hash.indexOf("?");
-    //     if (hash_search_index >= 0) {
-    //         location.hashJson = jv.query2Json(hash.slice(hash_search_index + 1));
-    //     }
-    //
-    // };
-    //
-    // if (document.readyState == "complete") {
-    //     jv.loadAllJson();
-    // } else {
-    //     document.addEventListener("DOMContentLoaded", jv.loadAllJson);
-    // }
-
-    // window.removeEventListener("hashchange", loadLocationHashJson);
-    // window.addEventListener("hashchange", loadLocationHashJson);
-    //
-    //
-    // vue 使用了 pushState
-    // let pushState_ori = history.pushState
-    // history.pushState = () => {
-    //     jv.loadAllJson();
-    //     return pushState_ori.apply(null, arguments);
-    // };
-    //
-    // window.addEventListener("popstate", loadAllJson);
-})();
+    if (r) {
+        return r[1];
+    }
+    return "";
+};
 
 //---------------------------------------------
 
@@ -862,6 +719,7 @@ jv.param = (obj) => {
  */
 jv.query2Json = (query) => {
     let ret = {};
+    if(!query) return ret;
     query.split("?").last().split("&").forEach((it) => {
         var sects = it.split("=");
         if (sects.length == 2) {

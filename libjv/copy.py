@@ -21,9 +21,9 @@ def cp(fromPath,toPath):
     print(fromPath + " ---> " + toPath)
 
 def mycp(source,toPath):
-    cp( os.path.join( source,"lib"), os.path.join(toPath ,"node_modules/libjv/lib"))
-    cp( os.path.join( source,"src"), os.path.join(toPath ,"node_modules/libjv/src"))
-    shutil.copyfile( os.path.join( source,"package.json"), os.path.join(toPath ,"node_modules/libjv/package.json"))
+    cp( os.path.join(source,"lib"), os.path.join(toPath ,"libjv/lib"))
+    cp( os.path.join(source,"src"), os.path.join(toPath ,"libjv/src"))
+    shutil.copyfile( os.path.join( source,"package.json"), os.path.join(toPath ,"libjv/package.json"))
 
 if __name__=='__main__':
     target = os.path.abspath( argv[1] )

@@ -21,10 +21,10 @@ def cp(fromPath,toPath):
   shutil.copytree(fromPath,toPath)
 
 def mycp(source,toPath):
-    cp( os.path.join( source,"lib"), os.path.join(toPath ,"node_modules/element-webpart/lib"))
-    cp( os.path.join( source,"src"), os.path.join(toPath ,"node_modules/element-webpart/src"))
-    cp( os.path.join( source,"packages"), os.path.join(toPath ,"node_modules/element-webpart/packages"))
-    shutil.copyfile( os.path.join( source,"package.json"), os.path.join(toPath ,"node_modules/element-webpart/package.json"))
+    cp( os.path.join( source,"lib"), os.path.join(toPath ,"element-webpart/lib"))
+    cp( os.path.join( source,"src"), os.path.join(toPath ,"element-webpart/src"))
+    cp( os.path.join( source,"packages"), os.path.join(toPath ,"element-webpart/packages"))
+    shutil.copyfile( os.path.join( source,"package.json"), os.path.join(toPath ,"element-webpart/package.json"))
 
 if __name__=='__main__':
     target = os.path.abspath( argv[1] )

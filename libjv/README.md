@@ -231,8 +231,8 @@ mobile{value[0]}[1]  //手机号格式,第一位必须是1
 
 # libjv 引用顺序
 
-* libjv
 * defineProperty
+* libjv
 * vue-chk
 * file-upload
 * jv-vue

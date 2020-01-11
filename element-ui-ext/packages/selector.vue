@@ -224,13 +224,13 @@
                         }
                         return;
                     }
-                    if (this.valueIsBoolean) {
-                        this.value1 = jv.AsString(v[this.keyField]);
-                    } else {
-                        this.value1 = v[this.keyField];
-                    }
+
+                    var v2 = v[this.keyField];
+
+                    this.value1 = this.valueIsBoolean ? jv.AsString(v2) : v2;
                     return;
                 }
+
                 if (v === null) {
                     v = [];
                 }

@@ -1,13 +1,14 @@
 //-----------------------------------------------------------------
-import jv from "../libjv";
 
 (function () {
     // Node环境需要
-    if (typeof document === 'undefined' ) {
+    if (typeof document === 'undefined') {
         return;
     }
 
-    jv.msie = !!window.ActiveXObject || "ActiveXObject" in window;
+    if(Location.prototype.json){
+        return;
+    }
 
     if (!Node.prototype.addEventListener && Node.prototype.attachEvent) {
         //兼容性添加。
@@ -23,6 +24,74 @@ import jv from "../libjv";
             }, enumerable: false
         });
     }
+
+
+    document.cookieJson = (() => {
+        // http://blog.csdn.net/lvjin110/article/details/37663067
+        let language = navigator.language || navigator.browserLanguage;
+        navigator.languageCode = "cn";
+
+        if (language.indexOf("zh") < 0) {
+            navigator.languageCode = "en";
+        }
+
+        let db = {};
+
+        (document.cookie || "").split(";").forEach(it => {
+            var sect = it.split("=");
+            db[sect[0].trim()] = decodeURIComponent((sect[1] || "").trim());
+        });
+
+        return {
+            get(key) {
+                if (!key) return db;
+                return db[key];
+            }
+            , set(key, value, cacheTime) {
+                key = key.trim();
+                value = value + "";
+                value = encodeURIComponent(value.trim() || "");
+                db[key] = value;
+
+                var expires = "";
+                if (cacheTime) {
+                    var exp = new Date();
+                    exp.setTime(exp.getTime() + cacheTime * 1000);
+                    expires = ";expires=" + exp.toGMTString()
+                }
+                document.cookie = key + "=" + value + ";path=/" + expires;
+            }
+            , remove(key) {
+                this.set(key, "", -1);
+            }
+        };
+    })();
+
+
+    // remove hash。
+    Object.defineProperty(Location.prototype, "fullUrl", {
+        get() {
+            return location.href.slice(0, (0 - location.hash.length) || undefined);
+        }, enumerable: false
+    });
+
+    Object.defineProperty(Location.prototype, "json", {
+        get() {
+            return jv.query2Json(location.search.slice(1));
+        }, enumerable: false
+    });
+
+    Object.defineProperty(Location.prototype, "hashJson", {
+        get() {
+            var hash = location.hash
+            var hash_search_index = hash.indexOf("?");
+            if (hash_search_index >= 0) {
+                return jv.query2Json(hash.slice(hash_search_index + 1));
+            }
+            return {};
+        }, enumerable: false
+    });
+
 
     //获取距离父dom的 x,y 距离.
     Object.defineProperty(Node.prototype, "offset_pdom", {
@@ -198,5 +267,3 @@ import jv from "../libjv";
         }, enumerable: false
     });
 })();
-
-export default jv;

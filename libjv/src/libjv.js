@@ -23,8 +23,8 @@ jv = new JvObject();
 jv.prototype = JvObject.prototype;
 jv.inBrowser = typeof window !== 'undefined';
 
-jv.root = window || global;
-;
+jv.root = jv.inBrowser ? window : global;
+
 jv.root.jv = jv;
 
 jv.msie = jv.inBrowser && (!!window.ActiveXObject || "ActiveXObject" in window);
@@ -70,6 +70,13 @@ jv.getFileType = function (fileName) {
     jv.root.Check = Check;
 })();
 
+jv.sleep = (time) => {
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            resolve();
+        }, time);
+    })
+};
 
 jv.getUrlHost = (url) => {
     var r;
@@ -719,7 +726,7 @@ jv.param = (obj) => {
  */
 jv.query2Json = (query) => {
     let ret = {};
-    if(!query) return ret;
+    if (!query) return ret;
     query.split("?").last().split("&").forEach((it) => {
         var sects = it.split("=");
         if (sects.length == 2) {

@@ -280,6 +280,16 @@ jv.AsString = (value, format) => {
     if (jv.IsNull(format)) return value.toString(format);
     return value.toString();
 }
+
+//如果是数字形式，返回 Int，否则返回 0.
+jv.AsInt = (value) => {
+    if (jv.IsNull(value)) return 0;
+    if (value.toString().IsNumberFormat(value)) {
+        return parseInt(value);
+    }
+    return 0;
+}
+
 // Object.defineProperty(JvEnum.prototype, "getData", {
 //     value(key) {
 //         if (!jv.IsNull(key)) {

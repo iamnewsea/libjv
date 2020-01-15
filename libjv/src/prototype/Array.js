@@ -228,8 +228,8 @@
 
     Object.defineProperty(Array.prototype, "removeAt", {
         value(index) {
-            if (index < 0 || index >= this.length) return this;
-            return this.splice(index, 1);
+            this.splice(index, 1);
+            return this;
         }, enumerable: false
     });
 

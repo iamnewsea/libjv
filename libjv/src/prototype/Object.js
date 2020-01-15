@@ -7,6 +7,9 @@
         return;
     }
 
+    JSON.clone = (value)=>{
+        return JSON.parse(JSON.stringify(value));
+    };
 
     Object.defineProperty(Object.prototype, "Type", {
         get() {

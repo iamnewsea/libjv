@@ -1,25 +1,16 @@
 import "./defineProperty"
 
-var jv;
-var JvObject = (function () {
-    // console.log("new JvObject()")
-    //私有字段。
-    // var db = Symbol("db");
-
-    class JvObject {
-        constructor() {
-            if (!jv) {
-                jv = this;
-            }
-            return jv;
+class JvObject {
+    constructor() {
+        if (!JvObject.instance) {
+            JvObject.instance = this;
         }
+        return JvObject.instance;
     }
+}
 
-    return JvObject;
-})();
-
-console.log("jv init!")
-jv = new JvObject();
+console.log("jv init!");
+var jv = new JvObject();
 jv.prototype = JvObject.prototype;
 jv.inBrowser = typeof window !== 'undefined';
 

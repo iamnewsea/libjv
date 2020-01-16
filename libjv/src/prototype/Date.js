@@ -25,7 +25,7 @@
 
     Date.today = () => {
         var now = new Date();
-        var time = now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + n.getUTCSeconds();
+        var time = now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + now.getUTCSeconds();
         return new Date(now.valueOf() - time * 1000);
     };
 

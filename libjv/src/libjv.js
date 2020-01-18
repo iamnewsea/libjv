@@ -102,7 +102,7 @@ jv.store = {
         key = "jv.store." + key;
         var expireAt_key = key + "..expireAt";
         var value = localStorage.getItem(key);
-        if (jv.IsNull(value)) {
+        if (jv.isNull(value)) {
             localStorage.removeItem(key);
             localStorage.removeItem(expireAt_key);
             return null;
@@ -221,7 +221,7 @@ function JvEnum(typeName, json) {
     });
 
     this.getData = (key) => {
-        if (!jv.IsNull(key)) {
+        if (!jv.isNull(key)) {
             return this.list.filter(it => it.name == key)[0] || {};
         }
         return this.list;
@@ -231,7 +231,7 @@ function JvEnum(typeName, json) {
             return;
         }
         var value = obj[key];
-        if (jv.IsNull(value)) {
+        if (jv.isNull(value)) {
             return;
         }
 
@@ -244,14 +244,35 @@ function JvEnum(typeName, json) {
     };
 }
 
+/**
+ * 0,"",null, NaN -> false
+ * {},[] -> false
+ * @param value
+ * @returns {boolean}
+ * @constructor
+ */
+jv.hasValue = (value) => {
+    var ret = jv.isNull(value);
+    if (ret) return false;
+    ret = !value;
+    if (ret) return false;
+
+    if (["array", "set", "object", "map"].includes(value.Type)) {
+        return !!Object.keys(value).length;
+    }
+    return !ret;
+};
+
+jv.isEmpty = (value)=> !jv.HasValue(value);
+
 // 判断是 null or defined
-jv.IsNull = (value) => {
+jv.isNull = (value) => {
     if (typeof (value) == "undefined") return true;
     return value === null;
 };
 
-jv.AsBoolean = (value) => {
-    if (jv.IsNull(value)) return null;
+jv.asBoolean = (value) => {
+    if (jv.isNull(value)) return null;
     if (value === "null" ||
         value === "undefined") return null;
 
@@ -266,15 +287,15 @@ jv.AsBoolean = (value) => {
     return null;
 }
 
-jv.AsString = (value, format) => {
-    if (jv.IsNull(value)) return "";
-    if (jv.IsNull(format)) return value.toString(format);
+jv.asString = (value, format) => {
+    if (jv.isNull(value)) return "";
+    if (jv.isNull(format)) return value.toString(format);
     return value.toString();
 }
 
 //如果是数字形式，返回 Int，否则返回 0.
-jv.AsInt = (value) => {
-    if (jv.IsNull(value)) return 0;
+jv.asInt = (value) => {
+    if (jv.isNull(value)) return 0;
     if (value.toString().IsNumberFormat(value)) {
         return parseInt(value);
     }
@@ -283,7 +304,7 @@ jv.AsInt = (value) => {
 
 // Object.defineProperty(JvEnum.prototype, "getData", {
 //     value(key) {
-//         if (!jv.IsNull(key)) {
+//         if (!jv.isNull(key)) {
 //             return this.list.filter(it => it.name == key)[0] || {};
 //         }
 //         return this.list;
@@ -367,7 +388,7 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
             return;
         }
 
-        if (jv.IsNull(value)) {
+        if (jv.isNull(value)) {
             target[key1 + "_res"] = "";
             return;
         }
@@ -447,7 +468,7 @@ objectEqualField 指定比较对象的id字段，如果该字段有值且相同�
 */
 jv.dataEquals = (a, b, objectEqualField) => {
     objectEqualField = objectEqualField || "";
-    var a_nul = jv.IsNull(a), b_nul = jv.IsNull(b);
+    var a_nul = jv.isNull(a), b_nul = jv.isNull(b);
 
     if (a_nul && b_nul) {
         return true;
@@ -500,12 +521,12 @@ jv.dataEquals = (a, b, objectEqualField) => {
             b_keys = Object.keys(b);
 
         var a_more_keys = a_keys.minus(b_keys);
-        if (a_more_keys.some(key => !jv.IsNull(a[key]))) {
+        if (a_more_keys.some(key => !jv.isNull(a[key]))) {
             return false;
         }
 
         var b_more_keys = b_keys.minus(a_keys);
-        if (b_more_keys.some(key => !jv.IsNull(b[key]))) {
+        if (b_more_keys.some(key => !jv.isNull(b[key]))) {
             return false;
         }
 
@@ -546,6 +567,7 @@ jv.isPlainObject = (obj) => {
     // }
     // return true;
 };
+
 
 jv.random = (min, max) => {
     if (!min && !max) {

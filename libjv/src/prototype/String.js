@@ -183,7 +183,7 @@
         Object.defineProperty(String.prototype, "padStart", {
             value(length, fillString) {
                 if (this.length >= length) return this;
-                if (jv.IsNull(fillString)) {
+                if (jv.isNull(fillString)) {
                     fillString = ' ';
                 }
                 return Array.init(length - this.length, fillString).join("") + this;

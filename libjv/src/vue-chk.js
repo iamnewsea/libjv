@@ -223,7 +223,7 @@ import jv from "./libjv"
 
     var convertValue = function (value) {
         var v = value;
-        if (jv.IsNull(v)) {
+        if (jv.isNull(v)) {
             v = "";
         }
         if (v.Type == "date") {

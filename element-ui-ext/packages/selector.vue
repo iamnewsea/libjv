@@ -178,7 +178,7 @@
             changed(v) {
                 var ret;
                 if (this.type == "radio") {
-                    if (jv.IsNull(v)) {
+                    if (jv.isNull(v)) {
                         v = this.value1;
                     }
 
@@ -193,10 +193,10 @@
                     }
 
                     if (this.valueIsBoolean) {
-                        ret = jv.AsBoolean(ret)
+                        ret = jv.asBoolean(ret)
                     }
                 } else {
-                    if (jv.IsNull(v)) {
+                    if (jv.isNull(v)) {
                         v = this.value2;
                     }
 
@@ -210,7 +210,7 @@
                     }
 
                     if (this.valueIsBoolean) {
-                        ret = ret.map(it => jv.AsBoolean(this.valueField))
+                        ret = ret.map(it => jv.asBoolean(this.valueField))
                     }
                 }
                 this.$emit("input", ret);
@@ -229,17 +229,17 @@
                 this.changed();
             },
             setValue(v) {
-                v = jv.IsNull(v) ? this.value : v;
+                v = jv.isNull(v) ? this.value : v;
 
                 if (this.type == "radio") {
-                    if (jv.IsNull(v)) {
+                    if (jv.isNull(v)) {
                         this.value1 = "";
                         return;
                     }
 
                     if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
                         if (this.valueIsBoolean) {
-                            this.value1 = jv.AsString(v)
+                            this.value1 = jv.asString(v)
                         } else {
                             this.value1 = v;
                         }
@@ -248,7 +248,7 @@
 
                     var v2 = v[this.keyField];
 
-                    this.value1 = this.valueIsBoolean ? jv.AsString(v2) : v2;
+                    this.value1 = this.valueIsBoolean ? jv.asString(v2) : v2;
                     return;
                 }
 
@@ -259,7 +259,7 @@
                 if (jv.dataEquals(v, this.value2)) {
                     return;
                 }
-                // if (jv.IsNull(v)) {
+                // if (jv.isNull(v)) {
                 //     this.value2 = [];
                 //     return;
                 // }
@@ -268,7 +268,7 @@
                 //解决 boolean类型问题
                 if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
                     if (this.valueIsBoolean) {
-                        this.value2 = v.map(it => jv.AsBoolean(it));
+                        this.value2 = v.map(it => jv.asBoolean(it));
                     } else {
                         this.value2 = v;
                     }
@@ -277,7 +277,7 @@
                 this.value2 = v.map(it => {
                     var rv = it[this.keyField];
                     if (this.valueIsBoolean) {
-                        return jv.AsBoolean(rv);
+                        return jv.asBoolean(rv);
                     }
                     return rv;
                 });
@@ -305,7 +305,7 @@
                     data = data || this.data;
                 }
 
-                if (jv.IsNull(data)) {
+                if (jv.isNull(data)) {
                     this.data2 = [];
                     return;
                 }
@@ -316,7 +316,7 @@
                     this.dataIsObject = true;
                 } else if (["array", "set"].includes(type)) {
                     var v0 = data[0];
-                    if (jv.IsNull(v0) == false) {
+                    if (jv.isNull(v0) == false) {
                         this.dataIsValueArray = !v0.ObjectType;
                     }
                 }

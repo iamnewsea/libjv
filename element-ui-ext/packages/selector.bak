@@ -92,7 +92,7 @@
                 deep: true, handler(v) {
                     if (this.mode == "radio") {
 
-                        if (jv.IsNull(v)) {
+                        if (jv.isNull(v)) {
                             this.value1 = {};
                             return;
                         }
@@ -101,7 +101,7 @@
                         if (jv.dataEquals(v, this.value2)) {
                             return;
                         }
-                        if (jv.IsNull(v)) {
+                        if (jv.isNull(v)) {
                             this.value2 = [];
                             return;
                         }
@@ -186,7 +186,7 @@
                 this.labelField = fields[1];
             },
             setData(data) {
-                if (jv.IsNull(data)) {
+                if (jv.isNull(data)) {
                     this.data2 = [];
                     return;
                 }

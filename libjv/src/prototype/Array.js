@@ -7,7 +7,7 @@
     Array.init = (number, value) => {
         var ret = [];
         if (!number) return ret;
-        var isNul = jv.IsNull(value);
+        var isNul = jv.isNull(value);
         for (var i = 0; i < number; i++) {
             ret.push(isNul ? null : value);
         }
@@ -154,7 +154,7 @@
 //集合减法，用 filter .
     Object.defineProperty(Array.prototype, "minus", {
         value(other, eqFunc) {
-            if (jv.IsNull(other)) return this;
+            if (jv.isNull(other)) return this;
             if (!other.length) return this;
 
             eqFunc = eqFunc || ((a, b) => a == b);

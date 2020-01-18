@@ -263,7 +263,7 @@ jv.hasValue = (value) => {
     return !ret;
 };
 
-jv.isEmpty = (value)=> !jv.HasValue(value);
+jv.isEmpty = (value)=> !jv.hasValue(value);
 
 // 判断是 null or defined
 jv.isNull = (value) => {

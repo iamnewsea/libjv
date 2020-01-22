@@ -189,6 +189,13 @@ jv.uploadFileAjaxPost = (file, axios, post_param, percentCallback) => {
         // "Content-Type": "multipart/form-data",  //文件上传不用添加。
         timeout: 1200000
     }).then(res => {
+        if (res.data.msg) {
+            return new Error(res.data.msg);
+        }
+        if (jv.isNull(res.data.data)) {
+            return new Error("服务器未返回数据");
+        }
+
         percentCallback(100);
         return res;
     })

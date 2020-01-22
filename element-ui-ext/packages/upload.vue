@@ -274,7 +274,7 @@
                         return res;
                     }
                     Object.assign(item, res.data.data);
-                    this.myValue.pushAll()
+                    this.myValue.pushAll();
                     this.emit(item, "add");
                     return res;
                 }).catch(res => {

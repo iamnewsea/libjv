@@ -148,12 +148,11 @@ jv.initVue = (setting) => {
         }
 
         var type = json.Type;
-        if (!json.ObjectType && !["array", "set"].includes(type)) return response;
+        if (!["array", "set","object", "map"].includes(type)) return response;
 
         //处理。
         // var data = json;
         if ((response.headers["content-type"] || "").indexOf("application/json") < 0) return response;
-
 
         //处理Java的布尔类型
         if (!response.config.ignoreJavaBooleanKey) {

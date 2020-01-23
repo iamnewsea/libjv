@@ -55,7 +55,6 @@
             value: {
                 type: [Array, Object], default: function () {
                     var ret = [];
-                    ret.defalt = true;
                     return ret;
                 }
             },
@@ -121,8 +120,8 @@
             },
             setMyValue(v) {
                 if (this.maxCount == 1) {
-                    if (v.Type == "array" && v.default) {
-                        throw new Error("上传1个文件时，value不能是数组");
+                    if (v.Type == "array") {
+                        v = v[0] || {};
                     }
 
                     if (jv.dataEquals(this.myValue[0], v)) {

@@ -1,5 +1,5 @@
 <template>
-  <div style="position:fixed;width:0;height:0;left:0;top:0;">
+  <div>
     <el-dialog title="预览" :visible.sync="p.preview_show" top="auto" width="auto" :center="true" @close="preview_closed">
       <img :src="p.url" v-if="p.type=='img'" class="preview_dom" id="preview_image_dom"/>
       <video :src="p.url" @loadeddata="loaded=false" class="preview_dom" v-if="p.type=='video'"

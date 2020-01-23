@@ -136,7 +136,7 @@
             <!--return;-->
           <!--}-->
 
-          <!--jv.EditImage({-->
+          <!--jv.openEditImage({-->
             <!--image: base64Data,-->
             <!--scales: this.scales_value,-->
             <!--fileName: fileName,-->
@@ -214,7 +214,7 @@
         <!--this.emit({});-->
       <!--},-->
       <!--file_preview() {-->
-        <!--jv.Preview({type: this.fileType, url: this.myValue.fullUrl});-->
+        <!--jv.openPreview({type: this.fileType, url: this.myValue.fullUrl});-->
       <!--}-->
     <!--}-->
   <!--}-->

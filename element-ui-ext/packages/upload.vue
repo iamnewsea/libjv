@@ -237,7 +237,7 @@
                 }
 
                 return jv.file2Base64Data(rawFile).then(base64Data => {
-                    jv.EditImage({
+                    jv.openEditImage({
                         image: base64Data,
                         scales: this.scales_value,
                         fileName: fileName,
@@ -408,7 +408,7 @@
             }
             ,
             file_preview(index) {
-                jv.Preview({type: this.myValue[index].fileType, url: this.myValue[index].fullUrl});
+                jv.openPreview({type: this.myValue[index].fileType, url: this.myValue[index].fullUrl});
             },
             file_download(index) {
                 jv.downloadFile(this.myValue[index].fullUrl)

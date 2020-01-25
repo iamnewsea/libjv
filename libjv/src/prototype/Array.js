@@ -14,6 +14,37 @@
         return ret;
     };
 
+    /**
+     * 根据 key 或 lambda 找出最小的项。
+     */
+    Object.defineProperty(Array.prototype, "findIndexByMinValue", {
+        value(key) {
+            var minIndex = -1;
+            if (this.length == 0) return minIndex;
+            var getKeyValue = (item)=>{
+                return item[key];
+            };
+
+            var min = null;
+            for(var i=0,len = this.length;i<len;i++){
+                var item = this[i];
+                if( i== 0){
+                    min = getKeyValue(item);
+                    minIndex = 0;
+                    continue;
+                }
+
+                var kv = getKeyValue(item);
+                if( kv < min){
+                    kv = min;
+                    minIndex = i;
+                }
+            }
+            return minIndex;
+        }
+        , enumerable: false
+    });
+
     //返回时间的字符串格式.
     Object.defineProperty(Array.prototype, "spliceDate", {
         value() {
@@ -101,7 +132,7 @@
 
             this.forEach(it => {
                 ret.putDistinct(it, eqFunc);
-            })
+            });
 
             return ret;
         }, enumerable: false

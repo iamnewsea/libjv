@@ -14,37 +14,54 @@
         return ret;
     };
 
+    var findIndex = (ary,key,minOrMax)=>{
+        var index = -1;
+        if (ary.length == 0) return index;
+        var getKeyValue = (item)=>{
+            return item[key];
+        };
+
+        var findOne = null;
+        for(var i=0,len = ary.length;i<len;i++){
+            var item = ary[i];
+            if( i== 0){
+                findOne = getKeyValue(item);
+                index = 0;
+                continue;
+            }
+
+            var kv = getKeyValue(item);
+            if( minOrMax) {
+                if (kv < findOne) {
+                    kv = findOne;
+                    index = i;
+                }
+            }
+            else{
+                if (kv > findOne) {
+                    kv = findOne;
+                    index = i;
+                }
+            }
+        }
+        return index;
+    }
     /**
      * 根据 key 或 lambda 找出最小的项。
      */
     Object.defineProperty(Array.prototype, "findIndexByMinValue", {
         value(key) {
-            var minIndex = -1;
-            if (this.length == 0) return minIndex;
-            var getKeyValue = (item)=>{
-                return item[key];
-            };
-
-            var min = null;
-            for(var i=0,len = this.length;i<len;i++){
-                var item = this[i];
-                if( i== 0){
-                    min = getKeyValue(item);
-                    minIndex = 0;
-                    continue;
-                }
-
-                var kv = getKeyValue(item);
-                if( kv < min){
-                    kv = min;
-                    minIndex = i;
-                }
-            }
-            return minIndex;
+            return findIndex(this,key,true);
         }
         , enumerable: false
     });
 
+    Object.defineProperty(Array.prototype, "findIndexByMaxValue", {
+        value(key) {
+            return findIndex(this,key,false);
+        }
+        , enumerable: false
+    });
     //返回时间的字符串格式.
     Object.defineProperty(Array.prototype, "spliceDate", {
         value() {

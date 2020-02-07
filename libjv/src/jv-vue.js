@@ -116,19 +116,23 @@ jv.initVue = (setting) => {
         if (!config.data.ObjectType && !["array", "set"].includes(type)) return config;
 
         //处理Java的布尔类型
-        jv.recursionJson(config.data, (key1, value, target) => {
-            if (value !== false && value !== true) {
-                return;
-            }
+        jv.recursionJson(config.data, (target) => {
+            Object.keys(target).forEach(key1 => {
+                var value = target[key1];
 
-            //转为 isUpper 形式。
-            if (key1.length > 2 && (key1.slice(0, 2) == "is" && key1.charCodeAt(2).Between(65, 90))) {
-                var key2 = key1[0].toLowerCase() + key1.slice(1);
-                if (key2 in target == false) {
-                    target[key2] = value;
-                    delete target[key1];
+                if (value !== false && value !== true) {
+                    return;
                 }
-            }
+
+                //转为 isUpper 形式。
+                if (key1.length > 2 && (key1.slice(0, 2) == "is" && key1.charCodeAt(2).Between(65, 90))) {
+                    var key2 = key1[0].toLowerCase() + key1.slice(1);
+                    if ((key2 in target) == false) {
+                        target[key2] = value;
+                        delete target[key1];
+                    }
+                }
+            });
         });
 
 
@@ -148,7 +152,7 @@ jv.initVue = (setting) => {
         }
 
         var type = json.Type;
-        if (!["array", "set","object", "map"].includes(type)) return response;
+        if (!["array", "set", "object", "map"].includes(type)) return response;
 
         //处理。
         // var data = json;

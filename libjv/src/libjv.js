@@ -263,7 +263,7 @@ jv.hasValue = (value) => {
     return !ret;
 };
 
-jv.isEmpty = (value)=> !jv.hasValue(value);
+jv.isEmpty = (value) => !jv.hasValue(value);
 
 // 判断是 null or defined
 jv.isNull = (value) => {
@@ -331,12 +331,12 @@ jv.recursionJson = (json, eachJsonItemCallback, deepth) => {
         return;
     }
 
+    if (eachJsonItemCallback(json, deepth) === false) {
+        return false;
+    }
+
     return Object.keys(json).ForEach(key => {
         var value = json[key];
-        if (eachJsonItemCallback(key, value, json, deepth) === false) {
-            return false;
-        }
-
         if (value) {
             if (jv.recursionJson(value, eachJsonItemCallback, deepth + 1) === false) {
                 return false;
@@ -422,16 +422,19 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
 
 
     if (key) {
-        jv.recursionJson(obj, (k, v, o) => {
-            if (k == key) {
-                res1(k, v, o, args);
+        jv.recursionJson(obj, (json) => {
+            if (Object.keys(json).includes(key)) {
+                var v = json[key];
+                res1(key, v, json, args);
             }
         });
         return;
     }
 
-    jv.recursionJson(obj, (k, v, o) => {
-        res1(k, v, o, args);
+    jv.recursionJson(obj, (json) => {
+        Object.keys(json).forEach(key => {
+            res1(key, json[key], json, args);
+        })
     });
 };
 
@@ -440,23 +443,27 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
  * 修复Java布尔类的字段名称。使用 isUdd 字段
  */
 jv.fixJavaBoolField = (json) => {
-    jv.recursionJson(json, (key1, value, target) => {
-        if (value !== false && value !== true) {
-            return;
-        }
+    jv.recursionJson(json, (target) => {
+        Object.keys(target).forEach(key1 => {
+            var value = target[key1];
 
-        //转为 isUpper 形式。
-        if (key1.length > 2 && (key1.slice(0, 2) == "is" && key1.charCodeAt(2).Between(65, 90))) {
-
-        } else {
-            var key2 = "is" + key1[0].toUpperCase() + key1.slice(1)
-            if (key2 in target == false) {
-                target[key2] = value;
-                delete target[key1];
+            if (value !== false && value !== true) {
+                return;
             }
-        }
+
+            //转为 isUpper 形式。
+            if (key1.length > 2 && (key1.slice(0, 2) == "is" && key1.charCodeAt(2).Between(65, 90))) {
+
+            } else {
+                var key2 = "is" + key1[0].toUpperCase() + key1.slice(1)
+                if (key2 in target == false) {
+                    target[key2] = value;
+                    delete target[key1];
+                }
+            }
+        });
     });
-}
+};
 
 
 /*如果两个对象是数组, 使用refDataEquals比较内容, 不比较顺序.

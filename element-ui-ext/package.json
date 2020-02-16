@@ -1,6 +1,6 @@
 {
   "name": "element-ui-ext",
-  "version": "0.3.55",
+  "version": "0.3.56",
   "description": "基于element-ui的vue扩展",
   "author": "于新海 <13466396863@163.com>",
   "scripts": {

@@ -4,29 +4,32 @@
         return;
     }
 
-//时间按 UTC 处理.
-
+    /**
+     * 要保证， Date.from("当日").toDateString()  返回的结果是一样的。
+     *  new Date("2020/02/17") 是当地时间
+     * @param year
+     * @param dates
+     * @returns {Date}
+     */
     Date.from = (year, dates) => {
-        if (!year && !dates) return new Date();
+        var now = new Date();
+        if (!year && !dates) return now;
 
         if (year.Type == "string" && !dates) {
-            var isoFormat = year.replace(/\//g, '-').trim();
-            if (isoFormat.IsDateTimeFormat()) {
-                isoFormat = isoFormat.replace(" ", "T");
-                if (!isoFormat.endsWith("Z")) {
-                    isoFormat += "Z";
-                }
-            }
-
-            return new Date(isoFormat);
+            return new Date(year.replace(/-/g, '\/').trim());
         }
-        return new Date(new Date(year + "-01-01T00:00:00Z").valueOf() + (dates - 1) * 86400000);
+
+        return new Date(new Date(now.getFullYear(), 0, 1).valueOf() + (dates - 1) * 86400000);
     };
 
+    /**
+     * 返回北京时间的，当天的0分0秒0分。
+     * 也就是说，北京的零晨执行时，也是当日。
+     * Date.today().toDateString(null,"local") 必须正确。
+     */
     Date.today = () => {
         var now = new Date();
-        var time = now.getUTCHours() * 3600 + now.getUTCMinutes() * 60 + now.getUTCSeconds();
-        return new Date(now.valueOf() - time * 1000);
+        return new Date(now.getFullYear(), now.getMonth(), now.getDate());
     };
 
 

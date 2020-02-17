@@ -414,7 +414,7 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
                 target[key1 + "_res"] = value;
                 return true;
             } else if (value.IsDateTimeFormat()) {
-                target[key1 + "_res"] = new Date(value).toDateString(args1, "local");
+                target[key1 + "_res"] = Date.from(value).toDateString(args1, "local");
                 return true;
             }
         }

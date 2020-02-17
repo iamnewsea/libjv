@@ -13,7 +13,7 @@
                 year = t.getFullYear(), month = t.getMonth(), day = t.getDate(),
                 hour = t.getHours(), minute = t.getMinutes(), second = t.getSeconds(), ms = t.getMilliseconds();
 
-            if (!timezone || timezone.toUpperCase() == "LOCAL") {
+            if (!timezone || (timezone.toUpperCase() == "LOCAL")) {
                 year = t.getFullYear();
                 month = t.getMonth();
                 day = t.getDate();

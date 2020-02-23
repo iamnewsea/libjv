@@ -438,6 +438,25 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
     });
 };
 
+/**
+ * 代理对象，避免 toJSON 递归调用。
+ * @param json
+ * @returns {*}
+ */
+// jv.proxy = (json) => {
+//     return new Proxy(json || {}, {
+//         get: function (target, key) {
+//             if (key in target == false) {
+//                 if (key.Type == "symbol") {
+//                     return null;
+//                 }
+//                 console.log("jv.proxy, 在对象：", JSON.stringify(target), ",找不到字段: ", key.toString());
+//             }
+//
+//             return target[key];
+//         }
+//     });
+// };
 
 /**
  * 修复Java布尔类的字段名称。使用 isUdd 字段

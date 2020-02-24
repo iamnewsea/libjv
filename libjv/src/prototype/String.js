@@ -198,4 +198,12 @@
             }, enumerable: false
         });
     }
-})()
+
+
+    Object.defineProperty(String.prototype, 'ToRound', {
+        value(dotLength = 2) {
+            return Number(this).ToRound(dotLength);
+        }, enumerable: false
+    });
+
+})();

@@ -171,6 +171,7 @@ jv.compressImage = (op) => {
 };
 
 jv.uploadFileAjaxPost = (file, axios, post_param, percentCallback) => {
+    file.name = file.name || "file";
 
     const formData = new FormData();
     formData.append(file.name.split("/").last(), file);
@@ -216,7 +217,7 @@ jv.doUploadFile = option => {
     option = option || {};
     var imgBase64 = option.imageBase64,
         file = option.file,   // imgBase64 和 file ,优先使用 file , 如果 file 为空，则使用 imgBase64
-        fileName = option.fileName || "file",
+        fileName = option.fileName || (file && file.name) || "file",
         process_callback = option.processCallback || (() => {
         }),
         post_param = option.postParam || {},
@@ -235,6 +236,8 @@ jv.doUploadFile = option => {
 
     //真正上传从 10% 开始。
     var doWork = file => {
+        file.name = file.name || fileName;
+
         return jv.getFileMd5(file)
             .then(md5 => {
                 process_callback(5);

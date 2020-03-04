@@ -29,13 +29,17 @@ const components = [
   image_edit
 ];
 
-var components_export = {};
+// var components_export = {};
+
+import menu from "./right-menu"
 
 const install = function (Vue, opts = {}) {
   components.map(component => {
-    components_export[component.name] = component;
+    // components_export[component.name] = component;
     Vue.component(component.name, component);
   });
+
+  menu.install(Vue);
 };
 
 /* istanbul ignore if */

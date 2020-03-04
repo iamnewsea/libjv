@@ -225,7 +225,7 @@
 
                 var fileName = rawFile.name, fileType = jv.getFileType(fileName);
 
-                var item = {percentage: 0};
+                var item = {percentage: 0, name: fileName};
                 this.myValue.push(item);
 
                 if (fileType.type == "img" && this.scales_value.length == 0 && this.maxWidth > 0) {

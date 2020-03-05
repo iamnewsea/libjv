@@ -2,7 +2,10 @@ import "spark-md5"
 import jv from './vue-chk'
 
 jv.getFileMd5 = (file) => {
-    return new Promise((resole, reject) => {
+    return new Promise((resolve, reject) => {
+        if (typeof (SparkMD5) == "undefined") {
+            return resolve("");
+        }
 
         var blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
             chunkSize = 2097152, // read in chunks of 2MB
@@ -19,7 +22,7 @@ jv.getFileMd5 = (file) => {
                 loadNext();
             else {
                 var d = "";
-                resole(spark.end());
+                resolve(spark.end());
             }
         };
 
@@ -170,16 +173,16 @@ jv.compressImage = (op) => {
     });
 };
 
-jv.uploadFileAjaxPost = (file, axios, post_param, percentCallback) => {
-    file.name = file.name || "file";
+jv.uploadFileAjaxPost = (file, fileName, axios, post_param, axiosConfig, percentCallback) => {
+    // file.name = file.name || "file";
 
     const formData = new FormData();
-    formData.append(file.name.split("/").last(), file);
+    formData.append(fileName.split("/").last(), file);
     for (var key in post_param) {
         formData.append(key, post_param[key]);
     }
 
-    return axios.post(window.Server_Host + "/sys/upload", formData, {
+    return axios.post(window.Server_Host + "/sys/upload", formData, Object.assign({}, {
         onUploadProgress: e => {
             if (e.total > 0) {
                 e.percent = parseInt(e.loaded / e.total * 90);
@@ -188,8 +191,8 @@ jv.uploadFileAjaxPost = (file, axios, post_param, percentCallback) => {
         }
     }, {
         // "Content-Type": "multipart/form-data",  //文件上传不用添加。
-        timeout: 1200000
-    }).then(res => {
+        timeout: 900000    //单位毫秒。最长15分钟
+    }, axiosConfig)).then(res => {
         if (res.data.msg) {
             return new Error(res.data.msg);
         }
@@ -222,6 +225,7 @@ jv.doUploadFile = option => {
         }),
         post_param = option.postParam || {},
         axios = option.axios,
+        axiosConfig = option.axiosConfig,
         maxWidth = option.maxWidth;
 
     if (!imgBase64 && !file) {
@@ -236,11 +240,15 @@ jv.doUploadFile = option => {
 
     //真正上传从 10% 开始。
     var doWork = file => {
-        file.name = file.name || fileName;
+        // file.name = file.name || fileName;
 
         return jv.getFileMd5(file)
             .then(md5 => {
                 process_callback(5);
+
+                if (!md5) {
+                    return jv.uploadFileAjaxPost(file, fileName, axios, post_param, axiosConfig, process_callback)
+                }
 
                 var param = Object.assign({md5: md5}, post_param);
 
@@ -249,7 +257,7 @@ jv.doUploadFile = option => {
                 // }
 
                 // 8.检查服务器文件的 Md5值。
-                return axios.post("/sys/check_upload", param)
+                return axios.post("/sys/check_upload", param, axiosConfig)
                     .then(res => {
                         process_callback(10);
                         // 8.1 如果服务器存在该文件，返回 data 属性，且 data 属性有 id
@@ -258,7 +266,7 @@ jv.doUploadFile = option => {
                             process_callback(100);
                             return res;
                         } else {
-                            return jv.uploadFileAjaxPost(file, axios, post_param, process_callback)
+                            return jv.uploadFileAjaxPost(file, axios, post_param, axiosConfig, process_callback)
                         }
                     });
             }).catch(err => {

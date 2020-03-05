@@ -34,7 +34,8 @@
       <!--        {{item.remark}}-->
       <!--      </div>-->
 
-      <el-progress type="circle" :percentage="item.percentage" v-else-if="item.percentage<100"></el-progress>
+      <el-progress type="circle" :percentage="item.percentage"
+                   v-else-if="item.percentage>0 && item.percentage<100"></el-progress>
     </div>
 
     <input type="file" name="file" style="display: none" @change="file_change" @click="file_click" v-bind="fileAttr"
@@ -70,7 +71,8 @@
             maxCount: {type: Number, default: 1},
             maxWidth: {type: Number, default: 0},
             fileType: {type: String, default: "img"}, //上传的要求
-            maxSize: {type: String, default: "5M"}
+            maxSize: {type: String, default: "5M"},
+            axiosConfig: {type: Object, default: {}}
         },
         data() {
             return {
@@ -264,6 +266,7 @@
                     imageBase64: imgBase64,
                     fileName: fileName,
                     axios: this.$http,
+                    axiosConfig: this.axiosConfig,
                     maxWidth: 0,
                     processCallback: p => item.percentage = p
                 }).then(res => {

@@ -6,7 +6,7 @@
         return;
     }
 
-    if(Location.prototype.json){
+    if (Location.prototype.json) {
         return;
     }
 
@@ -25,6 +25,14 @@
         });
     }
 
+    Object.defineProperty(Node.prototype, "once", {
+        value(event, callback) {
+            return this.addEventListener(event, function fn(e) {
+                e.target.removeEventListener(e.type, fn);
+                return callback(e);
+            }, false);
+        }, enumerable: false
+    });
 
     document.cookieJson = (() => {
         // http://blog.csdn.net/lvjin110/article/details/37663067
@@ -128,18 +136,18 @@
         , enumerable: false
     });
 
-    //触发无素事件.value附加到event上.返回event
+
+    /**
+     * 触发元素事件. event=jv.createEvent
+     */
     Object.defineProperty(Node.prototype, "trigger", {
-        value(event, value) {
+        value(event) {
             if (Node.prototype.dispatchEvent) {
-                var ev = document.createEvent("HTMLEvents");
-                ev.initEvent(event, true, true);
-                this.dispatchEvent(ev);
-                return ev;
+                this.dispatchEvent(event);
+                return event;
             } else {
-                var ev = document.createEventObject();
-                this.fireEvent("on" + event, ev)
-                return ev;
+                this.fireEvent("on" + event.type, event)
+                return event;
             }
         }, enumerable: false
     });

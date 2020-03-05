@@ -24,6 +24,21 @@ jv.noop = () => {
 };
 
 
+jv.createEvent = (eventName,evDetail) => {
+    if (jv.inBrowser) {
+        var chkEvent,evObj = {detail:evDetail};
+        if (document.createEvent) {
+            chkEvent = document.createEvent("CustomEvent");
+            chkEvent.initCustomEvent(eventName, true, true, evObj);
+        } else {
+            chkEvent = new CustomEvent(eventName, evObj);
+        }
+        return chkEvent;
+    }
+};
+
+
+
 jv.info = console.info;
 jv.error = console.error;
 jv.warn = console.warn;
@@ -814,5 +829,20 @@ jv.evalExpression = (obj, path) => {
     return ret;
 };
 
+/**
+ * 从 container 向下，遍历 $children，根据 $el == dom 查找 dom所属的 vnode
+ * @param container
+ * @param dom
+ */
+jv.findVNode = (container,dom)=>{
+    if( container.$el === dom ){ return container;}
+    var ret;
+    for(var item of container.$children){
+        ret = jv.findVNode(item,dom);
+        if( ret ){
+            return ret;
+        }
+    }
+};
 
 export default jv;

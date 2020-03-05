@@ -1,13 +1,13 @@
 <template>
   <div class="enum">
-    <template v-if="readOnly">
+    <template v-if="readOnly || !data2.length">
       <el-tag v-for="item in value_displays" :key="item" :type="tagType">{{item}}</el-tag>
     </template>
 
-
     <template v-else>
       <template v-if="type == 'radio'">
-        <el-radio-group v-model="value1" v-if="data2.length <= enumCount"
+        <label v-if="!data2.length && value1 && labelField && value1[labelField]">{{value1[labelField]}}</label>
+        <el-radio-group v-model="value1" v-else-if="data2.length <= enumCount"
                         @change="changed" :class="clearable? 'ri4c':''">
           <el-radio v-for="item in data2" :label="item[keyField]" @click.native.stop="item_click"
                     :key="item[keyField]">{{item[labelField]}}
@@ -25,6 +25,7 @@
         </el-select>
       </template>
       <template v-else>
+        <label v-if="!data2.length && labelField && value2.length">{{value2.map(it=>it[labelField]).join(",")}}</label>
         <el-checkbox-group v-model="value2" v-if="data2.length <= enumCount"
                            @change="changed(null)">
           <el-checkbox v-for="item in data2" :label="item[keyField]"
@@ -118,11 +119,34 @@
         },
         computed: {
             value_displays() {
+                var v2 = [];
                 if (this.type == "radio") {
-                    return this.data2.filter(it => it[this.keyField] == this.value1).map(it => it[this.labelField]);
+                    if (this.value1) {
+                        v2 = [this.value1];
+                    }
                 } else {
-                    return this.data2.filter(it => this.value2.includes(it[this.keyField])).map(it => it[this.labelField]);
+                    v2 = this.value2;
                 }
+
+                var getKey = (item) => {
+                    if (this.keyField) {
+                        return item[this.keyField];
+                    }
+                    return item;
+                };
+
+                var getValue = (item) => {
+                    if (this.labelField) {
+                        return item[this.labelField];
+                    }
+                    return item;
+                };
+
+                if (this.data2.length) {
+                    return this.data2.filter(it => v2.includes(getKey(it))).map(it => getValue(it));
+                }
+
+                return v2.map(it => getValue(it));
             }
         },
         data() {
@@ -237,7 +261,7 @@
                         return;
                     }
 
-                    if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
+                    if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray || !this.keyField) {
                         if (this.valueIsBoolean) {
                             this.value1 = jv.asString(v)
                         } else {

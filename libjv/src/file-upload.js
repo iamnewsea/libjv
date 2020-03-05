@@ -182,7 +182,7 @@ jv.uploadFileAjaxPost = (file, fileName, axios, post_param, axiosConfig, percent
         formData.append(key, post_param[key]);
     }
 
-    return axios.post(window.Server_Host + "/sys/upload", formData, Object.assign({}, {
+    return axios.post("/sys/upload", formData, Object.assign({}, {
         onUploadProgress: e => {
             if (e.total > 0) {
                 e.percent = parseInt(e.loaded / e.total * 90);
@@ -257,7 +257,7 @@ jv.doUploadFile = option => {
                 // }
 
                 // 8.检查服务器文件的 Md5值。
-                return axios.post("/sys/check_upload", param, axiosConfig)
+                return axios.post("/sys/check_upload", param, Object.assign({}, axiosConfig))
                     .then(res => {
                         process_callback(10);
                         // 8.1 如果服务器存在该文件，返回 data 属性，且 data 属性有 id
@@ -266,7 +266,7 @@ jv.doUploadFile = option => {
                             process_callback(100);
                             return res;
                         } else {
-                            return jv.uploadFileAjaxPost(file, axios, post_param, axiosConfig, process_callback)
+                            return jv.uploadFileAjaxPost(file, fileName, axios, post_param, axiosConfig, process_callback)
                         }
                     });
             }).catch(err => {

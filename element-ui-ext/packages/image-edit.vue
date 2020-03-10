@@ -163,16 +163,16 @@
                 div.innerHTML = "<iframe src=\"" + url + "\" />";
             }
 
-            jv.open = (url,target)=>{
-                if( !url){
+            jv.open = (url, target) => {
+                if (!url) {
                     return;
                 }
                 var link = this.$refs["link_a"];
-                if( target){
-                    link.setAttribute("target",target);
+                if (target) {
+                    link.setAttribute("target", target);
                 }
-                link.setAttribute("href",url);
-                link.trigger(jv.createEvent("click", {}));
+                link.setAttribute("href", url);
+                link.trigger(new MouseEvent("click", {view: window, bubbles: true, cancelable: true}));
             }
         },
         watch: {

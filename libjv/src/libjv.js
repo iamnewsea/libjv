@@ -24,9 +24,9 @@ jv.noop = () => {
 };
 
 
-jv.createEvent = (eventName,evDetail) => {
+jv.createEvent = (eventName, evDetail) => {
     if (jv.inBrowser) {
-        var chkEvent,evObj = {detail:evDetail};
+        var chkEvent, evObj = {detail: evDetail};
         if (document.createEvent) {
             chkEvent = document.createEvent("CustomEvent");
             chkEvent.initCustomEvent(eventName, true, true, evObj);
@@ -36,7 +36,6 @@ jv.createEvent = (eventName,evDetail) => {
         return chkEvent;
     }
 };
-
 
 
 jv.info = console.info;
@@ -100,99 +99,105 @@ jv.getUrlHost = (url) => {
 
 //---------------------------------------------
 
-//提供 基于 localStorage的缓存数据，增加过期时间机制。额外多保存一个 key ，默认有效期是4个小时。
-jv.store = {
+/**
+ * 提供 基于 localStorage 的缓存数据，增加过期时间机制。额外多保存一个 key ，默认有效期是4个小时。
+ * Vue 中使用原型方法
+ */
+jv.store  = {
+    getStoreKey(key) {
+        return "jv.store." + key;
+    },
+    getExpireKey(key) {
+        return "jv.store_exp." + key;
+    },
     getJson(key) {
-        var v = this.get(key);
+        if (!key) return null;
+
+        var v = this.getString(key);
         if (!v) return {};
         return JSON.parse(v);
     },
     setJson(key, value, cacheSeconds) {
         if (!value) return false;
-        this.set(key, JSON.stringify(value), cacheSeconds);
+        this.setString(key, JSON.stringify(value), cacheSeconds);
         return true;
     },
-    get(key) {
+    getString(key) {
         if (!key) return null;
-        key = "jv.store." + key;
-        var expireAt_key = key + "..expireAt";
-        var value = localStorage.getItem(key);
-        if (jv.isNull(value)) {
-            localStorage.removeItem(key);
-            localStorage.removeItem(expireAt_key);
-            return null;
+        this.check_key(key);
+
+        var storeKey = this.getStoreKey(key);
+
+        return localStorage.getItem(storeKey);
+    },
+    setString(key, value, cacheSeconds) {
+        if (!key) return;
+        if (value === null) {
+            this.remove(key);
+            return;
         }
 
-        this.check_key(key);
-        return value;
+        var storeKey = this.getStoreKey(key);
+
+        localStorage.setItem(storeKey, value);
+
+        cacheSeconds = cacheSeconds || 14400; //默认4小时。
+
+        if (cacheSeconds < 0) return;
+
+        var expireAt_key = this.getExpireKey(key);
+        localStorage.setItem(expireAt_key, Date.now() + cacheSeconds * 1000);
     },
     check_key(key) {
-        var expireAt_key = key + "..expireAt";
+        var expireAt_key = this.getExpireKey(key);
         var expireAt = localStorage.getItem(expireAt_key);
         if (!expireAt) {
             return;
         }
         if (parseInt(expireAt) < Date.now()) {
-            localStorage.removeItem(key);
-            localStorage.removeItem(expireAt_key);
+            this.remove(key);
             return null;
         }
     },
     check() {
         for (var i = localStorage.length - 1; i >= 0; i--) {
             var key = localStorage.key(i);
-            if (key.startsWith("jv.store.") == false) {
+
+            if (key.startsWith("jv.store_exp.") == false) {
                 continue;
             }
 
-            if (key.endsWith("..expireAt") == false) {
-                continue;
-            }
-
-            var cacheKey = key.slice(9, 0 - 10);
+            var cacheKey = key.slice(13);
 
             this.check_key(cacheKey);
         }
     },
     remove(key) {
         if (!key) return;
-
-        localStorage.removeItem(key);
-        var expireAt_key = key + "..expireAt";
+        var storeKey = this.getStoreKey(key);
+        var expireAt_key = this.getExpireKey(key);
+        localStorage.removeItem(storeKey);
         localStorage.removeItem(expireAt_key);
     },
-    set(key, value, cacheSeconds) {
-        if (!key) return;
-
-        key = "jv.store." + key;
-        var expireAt_key = key + "..expireAt";
-
-        if (value === null) {
-            localStorage.removeItem(key);
-            localStorage.removeItem(expireAt_key);
-            return;
-        }
-
-        localStorage.setItem(key, value);
-
-        cacheSeconds = cacheSeconds || 14400; //默认4小时。
-
-        if (cacheSeconds < 0) return;
-
-        localStorage.setItem(expireAt_key, Date.now() + cacheSeconds * 1000);
-    },
+    /**
+     *
+     * @param key
+     * @param cacheSeconds 设置为小于等于0,马上过期。
+     */
     setExpire(key, cacheSeconds) {
         if (!key) return;
         cacheSeconds = cacheSeconds || 14400;
-        if (cacheSeconds < 0) ;
+        if (cacheSeconds <= 0) {
+            this.remove(key);
+            return;
+        }
 
-        var expireAt_key = key + "..expireAt";
-        localStorage.removeItem(key);
-        localStorage.removeItem(expireAt_key);
-
+        var expireAt_key = this.getExpireKey(key);
         localStorage.setItem(expireAt_key, Date.now() + cacheSeconds * 1000);
     }
 };
+
+
 
 jv.cache_db = {};
 
@@ -834,12 +839,14 @@ jv.evalExpression = (obj, path) => {
  * @param container
  * @param dom
  */
-jv.findVNode = (container,dom)=>{
-    if( container.$el === dom ){ return container;}
+jv.findVNode = (container, dom) => {
+    if (container.$el === dom) {
+        return container;
+    }
     var ret;
-    for(var item of container.$children){
-        ret = jv.findVNode(item,dom);
-        if( ret ){
+    for (var item of container.$children) {
+        ret = jv.findVNode(item, dom);
+        if (ret) {
             return ret;
         }
     }

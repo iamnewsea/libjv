@@ -46,6 +46,7 @@
 
 
     <div style="display:none" ref="download_div"></div>
+    <a style="display: none" target="_self" ref="link_a"></a>
   </div>
 </template>
 <!--<style>-->
@@ -160,6 +161,18 @@
                 var div = this.$refs["download_div"];
                 div.innerHTML = "";
                 div.innerHTML = "<iframe src=\"" + url + "\" />";
+            }
+
+            jv.open = (url,target)=>{
+                if( !url){
+                    return;
+                }
+                var link = this.$refs["link_a"];
+                if( target){
+                    link.setAttribute("target",target);
+                }
+                link.setAttribute("href",url);
+                link.trigger(jv.createEvent("click", {}));
             }
         },
         watch: {

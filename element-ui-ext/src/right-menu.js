@@ -14,7 +14,7 @@ export default {
           var menu = vnode.context.$refs[binding.arg];
           menu.style.left = ev.pageX + "px";
           menu.style.top = ev.pageY + "px";
-          menu.classList.add("menu-shop");
+          menu.classList.add("context-menu-shop");
 
 
           setTimeout(() => {
@@ -26,7 +26,7 @@ export default {
               if (menu) {
                 var chkEvent = jv.createEvent("hide", {});
                 menu.trigger(chkEvent);
-                menu.classList.add("menu-hide");
+                menu.classList.add("context-menu-hide");
               }
             });
           }, 0);

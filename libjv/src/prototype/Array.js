@@ -107,12 +107,12 @@
                 var item = this[index];
                 var ret = filter(item, index);
                 if (ret === false) {
-                    if (falseAction && (falseAction(item, i) !== false)) {
+                    if (falseAction && (falseAction(item, index) !== false)) {
                         continue;
                     }
                     return ret;
                 } else if (ret === true && trueAction) {
-                    trueAction(item, i);
+                    trueAction(item, index);
                 }
             }
             return true;

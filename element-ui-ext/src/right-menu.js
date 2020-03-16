@@ -9,12 +9,13 @@ export default {
   install(Vue) {
     Vue.directive('menu', {
       inserted(el, binding, vnode) {
+
         el.addEventListener("contextmenu", function (ev) {
           ev.preventDefault();
           var menu = vnode.context.$refs[binding.arg];
           menu.style.left = ev.pageX + "px";
           menu.style.top = ev.pageY + "px";
-          menu.classList.add("context-menu-shop");
+          menu.classList.add("context-menu-shop","fade_in");
 
 
           setTimeout(() => {
@@ -26,12 +27,26 @@ export default {
               if (menu) {
                 var chkEvent = jv.createEvent("hide", {});
                 menu.trigger(chkEvent);
-                menu.classList.add("context-menu-hide");
+                menu.classList.add("context-menu-hide","fade_out");
               }
             });
           }, 0);
           return false;
         });
+
+        //添加样式表
+        // if (!Array.from(document.styleSheets).filter(it => it.id == "style-contextmenu").length) {
+        //
+        //   var nod = document.createElement("style"),
+        //     str = [".context-menu-hide{}",".context-menu-show{}"].join("\n");
+        //   nod.type = "text/css";
+        //   if (nod.styleSheet) {         //ie下
+        //     nod.styleSheet.cssText = str;
+        //   } else {
+        //     nod.innerHTML = str;       //或者写成 nod.appendChild(document.createTextNode(str))
+        //   }
+        //   document.head.appendChild(style)
+        // }
       }
     })
   }

@@ -58,7 +58,7 @@
                 this.total = store.total || 0;
                 this.pageNumber = store.pageNumber || 1;
                 this.lastRowId = store.lastRowId || "";
-                this.queryData = store.query || {};
+                this.queryData = Object.assign({}, this.query, store.query);
             }
         },
         watch: {
@@ -73,13 +73,18 @@
                         this.total = v.total;
                     }
                 }
+            },
+            query: {
+                deep: true, handler(v) {
+                    if (!v) return;
+                    this.queryData = Object.assign({}, v);
+                }
             }
         },
         methods: {
             //获取保存的查询条件
             getStoredQuery() {
-                var storeId = this.$el.id || "list";
-                return Object.assign({}, this.query, this.queryData, (this.$store.getJson()[storeId] || {}).query);
+                return this.queryData;
             },
             setTotal(total) {
                 this.total = total;
@@ -174,7 +179,7 @@
                     this.tableData = res.data.data;
                     //返回来的total只有第一次获取的时候才有值，第二次获取之后都是-1
 
-                    var storeData = {pageNumber: this.pageNumber, query: Object.assign({}, this.query, this.queryData)};
+                    var storeData = {pageNumber: this.pageNumber, query: this.queryData};
 
                     if (res.data.total >= 0) {
                         this.total = res.data.total;

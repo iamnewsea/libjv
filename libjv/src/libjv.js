@@ -103,7 +103,7 @@ jv.getUrlHost = (url) => {
  * 提供 基于 localStorage 的缓存数据，增加过期时间机制。额外多保存一个 key ，默认有效期是4个小时。
  * Vue 中使用原型方法
  */
-jv.store  = {
+jv.store = {
     getStoreKey(key) {
         return "jv.store." + key;
     },
@@ -196,7 +196,6 @@ jv.store  = {
         localStorage.setItem(expireAt_key, Date.now() + cacheSeconds * 1000);
     }
 };
-
 
 
 jv.cache_db = {};
@@ -820,18 +819,16 @@ jv.query2Json = (query) => {
 
 
 //用法： jv.evalExpression({a:{b:[{c:1}]}} , "a.b[0].c")
-//返回: {value: 1 , ok: true }
+//如果有错误 会设置到 jv.evalExpressionError，请先检查这个错误。
 jv.evalExpression = (obj, path) => {
     if (!path) return obj;
 
-    var ret = {};
+
     try {
-        ret.value = eval("(obj)=>obj." + path)(obj);
-        ret.ok = true;
+        return eval("(obj)=>obj." + path)(obj);
     } catch (e) {
-        ret.ok = false;
+        jv.evalExpressionError = e;
     }
-    return ret;
 };
 
 /**

@@ -140,7 +140,9 @@ import jv from "./libjv"
     Object.defineProperty(HTMLElement.prototype, "chk", {
         //chk_show:如何显示的回调.
         value: function (chk_show) {
-            if( jv.chk_ing){ jv.chk_ing() }
+            if (jv.chk_ing) {
+                jv.chk_ing()
+            }
 
             var index = 0;
             //
@@ -193,10 +195,10 @@ import jv from "./libjv"
 
                     //对于 el-input 它的值在 component._data.currentValue,对于其它 v-model 它的值在  vdata.model.value
                     ret = jv.evalExpression(data, vdata.model.expression);
-                    if (ret.ok) {
-                        return {vnode: vnode, value: ret.value, data: data};
+                    if (jv.evalExpressionError) {
+                        ret = null
                     } else {
-                        ret = null;
+                        return {vnode: vnode, value: ret.value, data: data};
                     }
                 }
 
@@ -370,7 +372,7 @@ import jv from "./libjv"
                 var chk_result = chk_item(chk_dom, inputDom, vueModel);
 
                 if (chk_result.result) {
-                    jv.chk_clear && jv.chk_clear({target: inputDom, vueModel:vueModel, chk_dom: chk_dom});
+                    jv.chk_clear && jv.chk_clear({target: inputDom, vueModel: vueModel, chk_dom: chk_dom});
                     continue;
                 }
 

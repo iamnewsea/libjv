@@ -246,9 +246,10 @@ import jv from "./libjv"
 
             //对于 el-input 它的值在 component._data.currentValue,对于其它 v-model 它的值在  vdata.model.value
             var ret = jv.evalExpression(data, vdata.model.expression);
-            if (ret.ok) {
-                return {value: convertValue(ret.value), data: data};
-            } else return {};
+            if (jv.evalExpressionError) {
+                return {};
+            }
+            return {value: convertValue(ret), data: data};
         }
 
         return {};
@@ -393,7 +394,7 @@ import jv from "./libjv"
         for (var chk_dom of list) {
             var chk_result = chk_item(chk_dom);
 
-            var chkEvent = jv.createEvent("chked",{
+            var chkEvent = jv.createEvent("chked", {
                 result: chk_result.result,
                 msg: chk_result.msg,
                 detail: chk_result.detail

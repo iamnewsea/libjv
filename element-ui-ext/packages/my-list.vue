@@ -75,7 +75,7 @@
                 this.$emit("input", this.tableData);
             },
             //仅刷新数据,用于更新后，更新某一条。
-            updateId(id, key = "id") {
+            updateById(id, key = "id") {
                 if (!id) return;
                 var row = this.tableData.find(it => it[key] == id);
                 if(!row) return ;
@@ -93,6 +93,7 @@
                 let para = Object.assign({}, this.query, newQuery);
 
                 this.$http.post(this.url, para).then(res => {
+                    this.$emit("loaded", res, para);
                     var newData = res.data.data[0] || {};
 
                     this.tableData = this.tableData.map(it=>{
@@ -101,9 +102,6 @@
                        }
                        return it;
                     });
-
-                    res.data.data = this.tableData;
-                    this.$emit("loaded", res, para);
 
                     this.$emit("input", this.tableData);
                     this.loading = false;

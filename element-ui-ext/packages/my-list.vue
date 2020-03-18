@@ -53,8 +53,8 @@
         },
         mounted() {
             if (this.store) {
-                var storeId = this.$el.id || "list";
-                var store = this.$store.getJson()[storeId] || {};
+                var storeId = this.$vnode.data.ref || "list";
+                var store = this.$store.getJson(storeId);
                 this.total = store.total || 0;
                 this.pageNumber = store.pageNumber || 1;
                 this.lastRowId = store.lastRowId || "";
@@ -94,10 +94,8 @@
             },
             setLastRowId(lastRowId) {
                 this.lastRowId = lastRowId;
-                var storeId = this.$el.id || "list";
-                var storeData = {};
-                storeData[storeId] = {lastRowId: lastRowId}
-                this.$store.setJson(storeData)
+                var storeId = this.$vnode.data.ref || "list";
+                this.$store.setJson(storeId, Object.assign(this.$store.getJson(storeId), {lastRowId: lastRowId}));
             },
             setData(data) {
                 if ("total" in data) {
@@ -122,22 +120,15 @@
                 this.$emit("input", this.tableData);
             },
             //仅刷新数据,用于更新后，更新某一条。
-            updateById(id, key = "id") {
+            updateById(id, key) {
                 if (!id) return;
                 var row = this.tableData.find(it => it[key] == id);
                 if (!row) return;
 
                 this.loading = true;
 
-                var newQuery = {
-                    pageNumber: this.pageNumber,
-                    skip: (this.pageNumber - 1) * this.pageSize,
-                    take: this.pageSize
-                };
-
-                newQuery[key] = id;
-
-                let para = Object.assign({}, this.query, this.queryData, newQuery);
+                let para = {};
+                para[key || "id"] = id;
 
                 this.$http.post(this.url, para).then(res => {
                     this.$emit("loaded", res, para);
@@ -173,7 +164,6 @@
                     take: this.pageSize
                 });
 
-
                 this.$http.post(this.url, para).then(res => {
                     this.$emit("loaded", res, para);
                     this.tableData = res.data.data;
@@ -187,10 +177,9 @@
                     }
 
                     if (this.store) {
-                        var storeId = this.$el.id || "list";
-                        var storeJson = {};
-                        storeJson[storeId] = storeData;
-                        this.$store.setJson(storeJson);
+                        var storeId = this.$vnode.data.ref || "list";
+
+                        this.$store.setJson(storeId, Object.assign(this.$store.getJson(storeId), storeData));
                     }
 
                     this.$emit("input", this.tableData);
@@ -205,4 +194,14 @@
             }
         }
     }
+
+    /**
+     * 使用说明,必要属性只有一个：url，其余为可选属性：
+     * ref "名称" : 当页面有多个列表，需要写义，默认值：list
+     * @loaded 事件：需要对返回的数据进行处理，参数 response , 通过 response.data.data 获取列表数据， response.data.total 获取总条数，服务器可以仅在第一页返回总条数即可。
+     * query 查询：绑定传递到服务器端的查询条件，额外的，还会增加两个查询字段：skip,take。
+     * page-size 每页条数：即 take , 默认10条
+     * row-key 返回数据标志每一行的key,默认是 id，lastRowId 使用。
+     * store 是否存储： 默认为true。会在查询时，把 query,total,skip,take,pageNumber, 保存到 $store.setJson(ref,{}) 中。
+     */
 </script>

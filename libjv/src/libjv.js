@@ -83,6 +83,22 @@ jv.sleep = (time) => {
     })
 };
 
+/**
+ * 深覆盖。
+ * Object.assign({},{a:{a1:1}}, { a: {b1:1}} ) => 结果 {a:{b1:1}}, a.a1会丢失。
+ * @param objs
+ */
+// jv.extend = (...objs) => {
+//     var ret = objs[0];
+//     for (var i = objs.length - 1; i > 0; i--) {
+//         var item = objs[i];
+//         if( !item) continue;
+//         jv.recursionJson(item)
+//     }
+//     return ret;
+// };
+
+
 jv.getUrlHost = (url) => {
     var r;
     if (url.startsWith("//")) {

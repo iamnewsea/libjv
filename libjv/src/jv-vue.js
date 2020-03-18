@@ -37,11 +37,23 @@ jv.initVue = (setting) => {
         resetGlobalJson(data) {
             jv.store.setJson("global", data);
         },
-        setJson(data) {
+        setJson(key, v) {
+            var data = {};
+            if (key && v && (key.Type == "string")) {
+                var obj = {};
+                obj[key] = v;
+                data = obj;
+            } else {
+                data = key;
+            }
             jv.store.setJson(jv.main.$route.fullPath, Object.assign({}, this.getJson(), data));
         },
-        getJson() {
-            return jv.store.getJson(jv.main.$route.fullPath);
+        getJson(key) {
+            var ret = jv.store.getJson(jv.main.$route.fullPath);
+            if (key) {
+                return ret[key] || {};
+            }
+            return ret;
         },
         resetJson(data) {
             jv.store.setJson(jv.main.$route.fullPath, data);

@@ -97,6 +97,10 @@
                 var storeId = this.$vnode.data.ref || "list";
                 this.$store.setJson(storeId, Object.assign(this.$store.getJson(storeId), {lastRowId: lastRowId}));
             },
+            setLastRow(row) {
+                var lastRowId = jv.evalExpression(row, this.rowKey || 'id');
+                this.setLastRowId(lastRowId);
+            },
             setData(data) {
                 if ("total" in data) {
                     this.total = data.total;
@@ -196,6 +200,7 @@
     }
 
     /**
+     * 插槽：默认： 列表列定义。
      * 使用说明,必要属性只有一个：url，其余为可选属性：
      * ref "名称" : 当页面有多个列表，需要写义，默认值：list
      * @loaded 事件：需要对返回的数据进行处理，参数 response , 通过 response.data.data 获取列表数据， response.data.total 获取总条数，服务器可以仅在第一页返回总条数即可。

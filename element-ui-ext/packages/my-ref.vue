@@ -6,7 +6,7 @@
 
 
           <el-tag :key="item.id" @click.prevent.stop="popClick"
-                  :closable="true" :close-transition="true"
+                  :closable="!readOnly" :close-transition="true"
                   @close.prevent.stop="removeTagClose(item.id,$event)" style="margin-right:18px;">
 <!--              {{item.name}}-->
             <slot name="display" v-bind:item="item">
@@ -14,8 +14,8 @@
             </slot>
           </el-tag>
         </span>
-      <slot name="button" v-if="!oriValue.length">
-        <el-button>选择{{name}}</el-button>
+      <slot name="button" v-if="!readOnly && !oriValue.length">
+        <el-button size="mini">选择{{name}}</el-button>
       </slot>
     </div>
 

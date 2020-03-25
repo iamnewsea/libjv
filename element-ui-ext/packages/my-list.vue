@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div class="query">
+      <slot name="query" v-bind:query="query2"></slot>
+    </div>
+
     <el-table :data="tableData"
               v-loading="loading"
               v-bind="[$props, $attrs]"
@@ -45,7 +49,8 @@
             return {
                 loading: false,
                 total: 0,
-                queryData: {},
+                queryData: {}, //传入的query属性
+                query2: {}, // 嵌入的query
                 pageNumber: 1,
                 lastRowId: "",
                 tableData: []
@@ -59,6 +64,7 @@
                 this.pageNumber = store.pageNumber || 1;
                 this.lastRowId = store.lastRowId || "";
                 this.queryData = Object.assign({}, this.query, store.query);
+                this.query2 = Object.assign({}, this.query2, store.query2);
             }
         },
         watch: {
@@ -84,7 +90,7 @@
         methods: {
             //获取保存的查询条件
             getStoredQuery() {
-                return this.queryData;
+                return Object.assign({}, this.query2, this.queryData);
             },
             setTotal(total) {
                 this.total = total;
@@ -162,7 +168,7 @@
 
                 this.loading = true;
 
-                let para = Object.assign({}, this.query, this.queryData, {
+                let para = Object.assign({}, this.query, this.query2, this.queryData, {
                     pageNumber: this.pageNumber,
                     skip: (this.pageNumber - 1) * this.pageSize,
                     take: this.pageSize
@@ -173,7 +179,7 @@
                     this.tableData = res.data.data;
                     //返回来的total只有第一次获取的时候才有值，第二次获取之后都是-1
 
-                    var storeData = {pageNumber: this.pageNumber, query: this.queryData};
+                    var storeData = {pageNumber: this.pageNumber, query: this.queryData, query2: this.query2};
 
                     if (res.data.total >= 0) {
                         this.total = res.data.total;
@@ -200,7 +206,15 @@
     }
 
     /**
-     * 插槽：默认： 列表列定义。
+     * 插槽：
+     * 默认： 列表列定义。
+     * query: 内嵌的查询方式，可以和外部query配合使用，使用方式：
+ <template #query="scope">
+   <kv label="名称">
+    <el-input v-model="scope.query.name"></el-input>
+   </kv>
+ </template>
+     *
      * 使用说明,必要属性只有一个：url，其余为可选属性：
      * ref "名称" : 当页面有多个列表，需要写义，默认值：list
      * @loaded 事件：需要对返回的数据进行处理，参数 response , 通过 response.data.data 获取列表数据， response.data.total 获取总条数，服务器可以仅在第一页返回总条数即可。
@@ -208,5 +222,7 @@
      * page-size 每页条数：即 take , 默认10条
      * row-key 返回数据标志每一行的key,默认是 id，lastRowId 使用。
      * store 是否存储： 默认为true。会在查询时，把 query,total,skip,take,pageNumber, 保存到 $store.setJson(ref,{}) 中。
+     *
+     *
      */
 </script>

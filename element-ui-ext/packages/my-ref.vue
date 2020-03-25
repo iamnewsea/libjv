@@ -8,6 +8,7 @@
           <el-tag :key="item.id" @click.prevent.stop="popClick"
                   :closable="true" :close-transition="true"
                   @close.prevent.stop="removeTagClose(item.id,$event)" style="margin-right:18px;">
+<!--              {{item.name}}-->
             <slot name="display" v-bind:item="item">
               {{item.name}}
             </slot>
@@ -25,7 +26,7 @@
       </div>
 
       <div style="text-align:right;margin:0 0 20px;">
-        <el-button v-if="query_length" @click="doQuery">查询</el-button>
+        <el-button @click="doQuery">查询</el-button>
         <el-dropdown split-button type="primary" trigger="click"
                      @click="handleClick" v-if="this.multi">
           选择 {{dbRefValue.length}} 项
@@ -56,9 +57,15 @@
 <script>
     /**
      *插槽：
-     * display: 显示选中的条目，使用方式：<template v-slot:display="item">{{item.name}}</template>
+     * display: 显示选中的条目，使用方式：<template #display="scope">{{scope.item.name}}</template>
+     * query: 嵌入式查询条件，使用方式：
+<template #query="scope">
+  <kv label="名称">
+    <el-input v-model="scope.query.name"></el-input>
+  </kv>
+</template>
+     *
      * button: 当没有选中样式时，选择按钮的样式。
-     * query: 查询条件,使用方式 <template v-slot:query="query"><kv label='名称'><input v-model="query.name" /></kv></template>
      * 默认： 列表列定义。
      */
     import MyList from "./my-list.vue"
@@ -73,7 +80,7 @@
             url: {type: String, default: ""},
             pageSize: {type: Number, default: 10},
             // minNumber: {type: Number, default: 3},
-            name: {type: String, default: ""}, //多选
+            name: {type: String, default: ""}, //显示的主体名称
             id: {type: [Object, String, Number], default: ""},    //标志数据，在change时传回。
             // query: {
             //     type: Object, default: function () {
@@ -88,16 +95,16 @@
         },
         data() {
             return {
-                query: {},
-                query_length: 0,
                 dbRefValue: [],    //实时数据。
                 oriValue: [],
+                query: {},
                 popOpen: this.open
             }
         },
         watch: {
             value: {
                 deep: true,
+                immediate: true,
                 handler(value) {
                     if (jv.dataEquals(value, this.oriValue)) return;
                     if (value instanceof Array) {
@@ -110,6 +117,9 @@
 
 
                     this.dbRefValue = Object.assign([], this.oriValue);
+
+                    jv.log(this.dbRefValue);
+                    jv.log(this.oriValue);
                 }
             }
         },
@@ -169,7 +179,6 @@
                 this.popOpen = true;
 
                 this.$nextTick(it => {
-                    this.query_length = this.$refs.dialog.$el.querySelector(".query").children.length;
                     this.$refs["ref"].loadData(1);
                 });
             },

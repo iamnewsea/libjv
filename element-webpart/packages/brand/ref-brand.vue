@@ -18,12 +18,12 @@
       </template>
     </el-table-column>
 
-    <template v-slot:query>
+    <template #query>
       <kv label="名称">
         <el-input v-model="query.name"></el-input>
       </kv>
     </template>
-    <template v-slot:button>
+    <template #button>
       <slot><el-button>选择品牌</el-button></slot>
     </template>
   </my-ref>

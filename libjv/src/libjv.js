@@ -42,6 +42,8 @@ jv.info = console.info;
 jv.error = console.error;
 jv.warn = console.warn;
 
+//调试使用，不显示。
+jv.log = jv.info;
 
 jv.fileTypes = {
     img: {type: "img", exts: "png,jpg,gif,bmp,ico,icon".split(","), remark: "图片文件"},

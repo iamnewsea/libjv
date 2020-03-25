@@ -45,7 +45,7 @@
             return {
                 loading: false,
                 total: 0,
-                query: {},
+                queryData: {},
                 pageNumber: 1,
                 lastRowId: "",
                 tableData: []

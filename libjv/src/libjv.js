@@ -632,18 +632,23 @@ jv.isPlainObject = (obj) => {
 };
 
 
-jv.random = (min, max) => {
-    if (!min && !max) {
-        return "r" + Math.random().toString(36).slice(3);
-    }
+/**
+ * 返回随机数
+ * @param length
+ * @returns {string}
+ */
+jv.random = (length, depth) => {
+    length = length || 8;
+    depth = depth || 0;
+    var ret = Math.random().toString(36).slice(2).replace(/0/ig, "");
+    if (length <= 0) return "";
 
-    if (!max) {
-        max = min;
-        min = 0;
+    if (!depth && ret[0].charCodeAt().Between(48, 57)) {
+        ret = "r" + ret.slice(1);
     }
-
-    return min + parseInt(Math.random() * (max - min));
+    return ret.slice(0, length) + jv.random(length - ret.length, depth + 1);
 };
+
 /**
  *
  * @param delayTime  循环暂停时间

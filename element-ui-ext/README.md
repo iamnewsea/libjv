@@ -7,6 +7,12 @@ vue element ui extend
 
 ![](https://gitee.com/uploads/74/1227074_imnewsea.png)
 
+## 安装依赖包
+> npm i --registry=https://registry.npm.taobao.org
+
+## 发版
+> npm publish
+
 ## 用法
 vue cli 3.0 用法:
 

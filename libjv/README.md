@@ -2,8 +2,12 @@
 Es6的单页应用常用扩展
 https://github.com/krasimir/webpack-library-starter
 
-# 安装依赖包
+## 安装依赖包
 > npm i --registry=https://registry.npm.taobao.org
+
+## 发版 
+> npm publish
+
 
 # 验证
 ```html

@@ -90,14 +90,29 @@ jv.sleep = (time) => {
  * Object.assign({},{a:{a1:1}}, { a: {b1:1}} ) => 结果 {a:{b1:1}}, a.a1会丢失。
  * @param objs
  */
-// jv.extend = (...objs) => {
-//     var ret = objs[0];
-//     for (var i = objs.length - 1; i > 0; i--) {
-//         var item = objs[i];
-//         if( !item) continue;
-//         jv.recursionJson(item)
-//     }
-//     return ret;
+// jv.extend = (target, ...sources) => {
+//     target = target || {};
+//
+//     sources.forEach(source => {
+//         let descriptors = Object.keys(source).reduce((descriptors, key) => {
+//             var value = source[key];
+//             if( value === null || value === 0 || value === "" || typeof(value) === "undefined"){
+//                 return descriptors;
+//             }
+//             descriptors[key] = Object.getOwnPropertyDescriptor(source, key);
+//             return descriptors;
+//         }, {});
+//
+//         // Object.assign 默认也会拷贝可枚举的Symbols
+//         Object.getOwnPropertySymbols(source).forEach(sym => {
+//             let descriptor = Object.getOwnPropertyDescriptor(source, sym);
+//             if (descriptor.enumerable) {
+//                 descriptors[sym] = descriptor;
+//             }
+//         });
+//         Object.defineProperties(target, descriptors);
+//     });
+//     return target;
 // };
 
 

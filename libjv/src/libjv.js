@@ -26,12 +26,12 @@ jv.noop = () => {
 
 jv.createEvent = (eventName, evDetail) => {
     if (jv.inBrowser) {
-        var chkEvent, evObj = {detail: evDetail};
+        var chkEvent;
         if (document.createEvent) {
             chkEvent = document.createEvent("CustomEvent");
-            chkEvent.initCustomEvent(eventName, true, true, evObj);
+            chkEvent.initCustomEvent(eventName, true, true, evDetail);
         } else {
-            chkEvent = new CustomEvent(eventName, evObj);
+            chkEvent = new CustomEvent(eventName, evDetail);
         }
         return chkEvent;
     }

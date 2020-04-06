@@ -184,6 +184,19 @@ import jv from "./libjv"
         return getVueTooltipFromUp(vueDom.$options.parent);
     };
 
+    var getHtmlTooltipFromUp = function (html_dom, deep) {
+        if (!html_dom) return;
+        deep = deep || 0;
+
+        if (deep > 9) return;
+
+        if (html_dom.__vue__) {
+            if (html_dom.__vue__.$options._componentTag == "el-tooltip") {
+                return html_dom;
+            }
+        }
+        return getHtmlTooltipFromUp(html_dom.parentNode);
+    };
     // var getInputValue = function (dom) {
     //     if (!dom.tagName) {
     //         return null;
@@ -255,8 +268,9 @@ import jv from "./libjv"
         return {};
     };
 
+
     // vueModel = { vnode , value }
-    var chk_item = function (chk_dom) {
+    var chk_vue_item = function (chk_dom) {
 
         var ret = {result: true};
         if (!chk_dom.$attrs) return ret;
@@ -266,6 +280,39 @@ import jv from "./libjv"
         if (!chk) return ret;
 
         ret.msg = chk_dom.$attrs.chkmsg;
+        var {value, data} = getVueData(chk_dom);
+        if (!data) {
+            ret.result = false;
+            ret.detail = "找不到vue数据!";
+            return ret;
+        }
+
+        return Object.assign(ret, chk_core(chk, value, data));
+    }
+
+
+    var getHtmlData = function (html_dom) {
+        return {value: convertValue(html_dom.value), data: {}};
+    };
+    var chk_html_item = function (chk_dom) {
+        var ret = {result: true};
+        var chk = chk_dom.getAttribute("chk") || "";
+        chk = chk.trim();
+        if (!chk) return ret;
+
+        ret.msg = chk_dom.getAttribute("chkmsg");
+        var {value, data} = getHtmlData(chk_dom);
+        if (!data) {
+            ret.result = false;
+            ret.detail = "找不到vue数据!";
+            return ret;
+        }
+
+        return Object.assign(ret, chk_core(chk, value, data));
+    }
+
+    var chk_core = function (chk, value, data) {
+        var ret = {};
 
         var chk_type_index = getNextNonCharIndex(chk),
             chk_type = chk.slice(0, chk_type_index),
@@ -285,12 +332,6 @@ import jv from "./libjv"
             chk_body = chk.slice(chk_type_index);
         }
 
-        var {value, data} = getVueData(chk_dom);
-        if (!data) {
-            ret.result = false;
-            ret.detail = "找不到vue数据!";
-            return ret;
-        }
 
         //如果是类型带着?表示可空.
         if (chk_body[0] == '?') {
@@ -392,7 +433,7 @@ import jv from "./libjv"
         var index = 0, ret = true, list = getAllVuesChkDom(container);
 
         for (var chk_dom of list) {
-            var chk_result = chk_item(chk_dom);
+            var chk_result = chk_vue_item(chk_dom);
 
             var chkEvent = jv.createEvent("chked", {
                 result: chk_result.result,
@@ -418,9 +459,46 @@ import jv from "./libjv"
             chk_dom.$el.classList.add("chk_error");
 
             if (singleShow) {
-                break;
+                return ret;
             }
         }
+
+        list = Array.from(container.$el.querySelectorAll("[chk]"));
+
+        for (var chk_dom of list) {
+            if (chk_dom.parentNode.closest("[chk]")) continue;
+
+            var chk_result = chk_html_item(chk_dom);
+
+            var chkEvent = jv.createEvent("chked", {
+                result: chk_result.result,
+                msg: chk_result.msg,
+                detail: chk_result.detail
+            });
+
+
+            var tooltip = getHtmlTooltipFromUp(chk_dom);
+            if (tooltip) {
+                tooltip.trigger(chkEvent);
+            } else {
+                //想要触发元素上的 chked 事件，必须用 addEventListener 绑定事件
+                chk_dom.trigger(chkEvent);
+            }
+
+
+            if (chk_result.result) {
+                chk_dom.classList.remove("chk_error");
+                continue;
+            }
+
+            ret &= false;
+            chk_dom.classList.add("chk_error");
+
+            if (singleShow) {
+                return ret;
+            }
+        }
+
 
         return ret;
     }

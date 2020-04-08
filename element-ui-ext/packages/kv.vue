@@ -38,10 +38,12 @@
             return {tooltip: ""};
         },
         mounted() {
-            this.$nextTick(()=>{
-               this.$refs.tooltip.$refs.popper.ondblclick = (e)=>{
-                   this.tooltip = "";
-               }
+            this.$nextTick(() => {
+                if (this.$refs.tooltip) {
+                    this.$refs.tooltip.$refs.popper.ondblclick = (e) => {
+                        this.tooltip = "";
+                    }
+                }
             });
         },
         computed: {

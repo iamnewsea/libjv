@@ -264,6 +264,13 @@ jv.cache_db = {};
 //   }
 // };
 
+
+/**
+ * 定义枚举类型
+ * @param typeName
+ * @param json
+ * @constructor
+ */
 function JvEnum(typeName, json) {
     this.typeName = typeName;
 

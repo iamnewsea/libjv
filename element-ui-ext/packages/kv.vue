@@ -11,14 +11,12 @@
       {{slot_k_tail}}
     </template>
 
-    <span class="v">
-        <el-tooltip ref="tooltip" :effect="effect" :manual="true" :value="!!tooltip" :content="tooltip"
-                    @chked="e=>tooltip = e.detail.result ? '': ( e.detail.msg || e.detail.detail)"
-                    :placement="placement">
-          <slot></slot>
-        </el-tooltip>
-    </span>
 
+    <el-tooltip class="v" ref="tooltip" :effect="effect" :manual="true" :value="!!tooltip" :content="tooltip"
+                @chked="e=>tooltip = e.detail.result ? '': ( e.detail.msg || e.detail.detail)"
+                :placement="placement">
+      <slot></slot>
+    </el-tooltip>
   </div>
 </template>
 <script>

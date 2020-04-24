@@ -59,13 +59,7 @@ jv.citys = [{
   n: '澳门'
 }]
 
-jv.citys.zhixia = [];
-
-jv.citys.forEach(it => {
-  if (it.c % 10000) {
-    jv.citys.zhixia.push(parseInt(it.c / 10000));
-  }
-});
+jv.citys._zhixia = [11, 12, 31, 50];
 
 jv.citys.isZhixia = function (code) {
   return jv.citys.zhixia.indexOf(parseInt(code / 10000)) >= 0;
@@ -77,6 +71,12 @@ jv.citys.recursion(it => it.s, it => {
   it.s = [];
 });
 
+/**
+ * 1级：河北，2级：沧州，3级：献县
+ * 1级：北京，2级：北京市，3级：海淀区
+ * @param code
+ * @returns {number}
+ */
 jv.citys.getLevel = function (code) {
   if (!code) return 0;
   if (code % 100) return 3;
@@ -116,14 +116,16 @@ jv.citys.findByCode = function (code) {
   };
 
   var level = jv.citys.getLevel(code);
-  var iszhi = jv.citys.isZhixia(code);
-  if (level == 1 && iszhi) {
-    return jv.citys.filter(it => parseInt(it.c / 10000) == parseInt(code / 10000))[0];
+
+  //如果选择了一级北京，返回2级北京市
+  if (level == 1 && jv.citys.isZhixia(code)) {
+    var min = parseInt(code / 10000), max = min + 9900;
+    return jv.citys.filter(it => it.c.Between(min, max))[0];
   }
   return findSubOne(jv.citys, code, iszhi ? 2 : 1, level);
 }
 
-jv.citys.url = "/open/getChildCitys";
+jv.citys.url = "/open/child-citys";
 jv.citys.loadChildCitys = function (code, loaded) {
   code = parseInt(code);
   if (code % 100) return;
@@ -132,22 +134,22 @@ jv.citys.loadChildCitys = function (code, loaded) {
     return;
   }
 
-  jv.ajax.post(jv.citys.url, {code: code},{proxy:true})
-      .then(res => {
-        var json = res.data.data;
+  jv.ajax.post(jv.citys.url, {code: code}, {proxy: true})
+    .then(res => {
+      var json = res.data.data;
 
-        if (!( city.c % 10000)) {
-          json.forEach(it => {
-            it.s = [];
-          });
-        }
+      if (!(city.c % 10000)) {
+        json.forEach(it => {
+          it.s = [];
+        });
+      }
 
-        city.s = json;
+      city.s = json;
 
-        if (loaded) {
-          loaded(city);
-        }
-      });
+      if (loaded) {
+        loaded(city);
+      }
+    });
 };
 
 //在页面加载的时候,根据 code ,加载出层级数据.
@@ -160,12 +162,12 @@ jv.citys.confirm = function (code, loaded) {
   var level = jv.citys.getLevel(code);
   if (level >= 2) {
     jv.citys.loadChildCitys(parseInt(code / 10000) * 10000, it => {
-      if (level == 3) {
+      if (level >= 3) {
         jv.citys.loadChildCitys(parseInt(code / 100) * 100, loaded);
       }
     });
   }
-}
+};
 
 jv.citys.getEachCitys = function (code) {
   var ret = [];
@@ -177,12 +179,13 @@ jv.citys.getEachCitys = function (code) {
   var chuShu = 1;
   for (var i = 1; i <= level; i++) {
     if (i == 1) {
+      if( jv.citys.isZhixia(code)){
+        continue;
+      }
       chuShu = 10000;
-    }
-    else if (i == 2) {
+    } else if (i == 2) {
       chuShu = 100;
-    }
-    else chuShu = 1;
+    } else chuShu = 1;
 
     var city = jv.citys.findByCode(parseInt(code / chuShu) * chuShu);
     if (!city) {

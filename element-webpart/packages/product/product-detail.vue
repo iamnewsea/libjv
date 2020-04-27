@@ -49,7 +49,7 @@
       loadData() {
         if (!this.productId) return;
 
-        return this.$http.post('/info/product/get', {productId: this.productId},{proxy:true}).then((res) => {
+        return this.$http.post('/info/product/get', {productId: this.productId}).then((res) => {
 
           var json = {
             get guidePrice_yuan() {

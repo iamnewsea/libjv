@@ -111,8 +111,7 @@
     methods: {
       loadSkus() {
         this.$http.post('/info/product/listProductSkuInfo',
-            {productId: this.productId},
-            {proxy:true}
+            {productId: this.productId}
           ).then((res) => {
           var json = res.data.data;
           json.skuDefines.forEach(it => {
@@ -155,7 +154,7 @@
           skuValue: row.value
         };
 
-        this.$http.post('/info/product/' + row._action + 'SkuDefine', para,{proxy:true}).then((res) => {
+        this.$http.post('/info/product/' + row._action + 'SkuDefine', para).then((res) => {
           this.loadSkus();
           jv.info('商品类型修改成功');
         });
@@ -169,7 +168,7 @@
             index: scope.$index,
             productId: this.productId
           };
-          this.$http.post('/info/product/delSkuDefine', para,{proxy:true}).then((res) => {
+          this.$http.post('/info/product/delSkuDefine', para).then((res) => {
             this.loadSkus();
             jv.info('删除成功');
           });
@@ -180,7 +179,7 @@
         this.$http.post('/info/product/saveSkuStock', {
           productId: this.productId,
           skuStockPrice: this.skuStockPrice
-        },{proxy:true}).then(res => {
+        }).then(res => {
           jv.info('保存成功');
         });
       },

@@ -59,10 +59,10 @@ jv.citys = [{
   n: '澳门'
 }]
 
-jv.citys._zhixia = [11, 12, 31, 50];
+jv.city_zhixia = [11, 12, 31, 50];
 
-jv.citys.isZhixia = function (code) {
-  return jv.citys.zhixia.indexOf(parseInt(code / 10000)) >= 0;
+jv.cityIsZhixia = function (code) {
+  return jv.city_zhixia.indexOf(parseInt(code / 10000)) >= 0;
 }
 
 jv.citys.recursion(it => it.s, it => {
@@ -77,14 +77,14 @@ jv.citys.recursion(it => it.s, it => {
  * @param code
  * @returns {number}
  */
-jv.citys.getLevel = function (code) {
+jv.getCityLevel = function (code) {
   if (!code) return 0;
   if (code % 100) return 3;
   if (code % 10000) return 2;
   return 1;
 }
 
-jv.citys.findByCode = function (code) {
+jv.findCityByCode = function (code) {
   if (!code) return;
   code = parseInt(code);
   // 由于1级码可能是直辖市，所以.
@@ -115,26 +115,27 @@ jv.citys.findByCode = function (code) {
     return null;
   };
 
-  var level = jv.citys.getLevel(code);
+  var level = jv.getCityLevel(code);
 
   //如果选择了一级北京，返回2级北京市
-  if (level == 1 && jv.citys.isZhixia(code)) {
+  var iszhi = jv.cityIsZhixia(code);
+  if (level == 1 && iszhi) {
     var min = parseInt(code / 10000), max = min + 9900;
     return jv.citys.filter(it => it.c.Between(min, max))[0];
   }
   return findSubOne(jv.citys, code, iszhi ? 2 : 1, level);
 }
 
-jv.citys.url = "/open/child-citys";
-jv.citys.loadChildCitys = function (code, loaded) {
+jv.child_citys_url = "/child-citys";
+jv.loadChildCitys = function (code, loaded) {
   code = parseInt(code);
   if (code % 100) return;
-  var city = jv.citys.findByCode(code);
+  var city = jv.findCityByCode(code);
   if (city && city.s && city.s.length) {
     return;
   }
 
-  jv.ajax.post(jv.citys.url, {code: code}, {proxy: true})
+  jv.ajax.post(jv.child_citys_url + "?pcode=" + code, {}, {cache: "page"})
     .then(res => {
       var json = res.data.data;
 
@@ -154,32 +155,32 @@ jv.citys.loadChildCitys = function (code, loaded) {
 
 //在页面加载的时候,根据 code ,加载出层级数据.
 //如: code=101122 .加载出 第一级,10的第二级,及 11的第三级.
-jv.citys.confirm = function (code, loaded) {
+jv.confirmCity = function (code, loaded) {
   if (!code) return;
   code = parseInt(code);
-  var city = jv.citys.findByCode(code);
+  var city = jv.findCityByCode(code);
   if (city) return loaded(city);
-  var level = jv.citys.getLevel(code);
+  var level = jv.getCityLevel(code);
   if (level >= 2) {
-    jv.citys.loadChildCitys(parseInt(code / 10000) * 10000, it => {
+    jv.loadChildCitys(parseInt(code / 10000) * 10000, it => {
       if (level >= 3) {
-        jv.citys.loadChildCitys(parseInt(code / 100) * 100, loaded);
+        jv.loadChildCitys(parseInt(code / 100) * 100, loaded);
       }
     });
   }
 };
 
-jv.citys.getEachCitys = function (code) {
+jv.getEachCitys = function (code) {
   var ret = [];
   if (!code) return ret;
   code = parseInt(code);
 
-  var level = jv.citys.getLevel(code);
+  var level = jv.getCityLevel(code);
 
   var chuShu = 1;
   for (var i = 1; i <= level; i++) {
     if (i == 1) {
-      if( jv.citys.isZhixia(code)){
+      if (jv.cityIsZhixia(code)) {
         continue;
       }
       chuShu = 10000;
@@ -187,7 +188,7 @@ jv.citys.getEachCitys = function (code) {
       chuShu = 100;
     } else chuShu = 1;
 
-    var city = jv.citys.findByCode(parseInt(code / chuShu) * chuShu);
+    var city = jv.findByCode(parseInt(code / chuShu) * chuShu);
     if (!city) {
       if (i == 1) {
         continue;

@@ -60,7 +60,7 @@
                     skip: (this.page - 1) * 10,
                     take: 10
                 };
-                this.$http.post("/info/product/find", para, {proxy: true}).then(res => {
+                this.$http.post("/info/product/find", para).then(res => {
                     var json = res.data.data;
                     json.forEach(item => {
                         //商品状态

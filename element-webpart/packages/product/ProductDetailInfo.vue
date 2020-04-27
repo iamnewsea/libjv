@@ -163,7 +163,7 @@
         console.log(json);
 
 
-        this.$http.post('/info/product/' + this.action, json, {proxy: true}).then(res => {
+        this.$http.post('/info/product/' + this.action, json).then(res => {
           jv.info('保存成功');
 
           if (this.action == "add") {
@@ -175,15 +175,13 @@
         });
       },
       loadCategories() {
-        this.$http.post("/info/product/categoryList", {},
-          {cache: true, proxy: true}
-        ).then(res => {
+        this.$http.post("/info/product/categoryList").then(res => {
           this.categories = res.data.data;
         });
       },
       loadBrands() {
         this.brands = [{name: "空"}];
-        this.$http.post("/info/brand/query", {}, {cache: true, proxy: true}).then(res => {
+        this.$http.post("/info/brand/query").then(res => {
           this.brands.push(...res.data.data);
         });
       },

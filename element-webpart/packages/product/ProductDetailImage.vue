@@ -7,7 +7,6 @@
     <el-form-item label="Logo:">
       <upload :maxCount="1"
               scales="1:1"
-              :proxy="true"
               v-model="info.logo"
               :uid="info.id"
               db="productInfo.logo"
@@ -18,7 +17,6 @@
     <el-form-item label="视频:">
       <upload :maxCount="1"
               v-model="info.video"
-              :proxy="true"
               maxSize="150MB"
               fileType="video"
               :uid="info.id"
@@ -29,7 +27,6 @@
     <el-form-item label="横版广告图片:">
       <upload :maxCount="1"
               scales="16:9"
-              :proxy="true"
               v-model="info.adImage"
               :uid="info.id"
               db="productInfo.adImage"
@@ -41,7 +38,6 @@
     <el-form-item label="轮播图片:">
       <upload
         v-model="info.showImages"
-        :proxy="true"
         :maxCount="9"
         scales="1:1"
         :uid="info.id"
@@ -53,7 +49,6 @@
     <el-form-item label="商品详情:">
       <upload
         v-model="info.images"
-        :proxy="true"
         :maxCount="9"
         :scales="[]"
         :uid="info.id"

@@ -72,7 +72,7 @@
     },
     methods: {
       loadParameters() {
-        this.$http.post('/info/product/listParameters', {productId: this.productId},{proxy:true}).then((res) => {
+        this.$http.post('/info/product/listParameters', {productId: this.productId}).then((res) => {
           var json = res.data.data;
           json.forEach(it => {
             it._edit = false;
@@ -112,7 +112,7 @@
           parameterValue: row.value
         };
 
-        this.$http.post('/info/product/' + row._action + 'Parameter', para,{proxy:true}).then((res) => {
+        this.$http.post('/info/product/' + row._action + 'Parameter', para).then((res) => {
           this.loadParameters();
           jv.info('商品类型修改成功');
         });
@@ -126,7 +126,7 @@
             index: scope.$index,
             productId: this.productId
           };
-          this.$http.post('/info/product/delParameter', para,{proxy:true}).then((res) => {
+          this.$http.post('/info/product/delParameter', para).then((res) => {
             this.loadParameters();
             jv.info('删除成功');
           });

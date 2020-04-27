@@ -94,6 +94,37 @@ jv.initVue = (setting) => {
     });
 
     //----------------------------------- axios
+    //代理 post
+
+    // var ori_post = axios.post;
+    //
+    // axios.post = (url, data, config) => {
+    //     var need_ajax = false;
+    //     if (!config.cache) {
+    //         need_ajax = true;
+    //     } else {
+    //         var key = "post." + url + "." + jv.param(data);
+    //         if (config.cache === "storage") {
+    //             var json = jv.store.getJson(key);
+    //
+    //         } else if (config.cache === "page") {
+    //             var json = jv.cache_db[key] || {};
+    //         } else {
+    //             throw new Error("不识别的缓存类型:" + config.cache)
+    //         }
+    //
+    //         if (Object.keys(json).length) {
+    //             return Promise.resolve(json);
+    //         } else {
+    //             need_ajax = true;
+    //         }
+    //     }
+    //
+    //     if (need_ajax) {
+    //         return ori_post.call(this, url, data, config);
+    //     }
+    // };
+
 
     jv.ajax = axios;
     axios.defaults.ignoreJavaBooleanKey = ajaxIgnoreJavaBooleanKey;

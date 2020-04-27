@@ -195,7 +195,7 @@
 
                 this.loading = true;
 
-                this.$http.post("/info/order/find", para, {proxy: true}).then(res => {
+                this.$http.post("/info/order/find", para).then(res => {
                     var json = res.data.data;
                     this.groupStyle = this.query.groupStyle;
                     var index = 0;

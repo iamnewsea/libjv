@@ -156,7 +156,7 @@
         },
         mounted() {
             this.getGoods();
-            this.$http.post('/info/express/find', {}, {proxy: true}).then(res => {
+            this.$http.post('/info/express/find').then(res => {
                 this.expressList = res.data.data;
             })
         },
@@ -168,7 +168,7 @@
                     return;
                 }
                 this.loading = true;
-                this.$http.post('/info/order/findByOrderCode', param, {proxy: true}).then((res) => {
+                this.$http.post('/info/order/findByOrderCode', param).then((res) => {
 
                     let json = res.data.data;
 
@@ -205,7 +205,7 @@
                 this.$http.post('/info/order/setStatus', {
                     orderCode: this.info.orderCode,
                     status: "Payed"
-                }, {proxy: true}).then(res => {
+                }).then(res => {
                     this.getGoods();
                     this.$message.info('该订单状态已修改为已付款');
                 })
@@ -215,7 +215,7 @@
                 this.$http.post('/info/order/setStatus', {
                     orderCode: this.info.orderCode,
                     status: "Prepare"
-                }, {proxy: true}).then(res => {
+                }).then(res => {
                     this.getGoods();
                     this.$message({
                         message: '该订单状态已修改为备货',
@@ -238,7 +238,7 @@
                     orderCode: this.info.orderCode,
                     status: "Delivered",
                 };
-                this.$http.post('/info/order/setStatus', para, {proxy: true}).then(res => {
+                this.$http.post('/info/order/setStatus', para).then(res => {
                     this.deliveryFormVisible = false;
                     this.getGoods();
                     this.$message({

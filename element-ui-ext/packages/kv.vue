@@ -2,13 +2,12 @@
   <div class="kv">
     <template v-if="label">
         <span class="k">
-          {{label}}{{label_tail}}
+          {{label}}
         </span>
     </template>
 
     <template v-else-if="slotk">
       <slot name="k"></slot>
-      {{slot_k_tail}}
     </template>
 
 
@@ -48,29 +47,29 @@
             slotk() {
                 return !!this.$scopedSlots.k;
             },
-            slot_k_tail() {
-                var ks = this.$slots.k;
-                if (!ks) return "";
-                var html = "";
-                ks.recursion(it => it.children, (item, index) => {
-                    html += item.text || "";
-                });
-
-
-                var c = html[html.length - 1];
-                if (c && c != ':' && c != '：') {
-                    return "：";
-                }
-                return "";
-            },
-            label_tail() {
-                var html = (this.label || "").trim();
-                var c = html[html.length - 1];
-                if (c && c != ':' && c != '：') {
-                    return "：";
-                }
-                return "";
-            }
+            // slot_k_tail() {
+            //     var ks = this.$slots.k;
+            //     if (!ks) return "";
+            //     var html = "";
+            //     ks.recursion(it => it.children, (item, index) => {
+            //         html += item.text || "";
+            //     });
+            //
+            //
+            //     var c = html[html.length - 1];
+            //     if (c && c != ':' && c != '：') {
+            //         return "：";
+            //     }
+            //     return "";
+            // },
+            // label_tail() {
+            //     var html = (this.label || "").trim();
+            //     var c = html[html.length - 1];
+            //     if (c && c != ':' && c != '：') {
+            //         return "：";
+            //     }
+            //     return "";
+            // }
         }
     }
 </script>

@@ -368,7 +368,14 @@
                 if (jv.dataEquals(this.data2, d2)) {
                     return;
                 }
+
                 this.data2 = d2;
+
+                //如果是单选，并且只有一个，自动选择。
+                if(this.type == "radio" && d2.length == 1){
+                    this.value1 = d2[0][this.keyField];
+                    this.changed();
+                }
             }
         }
     }

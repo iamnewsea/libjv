@@ -231,7 +231,7 @@
                 this.myValue.push(item);
 
                 if (fileType.type == "img" && this.scales_value.length == 0 && this.maxWidth > 0) {
-                    return this.doUpload(rawFile, null, fileName, this.maxWidth, item);
+                    return this.doUpload(rawFile, null, fileName, item);
                 } else if (fileType.type == "img" && this.scales_value.length) {
                 } else {
                     return this.doUpload(rawFile, null, fileName, item);
@@ -250,7 +250,7 @@
                             }
                             // this.imageRemark = imageRemark;
 
-                            return this.doUpload(null, imageData, fileName, this.maxWidth, item);
+                            return this.doUpload(null, imageData, fileName, item);
                         },
                         cancel: () => {
                             this.myValue.splice(this.myValue.length - 1, 1);
@@ -267,7 +267,7 @@
                     fileName: fileName,
                     axios: this.$http,
                     axiosConfig: this.axiosConfig,
-                    maxWidth: 0,
+                    maxWidth: this.maxWidth,
                     processCallback: p => item.percentage = p
                 }).then(res => {
                     if (!res) {

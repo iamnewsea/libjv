@@ -1,7 +1,7 @@
 <template>
   <div style="display: inline-block">
     <div @click="popClick">
-      <span v-for="(item,index) in oriValue" :key="index" class="tag-product-name"
+      <span v-for="(item,index) in oriValue" v-if="item.name" :key="index" class="tag-product-name"
             :style="{minWidth: computeWidth(item.name.length)}">
 
 
@@ -21,35 +21,31 @@
 
     <el-dialog ref="dialog" :title="'选择 ' +name" :visible.sync="popOpen" :center="true" width="80%"
                style="padding:20px;">
-      <div class="query">
-        <slot name="query" v-bind:query="query"></slot>
-      </div>
 
-      <div style="text-align:right;margin:0 0 20px;">
-        <el-button @click="doQuery">查询</el-button>
-        <el-dropdown split-button type="primary" trigger="click"
-                     @click="handleClick" v-if="this.multi">
-          选择 {{dbRefValue.length}} 项
-          <el-dropdown-menu slot="dropdown" title="选中对其删除" style="width:200px;">
-            <el-dropdown-item v-for="item in dbRefValue" :key="item.id" :command="item.id">{{item.name}}
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-      </div>
 
       <my-list ref="ref" :url="url" :query="query" :page-size="pageSize" @loaded="dataLoaded"
-               @row-dblclick="dbClick"
-               @row-click="tableRowClick">
-        <el-table-column width="55" v-if="this.multi">
-          <template slot-scope="scope">
-            <div :class="{ 'el-icon-check': scope.row.checked}" style="color:blue"/>
-          </template>
-        </el-table-column>
-        <el-table-column
-          type="index"
-          width="55">
-        </el-table-column>
+               @row-dblclick="dbl_click"
+               @row-click="tableRowClick"
+
+               :row-class-name="({row,rowIndex})=> dbRefValue.findIndex(it=> it.id == row.id ) >=0  ? 'check-row': '' "
+      >
         <slot></slot>
+
+
+        <template #query="scope">
+          <slot name="query" v-bind:query="scope.query"></slot>
+        </template>
+
+        <template #other>
+          <el-dropdown split-button size="small" trigger="click"
+                       @click="handleClick" v-if="multi" @command="removeTagClose">
+            选择 {{dbRefValue.length}} 项
+            <el-dropdown-menu slot="dropdown" title="选中对其删除" style="width:200px;">
+              <el-dropdown-item v-for="item in dbRefValue" :key="item.id" :command="item.id">{{item.name}}
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </template>
       </my-list>
     </el-dialog>
   </div>
@@ -59,11 +55,11 @@
      *插槽：
      * display: 显示选中的条目，使用方式：<template #display="scope">{{scope.item.name}}</template>
      * query: 嵌入式查询条件，使用方式：
-<template #query="scope">
-  <kv label="名称">
-    <el-input v-model="scope.query.name"></el-input>
-  </kv>
-</template>
+     <template #query="scope">
+     <kv label="名称">
+     <el-input v-model="scope.query.name"></el-input>
+     </kv>
+     </template>
      *
      * button: 当没有选中样式时，选择按钮的样式。
      * 默认： 列表列定义。
@@ -118,8 +114,8 @@
 
                     this.dbRefValue = Object.assign([], this.oriValue);
 
-                    jv.log(this.dbRefValue);
-                    jv.log(this.oriValue);
+                    // jv.log(this.dbRefValue);
+                    // jv.log(this.oriValue);
                 }
             }
         },
@@ -129,9 +125,9 @@
             },
             dataLoaded(res, option) {
                 var json = res.data.data;
-                json.forEach(it => {
-                    it.checked = (this.dbRefValue.findIndex(item => item.id == it.id) >= 0);
-                });
+                // json.forEach(it => {
+                //     it.checked = (this.dbRefValue.findIndex(item => item.id == it.id) >= 0);
+                // });
 
                 return this.$emit("loaded", res, option);
             },
@@ -148,24 +144,17 @@
             removeTagClose(id) {
                 var index = this.dbRefValue.findIndex(it => it.id == id)
                 this.dbRefValue.splice(index, 1);
-                this.handleClick();
                 return false;
             },
             tableRowClick(row) {
                 if (!this.multi) {
                     return;
                 }
-                row.checked = !row.checked;
+                // row.checked = !row.checked;
                 var index = this.dbRefValue.findIndex(it => it.id == row.id)
-                if (row.checked) {
-                    if (index < 0) {
-                        this.dbRefValue.push(row);
-                    } else {
-                        //错误.
-                        console.log("可能出错了.")
-                        console.log(this.dbRefValue)
-                        console.log(row)
-                    }
+
+                if (index < 0) {
+                    this.dbRefValue.push(row);
                 } else {
                     this.dbRefValue.splice(index, 1);
                 }
@@ -217,7 +206,7 @@
                 }
                 this.oriValue = Object.assign([], this.dbRefValue);
             },
-            dbClick(row, event) {
+            dbl_click(row, event) {
                 if (this.multi) return;
                 this.dbRefValue = [row];
 

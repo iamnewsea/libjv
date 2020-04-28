@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog title="预览" :visible.sync="p.preview_show" top="auto" width="auto" :center="true" @close="preview_closed">
+    <el-dialog title="预览"  :visible.sync="p.preview_show" top="auto" width="auto" :center="true" @close="preview_closed">
       <img :src="p.url" v-if="p.type=='img'" class="preview_dom" id="preview_image_dom"/>
       <video :src="p.url" @loadeddata="loaded=false" class="preview_dom" v-if="p.type=='video'"
              controls="controls" id="video_dom"></video>

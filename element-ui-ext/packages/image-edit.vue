@@ -29,6 +29,7 @@
                    ref="cropper"
                    :aspect-ratio="p.scale_number"
                    :src="p.url"
+                   :key="p.url"
                    alt="图片"
       ></vue-cropper>
 
@@ -99,6 +100,8 @@
         data() {
             return {
                 p: {
+                    url: "",
+                    type: "",
                     scale: "",
                     scales: [],
                     scale_number: NaN,
@@ -144,10 +147,14 @@
             //编辑图片,图片前后应该带着文字
             //{ type:['img','video'] , url:'', scales:["16:9"] , scale:"", remark:"", callback:"" }
             jv.openEditImage = jv.EditImage = p => {
-                p.url = p.image || p.url;
-                if (!p || !p.url) {
+                if (!p) {
                     return;
                 }
+                p.url = p.image || p.url;
+                if (!p.url) {
+                    return;
+                }
+
                 Object.assign(self.p, p,
                     {
                         edit_show: true,
@@ -242,49 +249,49 @@
                 this.p.url = "";
                 this.p.cancel && this.p.cancel();
             },
-            editImageLoaded(e) {
-                // if (jv.edit__Image) {
-                //     jv.edit__Image.destroy();
-                //     jv.edit__Image = null;
-                // }
-
-                var image = e.target;
-                var temp = this.p.scale.split(":")
-                var scale = parseInt(temp[0]) / parseInt(temp[1] || 1);
-                var self = this;
-                var ret = this.getSuitImageSize(image, scale);
-
-                // window.jQuery(image).Jcrop({
-                //   setSelect: ret,
-                //   animateTo: ret,
-                //   aspectRatio: scale,
-                //   minSize: [100, 100],
-                //   allowSelect: true
-                // }, function () {
-                //   jv.edit__Image = this;
-                //   self.Image_Scale_Change();
-                //
-                //   //image.closest(".el-dialog").style.width = "auto";//.width("auto");
-                // });
-            },
-            getSuitImageSize(img, scale) {
-                var style = img.ownerDocument.defaultView.getComputedStyle(img);
-                var width = parseInt(style.width), height = parseInt(style.height);
-                var ret = {};
-                ret.width = width;
-                ret.height = parseInt(width / scale);
-                ret.left = 0;
-                ret.top = (height - ret.height) / 2;
-                if (ret.height > height) {
-                    ret.height = height;
-                    ret.width = parseInt(height * scale);
-
-                    ret.top = 0;
-                    ret.left = (width - ret.width) / 2;
-                }
-
-                return [ret.left, ret.top, ret.left + ret.width, ret.top + ret.height];
-            },
+            // editImageLoaded(e) {
+            //     // if (jv.edit__Image) {
+            //     //     jv.edit__Image.destroy();
+            //     //     jv.edit__Image = null;
+            //     // }
+            //
+            //     var image = e.target;
+            //     var temp = this.p.scale.split(":")
+            //     var scale = parseInt(temp[0]) / parseInt(temp[1] || 1);
+            //     // var self = this;
+            //     // var ret = this.getSuitImageSize(image, scale);
+            //
+            //     // window.jQuery(image).Jcrop({
+            //     //   setSelect: ret,
+            //     //   animateTo: ret,
+            //     //   aspectRatio: scale,
+            //     //   minSize: [100, 100],
+            //     //   allowSelect: true
+            //     // }, function () {
+            //     //   jv.edit__Image = this;
+            //     //   self.Image_Scale_Change();
+            //     //
+            //     //   //image.closest(".el-dialog").style.width = "auto";//.width("auto");
+            //     // });
+            // },
+            // getSuitImageSize(img, scale) {
+            //     var style = img.ownerDocument.defaultView.getComputedStyle(img);
+            //     var width = parseInt(style.width), height = parseInt(style.height);
+            //     var ret = {};
+            //     ret.width = width;
+            //     ret.height = parseInt(width / scale);
+            //     ret.left = 0;
+            //     ret.top = (height - ret.height) / 2;
+            //     if (ret.height > height) {
+            //         ret.height = height;
+            //         ret.width = parseInt(height * scale);
+            //
+            //         ret.top = 0;
+            //         ret.left = (width - ret.width) / 2;
+            //     }
+            //
+            //     return [ret.left, ret.top, ret.left + ret.width, ret.top + ret.height];
+            // },
             image_ok_click() {
                 // if (!jv.edit__Image) {
                 //     console.error("找不到 jv.edit__Image !")

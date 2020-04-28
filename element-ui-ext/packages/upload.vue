@@ -1,7 +1,9 @@
 <template>
   <div class="avatar-uploader">
-    <div class="el-upload" :class="'el-upload-' + index"
-         v-for="(item,index) in myValue">
+    <input type="file" name="file" style="display: none" @change="file_change" @click="file_click" v-bind="fileAttr"
+           v-if="!readOnly">
+
+    <div class="el-upload" :class="'el-upload-' + index" v-for="(item,index) in myValue">
       <div class="el-upload-preview" v-if="item.id && item.fullUrl" onmouseleave="this.classList.remove('deleting')">
         <img class="avatar-uploader-icon" :src="item.fullUrl" v-if="item.fileType=='img'"/>
         <video v-else-if="item.fileType=='video'" :src="item.fullUrl" class="avatar-uploader-icon"
@@ -38,8 +40,6 @@
                    v-else-if="item.percentage>0 && item.percentage<100"></el-progress>
     </div>
 
-    <input type="file" name="file" style="display: none" @change="file_change" @click="file_click" v-bind="fileAttr"
-           v-if="!readOnly">
 
     <div class="el-upload" @click="upload_Click" v-if="!readOnly && ( !myValue ||  myValue.length < maxCount )">
       <div class="el-upload-preview">

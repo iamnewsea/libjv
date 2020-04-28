@@ -6,7 +6,7 @@
              controls="controls" id="video_dom"></video>
     </el-dialog>
 
-    <el-dialog title="编辑图片" :visible.sync="p.edit_show" @opened="edit_opened" @closed="edit_closed"
+    <el-dialog title="编辑图片" :visible.sync="p.edit_show" @opened="edit_opened" @close="edit_closed"
                :close-on-click-modal="false" top="auto" width="80%" :center="true">
       <div style="margin-bottom: 10px;display:flex;justify-content: space-between;">
         <el-radio-group v-model="p.scale" size="medium" @change="Image_Scale_Change">
@@ -245,6 +245,7 @@
                 //     this.editImageLoaded({target: image});
                 // }
             },
+            //手动关闭执行。
             edit_closed() {
                 this.p.url = "";
                 this.p.cancel && this.p.cancel();

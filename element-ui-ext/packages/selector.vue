@@ -85,7 +85,7 @@
             },
             //默认:如果是json，返回 key.如果是 valueArray ["a","b"] ，会返回值。 枚举会返回name,其它情况返回整条数据。
             //该字段仅对返回整条数据的情况有效,指定返回该条数据的哪个值
-            valueField: {type: String, default: ""}
+            // valueField: {type: String, default: ""}
         },
         watch: {
             url(v) {
@@ -211,9 +211,9 @@
 
                     } else {
                         ret = this.data2.find(it => it[this.keyField] == v)
-                        if (this.valueField) {
-                            ret = ret[this.valueField]
-                        }
+                        // if (this.valueField) {
+                        //     ret = ret[this.valueField]
+                        // }
                     }
 
                     if (this.valueIsBoolean) {
@@ -228,13 +228,13 @@
                         ret = v;
                     } else {
                         ret = this.data2.filter(it => v.includes(it[this.keyField]));
-                        if (this.valueField) {
-                            ret = ret.map(it => it[this.valueField])
-                        }
+                        // if (this.valueField) {
+                        //     ret = ret.map(it => it[this.valueField])
+                        // }
                     }
 
                     if (this.valueIsBoolean) {
-                        ret = ret.map(it => jv.asBoolean(this.valueField))
+                        ret = ret.map(it => jv.asBoolean(it))
                     }
                 }
                 this.$emit("input", ret);

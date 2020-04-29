@@ -12,11 +12,11 @@
 
     <el-table :data="tableData"
               v-loading="loading"
-              v-bind="[$props, $attrs]"
+              v-bind="[attrs]"
               @row-dblclick="dbClick"
               @row-click="tableRowClick"
               @rowKey="rowKey"
-              :row-class-name="({row,rowIndex})=> jv.evalExpression(row, rowKey || 'id') == lastRowId ? 'last-row': '' "
+
     >
       <slot></slot>
     </el-table>
@@ -27,18 +27,18 @@
   </div>
 </template>
 <style scoped>
-  .buttons{
+  .buttons {
     min-width: auto;
     max-width: unset;
-    width:auto;
+    width: auto;
   }
 
-  .buttons > *{
-    margin-right:12px;
+  .buttons > * {
+    margin-right: 12px;
   }
 
-  .buttons > *:last-child{
-    margin-right:0;
+  .buttons > *:last-child {
+    margin-right: 0;
   }
 </style>
 <script type="text/ecmascript-6">
@@ -46,11 +46,7 @@
         name: "my-list",
         inheritAttrs: false,
         props: {
-            rowKey: {type: String, default: "id"},
-            border: {type: Boolean, default: true},
             store: {type: Boolean, default: true}, //是否存储 页码，总页数,lastRowId
-            stripe: {type: Boolean, default: true},
-            fit: {type: Boolean, default: true},
             pageSize: {type: Number, default: 10},
             url: {type: String, default: ""},
             // query: {
@@ -72,7 +68,10 @@
                 query: {}, // 嵌入的query
                 pageNumber: 1,
                 lastRowId: "",
-                tableData: []
+                tableData: [],
+                attrs: [],
+
+                rowKey: this.$attrs.rowKey
             }
         },
         mounted() {
@@ -83,6 +82,22 @@
                 this.pageNumber = store.pageNumber || 1;
                 this.lastRowId = store.lastRowId || "";
                 this.query = Object.assign({}, this.query, store.query);
+            }
+
+            this.attrs = Object.assign([], this.$attrs);
+
+            //修改默认属性值
+            if (jv.isNull(this.attrs.border)) {
+                this.attrs.border = true;
+            }
+            if (jv.isNull(this.attrs.stripe)) {
+                this.attrs.stripe = true;
+            }
+
+            if (jv.isNull(this.attrs["row-class-name"])) {
+                this.attrs["row-class-name"] = ({row, rowIndex}) => {
+                    jv.evalExpression(row, this.rowKey || 'id') == this.lastRowId ? 'last-row' : ''
+                }
             }
         },
         watch: {

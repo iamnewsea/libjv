@@ -1,11 +1,11 @@
 <template>
   <div style="display: inline-block">
     <div @click="popClick">
-      <span v-for="(item,index) in oriValue" v-if="item.name" :key="index" class="tag-product-name"
-            :style="{minWidth: computeWidth(item.name.length)}">
+      <span v-for="(item) in oriValue" :key="item.id" class="tag-product-name"
+            :style="{minWidth: computeWidth(item.name && item.name.length)}">
 
 
-          <el-tag :key="item.id" @click.prevent.stop="popClick"
+          <el-tag  @click.prevent.stop="popClick"
                   :closable="!readOnly" :close-transition="true"
                   @close.prevent.stop="removeTagClose(item.id,$event)" style="margin-right:18px;">
 <!--              {{item.name}}-->
@@ -38,7 +38,7 @@
 
         <template #other>
           <el-dropdown split-button size="small" trigger="click"
-                       @click="handleClick" v-if="multi" @command="removeTagClose">
+                       @click="handleClick" v-if="multi" @command="removeTag">
             选择 {{dbRefValue.length}} 项
             <el-dropdown-menu slot="dropdown" title="选中对其删除" style="width:200px;">
               <el-dropdown-item v-for="item in dbRefValue" :key="item.id" :command="item.id">{{item.name}}
@@ -101,25 +101,31 @@
             value: {
                 deep: true,
                 immediate: true,
-                handler(value) {
-                    if (jv.dataEquals(value, this.oriValue)) return;
-                    if (value instanceof Array) {
-                        this.oriValue = value.map(it => Object.assign({}, it));
-                    } else if (value.id) {
-                        this.oriValue = [Object.assign({}, value)];
-                    } else {
-                        this.oriValue = [];
-                    }
-
-
-                    this.dbRefValue = Object.assign([], this.oriValue);
+                handler(val) {
+                    // if (jv.dataEquals(val, this.oriValue)) return;
+                    this.setValue(val);
 
                     // jv.log(this.dbRefValue);
                     // jv.log(this.oriValue);
                 }
             }
         },
+        mounted(){
+          // this.setValue(this.value);
+        },
         methods: {
+            setValue(val){
+                if (val instanceof Array) {
+                    this.oriValue = val.map(it => Object.assign({}, it));
+                } else if (val.id) {
+                    this.oriValue = [Object.assign({}, val)];
+                } else {
+                    this.oriValue = [];
+                }
+
+
+                this.dbRefValue = Object.assign([], this.oriValue);
+            },
             doQuery() {
                 this.$refs["ref"].loadData(1);
             },
@@ -135,15 +141,21 @@
             //   this.skip = (page -1)* this.take;
             // },
             computeWidth(charCount) {
-                var ret = "";
+                if(!charCount) return "60px";
                 //1个字符宽度为10, 空为60
                 if (charCount < 5) return "110px";
                 if (charCount < 15) return "220px";
                 return "330px";
             },
+            removeTag(id) {
+                var index = this.dbRefValue.findIndex(it => it.id == id)
+                this.dbRefValue.splice(index, 1);
+                return false;
+            },
             removeTagClose(id) {
                 var index = this.dbRefValue.findIndex(it => it.id == id)
                 this.dbRefValue.splice(index, 1);
+                this.handleClick();
                 return false;
             },
             tableRowClick(row) {

@@ -88,16 +88,18 @@
             // valueField: {type: String, default: ""}
         },
         watch: {
-            url(v) {
-                if (!v) {
-                    return;
+            url: {
+                immediate: true, handler(v) {
+                    if (!v) {
+                        return;
+                    }
+                    this.$http.post(v).then(res => {
+                        this.setData(res.data.data);
+                    });
                 }
-                this.$http.post(v).then(res => {
-                    this.setData(res.data.data);
-                });
             },
             data: {
-                deep: true, handler(v) {
+                deep: true, immediate: true, handler(v) {
                     if (jv.dataEquals(v, this.data2)) {
                         return;
                     }
@@ -112,7 +114,7 @@
                 this.setFields()
             },
             value: {
-                deep: true, handler(v) {
+                deep: true, immediate: true, handler(v) {
                     this.setValue(v);
                 }
             },
@@ -372,7 +374,7 @@
                 this.data2 = d2;
 
                 //如果是单选，并且只有一个，自动选择。
-                if(this.type == "radio" && d2.length == 1){
+                if (this.type == "radio" && d2.length == 1) {
                     this.value1 = d2[0][this.keyField];
                     this.changed();
                 }

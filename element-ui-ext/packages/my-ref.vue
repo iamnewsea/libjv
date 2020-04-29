@@ -5,7 +5,7 @@
             :style="{minWidth: computeWidth(item.name && item.name.length)}">
 
 
-          <el-tag  @click.prevent.stop="popClick"
+          <el-tag @click.prevent.stop="popClick"
                   :closable="!readOnly" :close-transition="true"
                   @close.prevent.stop="removeTagClose(item.id,$event)" style="margin-right:18px;">
 <!--              {{item.name}}-->
@@ -26,8 +26,7 @@
       <my-list ref="ref" :url="url" :query="query" :page-size="pageSize" @loaded="dataLoaded"
                @row-dblclick="dbl_click"
                @row-click="tableRowClick"
-
-               :row-class-name="({row,rowIndex})=> dbRefValue.findIndex(it=> it.id == row.id ) >=0  ? 'check-row': '' "
+               v-bind="[attrs]"
       >
         <slot></slot>
 
@@ -91,6 +90,7 @@
         },
         data() {
             return {
+                attrs: [],
                 dbRefValue: [],    //实时数据。
                 oriValue: [],
                 query: {},
@@ -110,11 +110,18 @@
                 }
             }
         },
-        mounted(){
-          // this.setValue(this.value);
+        mounted() {
+            // this.setValue(this.value);
+            this.attrs = Object.assign([], this.$attrs);
+
+            if (jv.isNull(this.attrs["row-class-name"])) {
+                this.attrs["row-class-name"] = ({row, rowIndex}) => {
+                    return this.dbRefValue.findIndex(it => it.id == row.id) >= 0 ? 'check-row' : ''
+                }
+            }
         },
         methods: {
-            setValue(val){
+            setValue(val) {
                 if (val instanceof Array) {
                     this.oriValue = val.map(it => Object.assign({}, it));
                 } else if (val.id) {
@@ -141,7 +148,7 @@
             //   this.skip = (page -1)* this.take;
             // },
             computeWidth(charCount) {
-                if(!charCount) return "60px";
+                if (!charCount) return "60px";
                 //1个字符宽度为10, 空为60
                 if (charCount < 5) return "110px";
                 if (charCount < 15) return "220px";

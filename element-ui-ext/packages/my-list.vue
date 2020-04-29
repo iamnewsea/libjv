@@ -96,7 +96,7 @@
 
             if (jv.isNull(this.attrs["row-class-name"])) {
                 this.attrs["row-class-name"] = ({row, rowIndex}) => {
-                    jv.evalExpression(row, this.rowKey || 'id') == this.lastRowId ? 'last-row' : ''
+                    return jv.evalExpression(row, this.rowKey || 'id') == this.lastRowId ? 'last-row' : ''
                 }
             }
         },

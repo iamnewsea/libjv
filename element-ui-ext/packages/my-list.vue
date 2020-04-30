@@ -68,10 +68,7 @@
                 query: {}, // 嵌入的query
                 pageNumber: 1,
                 lastRowId: "",
-                tableData: [],
-                attrs: [],
-
-                rowKey: this.$attrs.rowKey
+                tableData: []
             }
         },
         mounted() {
@@ -83,21 +80,19 @@
                 this.lastRowId = store.lastRowId || "";
                 this.query = Object.assign({}, this.query, store.query);
             }
-
-            this.attrs = Object.assign([], this.$attrs);
-
-            //修改默认属性值
-            if (jv.isNull(this.attrs.border)) {
-                this.attrs.border = true;
-            }
-            if (jv.isNull(this.attrs.stripe)) {
-                this.attrs.stripe = true;
-            }
-
-            if (jv.isNull(this.attrs["row-class-name"])) {
-                this.attrs["row-class-name"] = ({row, rowIndex}) => {
-                    return jv.evalExpression(row, this.rowKey || 'id') == this.lastRowId ? 'last-row' : ''
-                }
+        },
+        computed: {
+            rowKey() {
+                return this.$attrs.rowKey;
+            },
+            attrs() {
+                return Object.assign({
+                    border: true,
+                    stripe: true,
+                    "row-class-name": ({row, rowIndex}) => {
+                        return jv.evalExpression(row, this.rowKey || 'id') == this.lastRowId ? 'last-row' : ''
+                    }
+                }, this.$attrs);
             }
         },
         watch: {
@@ -112,7 +107,7 @@
                         this.total = v.total;
                     }
                 }
-            },
+            }
         },
         methods: {
             //获取保存的查询条件

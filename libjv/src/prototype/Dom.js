@@ -28,7 +28,7 @@
     Object.defineProperty(Node.prototype, "once", {
         value(event, callback) {
             return this.addEventListener(event, function fn(e) {
-                e.target.removeEventListener(e.type, fn);
+                e.currentTarget.removeEventListener(e.type, fn);
                 return callback(e);
             }, false);
         }, enumerable: false

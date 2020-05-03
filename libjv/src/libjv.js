@@ -303,6 +303,27 @@ function JvEnum(typeName, json) {
     };
 }
 
+jv.meta = function (where, attrs) {
+    if (!attrs || !where) return;
+    var metas = Array.from(document.head.children).filter(it => it.tagName == "META");
+    Object.keys(where).forEach(key => {
+        metas = metas.filter(it => it[key] == where[key]);
+    });
+
+    var meta = metas[0];
+    if (!meta) {
+        meta = document.createElement("META");
+        Object.keys(where).forEach(key => {
+            meta.setAttribute(key, where[key]);
+        });
+        document.head.appendChild(meta);
+    }
+
+    Object.keys(attrs).forEach(key => {
+        meta.setAttribute(key, attrs[key]);
+    });
+}
+
 /**
  * 0,"",null, NaN -> false
  * {},[] -> false

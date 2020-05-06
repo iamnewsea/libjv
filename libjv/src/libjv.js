@@ -303,7 +303,12 @@ function JvEnum(typeName, json) {
     };
 }
 
-jv.meta = function (where, attrs) {
+/**
+ * meta标签
+ * @param where
+ * @param attrs
+ */
+jv.meta = (where, attrs) => {
     if (!attrs || !where) return;
     var metas = Array.from(document.head.children).filter(it => it.tagName == "META");
     Object.keys(where).forEach(key => {
@@ -322,7 +327,31 @@ jv.meta = function (where, attrs) {
     Object.keys(attrs).forEach(key => {
         meta.setAttribute(key, attrs[key]);
     });
-}
+};
+
+/**
+ * 窗口变化事件回调，延时 150ms 触发一次,
+ * 应该放到 App.vue created 方法中执行。保证在DOMContentLoadedgk事件后。
+ */
+jv.resize = (callback, time) => {
+    if (!callback) return;
+
+    var timerId = 0;
+    time = time || 150;
+
+    var recalc = () => {
+        if (timerId) {
+            clearTimeout(timerId);
+        }
+        timerId = setTimeout(callback, time);
+    };
+
+    var resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize';
+    window.addEventListener(resizeEvt, recalc, false);
+    callback();
+    return recalc;
+};
+
 
 /**
  * 0,"",null, NaN -> false

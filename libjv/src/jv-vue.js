@@ -61,9 +61,35 @@ jv.initVue = (setting) => {
     };
 
     Object.defineProperty(vueProtype, "chk", {
-        value(chk_show) {
-            return jv.chk_vue_dom(this, chk_show);
+        value(singleShow) {
+            return jv.chk_vue_dom(this, singleShow);
         }, enumerable: false
+    });
+
+
+    Object.defineProperty(HTMLElement.prototype, "chk", {
+        value(singleShow) {
+            //遍历所有的Vue元素。
+            var recusion_vue_dom = (dom, singleShow) => {
+                if (dom.__vue__) {
+                    return dom.__vue__.chk(singleShow);
+                }
+
+                var ret = true;
+
+                for (var i = 0, children = dom.children, len = children.length; i < len; i++) {
+                    var item = children[i];
+                    ret &= recusion_vue_dom(item, singleShow);
+                    if ((ret === false) && singleShow) {
+                        return ret;
+                    }
+                }
+
+                return ret;
+            };
+
+            return recusion_vue_dom(this, singleShow)
+        }
     });
 
     Object.defineProperty(vueProtype, "$Find", {

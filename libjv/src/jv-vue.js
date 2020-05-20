@@ -278,6 +278,35 @@ jv.initVue = (setting) => {
     //----------------------router
 
 
+    jv.addStyleDom = (id, cssContent, attributes) => {
+        if (!cssContent) return;
+
+        var style = id && document.getElementById(id);
+        if (!style) {
+            style = document.createElement("style");
+            document.head.appendChild(style);
+        }
+        attributes = attributes || {};
+
+        if (!attributes.type) {
+            attributes.type = "text/css";
+        }
+
+        if (id) {
+            attributes.id = id;
+        }
+
+        Object.keys(attributes).forEach(it => {
+            style.setAttribute(it, attributes[it]);
+        });
+
+        if (style.styleSheet) {
+            style.styleSheet.cssText = cssContent;
+        } else {
+            style.innerHTML = cssContent;
+        }
+    }
+
     // router.afterEach((to, from, next) => {
     //   jv.loadAllJson(to.fullPath);
     // });

@@ -276,8 +276,33 @@ jv.initVue = (setting) => {
 
 
     //----------------------router
+    //添加外部的 script 标签
+    jv.addScriptFile = (id, fileName, attributes) => {
+        if (!fileName) return;
 
+        var script = id && document.getElementById(id);
+        if (!script) {
+            script = document.createElement("script");
+            document.head.appendChild(script);
+        }
+        attributes = attributes || {};
 
+        if (!attributes.type) {
+            attributes.type = "text/javascript";
+        }
+
+        if (id) {
+            attributes.id = id;
+        }
+
+        attributes.src = fileName;
+
+        Object.keys(attributes).forEach(it => {
+            script.setAttribute(it, attributes[it]);
+        });
+    };
+
+    //添加 style 标签
     jv.addStyleDom = (id, cssContent, attributes) => {
         if (!cssContent) return;
 
@@ -305,7 +330,7 @@ jv.initVue = (setting) => {
         } else {
             style.innerHTML = cssContent;
         }
-    }
+    };
 
     // router.afterEach((to, from, next) => {
     //   jv.loadAllJson(to.fullPath);

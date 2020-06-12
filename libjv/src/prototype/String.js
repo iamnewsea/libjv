@@ -136,36 +136,32 @@
                 style = arguments[1] || "{}", // 默认样式.
                 itemCallback = arguments[2];
 
-            var styles = {
-                "{}": {escape: "{{", regexp: "{([^}]+)}"},
-                "${}": {escape: "$${", regexp: "\\${([^}]+)}"},
-                "@": {escape: "@@", regexp: "@(\\w+)"}
-            }, config = styles[style];
+            var regexp = {
+                "{}": "{([^}]+)}",
+                "${}": "\\${([^}]+)}",
+                "@": "@(\\w+)"
+            } [style];
 
-            return this
-                .replace(new RegExp(config.escape, "g"), String.fromCharCode(7))
-                .replace(new RegExp(config.regexp, "g"),
-                    // m 是指搜索到的整个部分， "(\\w+)"如： {id} , 而 i  是指 该部分的分组内容 ， 如 id
-                    function (m, key) {
-                        var value = m;
-                        try {
-                            value = eval("(function(){ return  this['" + key + "']; })").call(json)
-                        } catch (e) {
-                            console.log("String.format 执行出错, " + e.message);
-                            throw e;
-                        }
+            return this.replace(new RegExp(regexp, "g"),
+                // m 是指搜索到的整个部分， "(\\w+)"如： {id} , 而 i  是指 该部分的分组内容 ， 如 id
+                function (m, key) {
+                    var value = m;
+                    try {
+                        value = eval("(function(){ return  this['" + key + "']; })").call(json)
+                    } catch (e) {
+                        console.log("String.format 执行出错, " + e.message);
+                        throw e;
+                    }
 
-                        // if ((value === 0) || (value === false) || (value === "") || value === null ) {
-                        //     return value;
-                        // }
-                        // return value || m;
-                        if (itemCallback) {
-                            return itemCallback(value)
-                        }
-                        return value;
-                    })
-                .replace(new RegExp(String.fromCharCode(7), "g"), config.escape)
-                ;
+                    // if ((value === 0) || (value === false) || (value === "") || value === null ) {
+                    //     return value;
+                    // }
+                    // return value || m;
+                    if (itemCallback) {
+                        return itemCallback(value)
+                    }
+                    return value;
+                })
         }, enumerable: false
     });
 

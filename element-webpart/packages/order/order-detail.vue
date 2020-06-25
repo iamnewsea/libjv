@@ -87,19 +87,19 @@
 
             <p class="card-info" v-if="info.payInfo.invoice.type=='Tax'">
               <span class="card-text">营业执照：</span>
-              <img style="width: 100px" @click="CheckQualificationClick" :src="info.payInfo.invoice.license.fullUrl"
+              <img style="width: 100px" @click="CheckQualificationClick" :src="info.payInfo.invoice.license.url"
                    class="image"/>
             </p>
 
             <p class="card-info" v-if="info.payInfo.invoice.type=='Tax'">
               <span class="card-text">纳税人证明：</span>
               <span><img @click="CheckQualificationClick" style="width: 100px"
-                         :src="info.payInfo.invoice.taxpayer.fullUrl" class="image"/></span>
+                         :src="info.payInfo.invoice.taxpayer.url" class="image"/></span>
             </p>
 
             <p class="card-info" v-if="info.payInfo.invoice.type=='Tax'">
               <span class="card-text">开户许可证：</span><img @click="CheckQualificationClick" style="width: 100px"
-                                                        :src="info.payInfo.invoice.bankImage.fullUrl" class="image"/>
+                                                        :src="info.payInfo.invoice.bankImage.url" class="image"/>
             </p>
           </el-card>
         </div>

@@ -4,9 +4,9 @@
            v-if="!readOnly">
 
     <div class="el-upload" :class="'el-upload-' + index" v-for="(item,index) in myValue">
-      <div class="el-upload-preview" v-if="item.id && item.fullUrl" onmouseleave="this.classList.remove('deleting')">
-        <img class="avatar-uploader-icon" :src="item.fullUrl" v-if="item.fileType=='img'"/>
-        <video v-else-if="item.fileType=='video'" :src="item.fullUrl" class="avatar-uploader-icon"
+      <div class="el-upload-preview" v-if="item.id && item.url" onmouseleave="this.classList.remove('deleting')">
+        <img class="avatar-uploader-icon" :src="item.url" v-if="item.fileType=='img'"/>
+        <video v-else-if="item.fileType=='video'" :src="item.url" class="avatar-uploader-icon"
                controls="controls"></video>
         <div v-else class="avatar-uploader-icon upload-fill el-icon-document"
              :class="'upload-icon-'+ item.fileType">
@@ -410,10 +410,10 @@
             }
             ,
             file_preview(index) {
-                jv.openPreview({type: this.myValue[index].fileType, url: this.myValue[index].fullUrl});
+                jv.openPreview({type: this.myValue[index].fileType, url: this.myValue[index].url});
             },
             file_download(index) {
-                jv.downloadFile(this.myValue[index].fullUrl)
+                jv.downloadFile(this.myValue[index].url)
             }
         }
     }

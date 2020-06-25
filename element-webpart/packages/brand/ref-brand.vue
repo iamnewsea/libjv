@@ -5,7 +5,7 @@
           :query="query" :multi="multi" :readOnly="readOnly">
     <el-table-column label="Logo">
       <template slot-scope="scope">
-        <img :src="scope.row.logo.fullUrl" style="height:50px;" v-if="scope.row.logo.fullUrl"/>
+        <img :src="scope.row.logo.url" style="height:50px;" v-if="scope.row.logo.url"/>
       </template>
     </el-table-column>
     <el-table-column prop="name" label="名称"></el-table-column>
@@ -74,7 +74,7 @@
         var json = res.data.data;
         json.forEach(it => {
           if (!it.logo) {
-            it.logo = {fullUrl: ""}
+            it.logo = {url: ""}
           }
 
           if (!it.categories) {

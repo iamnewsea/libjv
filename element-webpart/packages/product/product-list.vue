@@ -9,7 +9,7 @@
       </el-table-column>
       <el-table-column label="Logo" align="center">
         <template slot-scope="scope">
-          <img :src="scope.row.logo.fullUrl"/>
+          <img :src="scope.row.logo.url"/>
         </template>
       </el-table-column>
       <el-table-column prop="category.name" label="类型" align="center"></el-table-column>

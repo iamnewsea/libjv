@@ -504,7 +504,7 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
 
         var type = value.Type;
 
-        if (ignoreBoolean && (type == "boolean")) {
+        if (!ignoreBoolean && (type == "boolean")) {
             args1 = args1 || "";  //.replace(/，/g,",")
 
             var stringValue = "";
@@ -517,6 +517,14 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
 
             target[key1 + "_res"] = stringValue;
 
+            if (key1.startsWith("is")) {
+                var key2 = key1.slice(2);
+                if (key2) {
+                    key2 = key2[0].toLowerCase() + key2.slice(1);
+                    target[key2] = target[key1];
+                    target[key2 + "_res"] = stringValue;
+                }
+            }
             return true;
         } else if (!ignoreDate && (type == "string")) {
             if (value.IsDateFormat()) {
@@ -570,28 +578,28 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
 /**
  * 修复Java布尔类的字段名称。使用 isUdd 字段
  */
-jv.fixJavaBoolField = (json) => {
-    jv.recursionJson(json, (target) => {
-        Object.keys(target).forEach(key1 => {
-            var value = target[key1];
-
-            if (value !== false && value !== true) {
-                return;
-            }
-
-            //转为 isUpper 形式。
-            if (key1.length > 2 && (key1.slice(0, 2) == "is" && key1.charCodeAt(2).Between(65, 90))) {
-
-            } else {
-                var key2 = "is" + key1[0].toUpperCase() + key1.slice(1)
-                if (key2 in target == false) {
-                    target[key2] = value;
-                    delete target[key1];
-                }
-            }
-        });
-    });
-};
+// jv.fixJavaBoolField = (json) => {
+//     jv.recursionJson(json, (target) => {
+//         Object.keys(target).forEach(key1 => {
+//             var value = target[key1];
+//
+//             if (value !== false && value !== true) {
+//                 return;
+//             }
+//
+//             //转为 isUpper 形式。
+//             if (key1.length > 2 && (key1.slice(0, 2) == "is" && key1.charCodeAt(2).Between(65, 90))) {
+//
+//             } else {
+//                 var key2 = "is" + key1[0].toUpperCase() + key1.slice(1)
+//                 if (key2 in target == false) {
+//                     target[key2] = value;
+//                     delete target[key1];
+//                 }
+//             }
+//         });
+//     });
+// };
 
 
 /*如果两个对象是数组, 使用refDataEquals比较内容, 不比较顺序.

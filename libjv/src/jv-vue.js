@@ -228,9 +228,9 @@ jv.initVue = (setting) => {
         if ((response.headers["content-type"] || "").indexOf("application/json") < 0) return response;
 
         //处理Java的布尔类型
-        if (!response.config.ignoreJavaBooleanKey) {
-            jv.fixJavaBoolField(json);
-        }
+        // if (!response.config.ignoreJavaBooleanKey) {
+        //     jv.fixJavaBoolField(json);
+        // }
 
         jv.fillRes(json, null, null, response.config.ignoreResType);
 

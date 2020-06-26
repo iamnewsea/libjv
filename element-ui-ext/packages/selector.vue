@@ -78,11 +78,11 @@
                     return "";
                 }
             },
-            valueIsBoolean: {
-                type: Boolean, default() {
-                    return false
-                }
-            },
+            // valueIsBoolean: {
+            //     type: Boolean, default() {
+            //         return false
+            //     }
+            // },
             //默认:如果是json，返回 key.如果是 valueArray ["a","b"] ，会返回值。 枚举会返回name,其它情况返回整条数据。
             //该字段仅对返回整条数据的情况有效,指定返回该条数据的哪个值
             // valueField: {type: String, default: ""}
@@ -166,6 +166,7 @@
                 dataIsEnum: false,
                 dataIsValueArray: false,
                 dataIsObject: false,
+                valueIsBoolean: false,    //如果 type=radio 且 data 包含 true,false 或 value值为boolean
                 value1_click_v1: "", //click下会有两次点击，记录第一次点击时的值
             };
         },
@@ -340,6 +341,12 @@
 
                 if (["object", "map"].includes(type)) {
                     this.dataIsObject = true;
+
+                    if (this.type == "radio" && ((!this.value && ("true" in data) && ("false" in data))
+                        || (this.value && this.value.Type == "boolean"))) {
+                        this.valueIsBoolean = true;
+                    }
+
                 } else if (["array", "set"].includes(type)) {
                     var v0 = data[0];
                     if (jv.isNull(v0) == false) {

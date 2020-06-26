@@ -521,7 +521,7 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
                 var key2 = key1.slice(2);
                 if (key2) {
                     key2 = key2[0].toLowerCase() + key2.slice(1);
-                    target[key2] = target[key1];
+                    target[key2] = value;
                     target[key2 + "_res"] = stringValue;
                 }
             }

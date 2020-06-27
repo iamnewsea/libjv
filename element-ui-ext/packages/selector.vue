@@ -1,13 +1,16 @@
 <template>
   <div class="enum">
-    <template v-if="readOnly || !data2.length">
+    <template v-if="!data2.length">
+      <label>{{nodata_display}}</label>
+    </template>
+
+    <template v-if="readOnly">
       <el-tag v-for="item in value_displays" :key="item" :type="tagType">{{item}}</el-tag>
     </template>
 
     <template v-else>
       <template v-if="type == 'radio'">
-        <label v-if="!data2.length && value1 && labelField && value1[labelField]">{{value1[labelField]}}</label>
-        <el-radio-group v-model="value1" v-else-if="data2.length <= enumCount"
+        <el-radio-group v-model="value1" v-if="data2.length <= enumCount"
                         @change="changed" :class="clearable? 'ri4c':''">
           <el-radio v-for="item in data2" :label="item[keyField]" @click.native.stop="item_click"
                     :key="item[keyField]">{{item[labelField]}}
@@ -25,7 +28,6 @@
         </el-select>
       </template>
       <template v-else>
-        <label v-if="!data2.length && labelField && value2.length">{{value2.map(it=>it[labelField]).join(",")}}</label>
         <el-checkbox-group v-model="value2" v-if="data2.length <= enumCount"
                            @change="changed(null)">
           <el-checkbox v-for="item in data2" :label="item[keyField]"
@@ -121,6 +123,20 @@
             },
         },
         computed: {
+            nodata_display() {
+                if (this.type == "radio") {
+                    if (this.labelField) {
+                        return this.value1 && this.value1[this.labelField];
+                    } else {
+                        return this.value1;
+                    }
+                }
+                if (this.labelField) {
+                    return this.value2 && this.value2.length && this.value2.map(it => it[labelField]).join(",")
+                } else {
+                    return this.value2 && this.value2.length && this.value2.join(",")
+                }
+            },
             value_displays() {
                 var v2 = [];
                 if (this.type == "radio") {
@@ -323,8 +339,8 @@
             },
             setData(data) {
                 if (this.enum) {
-                    var data2 = jv[this.enum];
-                    if (data2 && data2.Type == "jvEnum") {
+                    var data2 = jv.enum[this.enum];
+                    if (data2) {
                         this.dataIsEnum = true;
                         data = data2.getData();
                         type = data.Type;

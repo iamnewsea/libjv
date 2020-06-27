@@ -276,7 +276,7 @@ jv.cache_db = {};
  * @param json
  * @constructor
  */
-jv.JvEnum = function(typeName, json) {
+jv.JvEnum = function JvEnum(typeName, json) {
     this.typeName = typeName;
 
     var index = 0;

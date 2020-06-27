@@ -1,6 +1,7 @@
 <template>
   <el-cascader class="my-city" placeholder="请选择地区"
                :props="props_data"
+               :multiple="multiple"
                :emitPath="false"
                @change="cityChange"
                v-model="cityValue">
@@ -12,7 +13,11 @@
     export default {
         name: 'my-city',
         props: {
-            value: {type: Object, default: {code: "", name: ""}}
+            multiple: {type: Boolean, default: false},
+            value: {
+                type: [Object, Array]
+                , default: {code: "", name: ""}
+            }
         },
         data() {
             return {

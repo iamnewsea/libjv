@@ -57,18 +57,30 @@ jv.citys = [{
 }, {c: 640000, n: '宁夏'}, {c: 650000, n: '新疆'}, {c: 710000, n: '台湾'}, {c: 810000, n: '香港'}, {
   c: 820000,
   n: '澳门'
-}]
+}];
+
 
 jv.city_zhixia = [11, 12, 31, 50];
 
 jv.cityIsZhixia = function (code) {
   return jv.city_zhixia.indexOf(parseInt(code / 10000)) >= 0;
-}
+};
 
-jv.citys.recursion(it => it.s, it => {
-  if (it.c % 100) return;
-  if (it.s && it.s.length) return;
-  it.s = [];
+jv._translateCityData = function (data) {
+  data.value = data.c;
+  data.label = data.n;
+  if( data.s) {
+    data.children = data.s;
+  }
+
+  delete data.c;
+  delete data.n;
+  delete data.s;
+};
+
+
+jv.citys.recursion(it => it.s || it.children, it => {
+  jv._translateCityData(it);
 });
 
 /**
@@ -82,8 +94,13 @@ jv.getCityLevel = function (code) {
   if (code % 100) return 3;
   if (code % 10000) return 2;
   return 1;
-}
+};
 
+/**
+ * 根据 code,找数据项。
+ * @param code
+ * @returns {null|T}
+ */
 jv.findCityByCode = function (code) {
   if (!code) return;
   code = parseInt(code);
@@ -102,11 +119,11 @@ jv.findCityByCode = function (code) {
     var levelCode = parseInt(code / chuShu) * chuShu;
 
     for (var data of datas) {
-      if (data.c == code) {
+      if (data.value == code) {
         return data;
       }
-      if (data.c == levelCode) {
-        return findSubOne(data.s, code, level + 1, maxLevel);
+      if (data.value == levelCode) {
+        return findSubOne(data.children, code, level + 1, maxLevel);
       }
       // if (level == 1 && data.c == level2Code) {
       //   return findSubOne(datas, code, level + 1);
@@ -121,17 +138,27 @@ jv.findCityByCode = function (code) {
   var iszhi = jv.cityIsZhixia(code);
   if (level == 1 && iszhi) {
     var min = parseInt(code / 10000), max = min + 9900;
-    return jv.citys.filter(it => it.c.Between(min, max))[0];
+    return jv.citys.filter(it => it.value.Between(min, max))[0];
   }
   return findSubOne(jv.citys, code, iszhi ? 2 : 1, level);
 }
 
 jv.child_citys_url = "/child-citys";
-jv.loadChildCitys = function (code, loaded) {
+
+jv.loadChildCitys = function (code, resolve) {
+  resolve = resolve || jv.noop;
   code = parseInt(code);
-  if (code % 100) return;
+  if (!code) {
+    resolve(jv.citys);
+    return;
+  }
+  if (code % 100) {
+    resolve();
+    return;
+  }
   var city = jv.findCityByCode(code);
-  if (city && city.s && city.s.length) {
+  if (city && city.children && city.children.length) {
+    resolve(city.children);
     return;
   }
 
@@ -139,17 +166,21 @@ jv.loadChildCitys = function (code, loaded) {
     .then(res => {
       var json = res.data.data;
 
-      if (!(city.c % 10000)) {
+      if (!(city.value % 10000)) {
         json.forEach(it => {
           it.s = [];
         });
+
+        json.forEach(it => jv._translateCityData(it));
+
+        city.children = json;
+        resolve(json);
+
+        return;
       }
 
-      city.s = json;
 
-      if (loaded) {
-        loaded(city);
-      }
+      resolve();
     });
 };
 
@@ -157,14 +188,17 @@ jv.loadChildCitys = function (code, loaded) {
 //如: code=101122 .加载出 第一级,10的第二级,及 11的第三级.
 jv.confirmCity = function (code, loaded) {
   if (!code) return;
+  loaded = loaded || jv.noop;
   code = parseInt(code);
   var city = jv.findCityByCode(code);
-  if (city) return loaded(city);
+  if (city) return loaded();
   var level = jv.getCityLevel(code);
   if (level >= 2) {
     jv.loadChildCitys(parseInt(code / 10000) * 10000, it => {
       if (level >= 3) {
         jv.loadChildCitys(parseInt(code / 100) * 100, loaded);
+      } else {
+        loaded();
       }
     });
   }
@@ -195,8 +229,8 @@ jv.getEachCitys = function (code) {
       }
       return ret;
     }
-    ret.push({c: city.c, n: city.n});
-    if (city.c == code) break;
+    ret.push({value: city.value, label: city.label});
+    if (city.value == code) break;
   }
   return ret;
 }

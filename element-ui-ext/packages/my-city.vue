@@ -1,9 +1,8 @@
 <template>
   <el-cascader style="width:100%" placeholder="请选择地区"
-               :options="citys"
-               @active-item-change="cityChanges"
+               :props="props_data"
+               :emitPath="false"
                @change="cityChange"
-               :props="{value: 'c', label: 'n', children: 's'}"
                v-model="cityValue">
   </el-cascader>
 </template>
@@ -16,30 +15,47 @@
             value: {type: Object, default: {code: "", name: ""}}
         },
         data() {
-            return {cityValue: [], citys: jv.citys}
+            return {
+                cityValue: [],
+                props_data: {
+                    lazy: true,
+                    lazyLoad(node, resolve) {
+                        jv.loadChildCitys(!node.level ? 0 : node.value, (subCitys) => {
+                            var leaf = false;
+                            if (jv.cityIsZhixia(node.value) && node.level == 1) {
+                                leaf = true;
+                            } else if (jv.cityIsZhixia(node.value) && node.level == 2) {
+                                leaf = true;
+                            }
+                            if (leaf) {
+                                subCitys.forEach(it => {
+                                    it.leaf = true;
+                                });
+                            }
+
+                            resolve(subCitys);
+                        });
+                    }
+                }
+            }
         },
 
         watch: {
             value: {
-                deep: true, handler(value) {
+                deep: true, immediate: true,
+                handler(value) {
                     var code = value && value.code || "";
                     jv.confirmCity(code, it => {
-                        this.cityValue = jv.getEachCitys(this.citys, code).map(it => it.c);
+                        this.cityValue = jv.getEachCitys(code).map(it => it.code);
                     })
                 }
             }
         },
         methods: {
             cityChange(vals) {
-                var city = jv.findCityByCode(vals.last());
-                this.$emit("input", {code: city.c, name: city.n});
-            },
-            cityChanges(vals) {
-                var city = jv.findCityByCode(vals.last());
-                this.$emit("input", {code: city.c, name: city.n});
-                jv.loadChildCitys(vals.last())
-
-                this.citys = jv.citys;
+                var code = vals.last();
+                var city = jv.findCityByCode(code);
+                this.$emit("input", {code: city.value, name: city.label});
             }
         }
     }

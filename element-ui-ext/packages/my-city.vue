@@ -20,11 +20,11 @@
                 props_data: {
                     lazy: true,
                     lazyLoad(node, resolve) {
-                        jv.loadChildCitys(!node.level ? 0 : node.value, (subCitys) => {
+                        jv.city.loadChildren(!node.level ? 0 : node.value, (subCitys) => {
                             var leaf = false;
-                            if (jv.cityIsZhixia(node.value) && node.level == 1) {
+                            if (jv.city.isZhixia(node.value) && node.level == 1) {
                                 leaf = true;
-                            } else if (jv.cityIsZhixia(node.value) && node.level == 2) {
+                            } else if (jv.city.isZhixia(node.value) && node.level == 2) {
                                 leaf = true;
                             }
                             if (leaf) {
@@ -45,8 +45,8 @@
                 deep: true, immediate: true,
                 handler(value) {
                     var code = value && value.code || "";
-                    jv.confirmCity(code, it => {
-                        this.cityValue = jv.getEachCitys(code).map(it => it.code);
+                    jv.city.confirm(code, it => {
+                        this.cityValue = jv.city.getEachCitys(code).map(it => it.code);
                     })
                 }
             }
@@ -54,7 +54,7 @@
         methods: {
             cityChange(vals) {
                 var code = vals.last();
-                var city = jv.findCityByCode(code);
+                var city = jv.city.getByCode(code);
                 this.$emit("input", {code: city.value, name: city.label});
             }
         }

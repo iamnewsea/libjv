@@ -23,6 +23,11 @@ jv.msie = jv.inBrowser && (!!window.ActiveXObject || "ActiveXObject" in window);
 jv.noop = () => {
 };
 
+/**
+ * 所有枚举。
+ */
+jv.enum = {};
+
 
 jv.createEvent = (eventName, evDetail) => {
     if (jv.inBrowser) {
@@ -271,7 +276,7 @@ jv.cache_db = {};
  * @param json
  * @constructor
  */
-function JvEnum(typeName, json) {
+jv.JvEnum = function(typeName, json) {
     this.typeName = typeName;
 
     var index = 0;
@@ -459,7 +464,7 @@ jv.recursionJson = (json, eachJsonItemCallback, deepth) => {
 使用 对象.Enumer(键,jv.枚举)  对对象的key进行枚举化。
  */
 jv.defEnum = (typeName, json) => {
-    jv[typeName] = new JvEnum(typeName, json);
+    jv.enum[typeName] = new jv.JvEnum(typeName, json);
 };
 
 
@@ -924,8 +929,9 @@ jv.query2Json = (query) => {
 //用法： jv.evalExpression({a:{b:[{c:1}]}} , "a.b[0].c")
 //如果有错误 会设置到 jv.evalExpressionError，请先检查这个错误。
 jv.evalExpression = (obj, path) => {
-    if (!path) return obj;
+    if( path === 0) return obj[path];
 
+    if (!path) return obj;
 
     try {
         return eval("(obj)=>obj." + path)(obj);

@@ -52,6 +52,7 @@
         props: {
             // url 优先级 大于 data
             url: {type: String, default: ""},
+            urlDataPath: {type: String, default: "data"},   //数据在返回json的路径
             // data 如果是数组，对象深度只能是一级或零级： [{id,name } , ...]  ,["中学","小学",...]
             // 到 data2的时候，全部是一级对象。
             data: {
@@ -94,7 +95,7 @@
                         return;
                     }
                     this.$http.post(v).then(res => {
-                        this.setData(res.data.data);
+                        this.setData(jv.evalExpression(res.data, this.urlDataPath));
                     });
                 }
             },

@@ -10,6 +10,8 @@
       </div>
     </div>
 
+    <slot name="head"></slot>
+
     <el-table :data="tableData"
               v-loading="url && loading"
               v-bind="[attrs]"

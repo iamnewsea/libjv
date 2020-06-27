@@ -16,8 +16,16 @@ jv.initVue = (setting) => {
     vueProtype.jv = jv;
     vueProtype.Server_Host = window.Server_Host;
     vueProtype.$http = axios;
-    
+
     jv.initVue_setting = {ajaxIgnoreJavaBooleanKey, ajaxIgnoreResType};
+
+    window.BASE_URL = process.env.BASE_URL;
+    Object.keys(process.env).forEach(key => {
+        if (key.startsWith("VUE_APP_")) {
+            var key2 = key.slice(8);
+            window[key2] = process.env[key];
+        }
+    });
 
     // vueProtype.Upload_Url = window.Server_Host + "/sys/upload";
 

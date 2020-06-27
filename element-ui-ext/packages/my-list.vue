@@ -11,7 +11,7 @@
     </div>
 
     <el-table :data="tableData"
-              v-loading="loading"
+              v-loading="url && loading"
               v-bind="[attrs]"
               @row-dblclick="dbClick"
               @row-click="tableRowClick"
@@ -74,7 +74,7 @@
         mounted() {
             if (this.store) {
                 var storeId = this.$vnode.data.ref || "list";
-                var store = this.$store.getJson(storeId);
+                var store = this.$my_store.getJson(storeId);
                 this.total = store.total || 0;
                 this.pageNumber = store.pageNumber || 1;
                 this.lastRowId = store.lastRowId || "";
@@ -83,14 +83,14 @@
         },
         computed: {
             rowKey() {
-                return this.$attrs.rowKey;
+                return this.$attrs.rowKey || 'id';
             },
             attrs() {
                 return Object.assign({
                     border: true,
                     stripe: true,
                     "row-class-name": ({row, rowIndex}) => {
-                        return jv.evalExpression(row, this.rowKey || 'id') == this.lastRowId ? 'last-row' : ''
+                        return jv.evalExpression(row, this.rowKey) == this.lastRowId ? 'last-row' : ''
                     }
                 }, this.$attrs);
             }
@@ -114,7 +114,7 @@
             getStoredQuery() {
                 var storeId = this.$vnode.data.ref || "list";
 
-                return this.$store.getJson(storeId).query;
+                return this.$my_store.getJson(storeId).query;
             },
             setTotal(total) {
                 this.total = total;
@@ -125,7 +125,7 @@
             setLastRowId(lastRowId) {
                 this.lastRowId = lastRowId;
                 var storeId = this.$vnode.data.ref || "list";
-                this.$store.setJson(storeId, Object.assign(this.$store.getJson(storeId), {lastRowId: lastRowId}));
+                this.$my_store.setJson(storeId, Object.assign(this.$my_store.getJson(storeId), {lastRowId: lastRowId}));
             },
             setLastRow(row) {
                 var lastRowId = jv.evalExpression(row, this.rowKey || 'id');
@@ -164,22 +164,26 @@
                 let para = {};
                 para[key || "id"] = id;
 
-                this.$http.post(this.url, para).then(res => {
-                    this.$emit("loaded", res, para);
-                    var newData = res.data.data[0] || {};
+                if (this.url) {
+                    this.$http.post(this.url, para).then(res => {
+                        this.$emit("loaded", res, para);
+                        var newData = res.data.data[0] || {};
 
-                    this.tableData = this.tableData.map(it => {
-                        if (it[key] == newData[key]) {
-                            return newData;
-                        }
-                        return it;
+                        this.tableData = this.tableData.map(it => {
+                            if (it[key] == newData[key]) {
+                                return newData;
+                            }
+                            return it;
+                        });
+
+                        this.$emit("input", this.tableData);
+                        this.loading = false;
                     });
-
-                    this.$emit("input", this.tableData);
-                    this.loading = false;
-                });
+                }
             },
             loadData(pageNumber) {
+                if (!this.url) return;
+
                 if (pageNumber) {
                     this.pageNumber = pageNumber;
                 } else if (pageNumber === 0) {
@@ -198,6 +202,7 @@
                     take: this.pageSize
                 });
 
+
                 this.$http.post(this.url, para).then(res => {
                     this.$emit("loaded", res, para);
                     this.tableData = res.data.data;
@@ -213,12 +218,13 @@
                     if (this.store) {
                         var storeId = this.$vnode.data.ref || "list";
 
-                        this.$store.setJson(storeId, Object.assign(this.$store.getJson(storeId), storeData));
+                        this.$my_store.setJson(storeId, Object.assign(this.$my_store.getJson(storeId), storeData));
                     }
 
                     this.$emit("input", this.tableData);
                     this.loading = false;
                 });
+
             },
             dbClick(e) {
                 return this.$emit("row-dblclick", e)
@@ -245,7 +251,7 @@
      * query 查询：绑定传递到服务器端的查询条件，额外的，还会增加两个查询字段：skip,take。
      * page-size 每页条数：即 take , 默认10条
      * row-key 返回数据标志每一行的key,默认是 id，lastRowId 使用。
-     * store 是否存储： 默认为true。会在查询时，把 query,total,skip,take,pageNumber, 保存到 $store.setJson(ref,{}) 中。
+     * store 是否存储： 默认为true。会在查询时，把 query,total,skip,take,pageNumber, 保存到 $my_store.setJson(ref,{}) 中。
      *
      * 使用方式：
      * mounted 方法

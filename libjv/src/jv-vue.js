@@ -15,7 +15,8 @@ jv.initVue = (setting) => {
     var vueProtype = vue.prototype;
     vueProtype.jv = jv;
     vueProtype.Server_Host = window.Server_Host;
-
+    vueProtype.$http = axios;
+    
     jv.initVue_setting = {ajaxIgnoreJavaBooleanKey, ajaxIgnoreResType};
 
     // vueProtype.Upload_Url = window.Server_Host + "/sys/upload";
@@ -27,7 +28,7 @@ jv.initVue = (setting) => {
     // });
 
     //创建简单的 store
-    vueProtype.$store = {
+    vueProtype.$my_store = {
         setGlobalJson(data) {
             jv.store.setJson("global", Object.assign({}, this.getGlobal(), data));
         },

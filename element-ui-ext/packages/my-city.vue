@@ -20,21 +20,7 @@
                 props_data: {
                     lazy: true,
                     lazyLoad(node, resolve) {
-                        jv.city.loadChildren(!node.level ? 0 : node.value, (subCitys) => {
-                            var leaf = false;
-                            if (jv.city.isZhixia(node.value) && node.level == 1) {
-                                leaf = true;
-                            } else if (jv.city.isZhixia(node.value) && node.level == 2) {
-                                leaf = true;
-                            }
-                            if (leaf) {
-                                subCitys.forEach(it => {
-                                    it.leaf = true;
-                                });
-                            }
-
-                            resolve(subCitys);
-                        });
+                        jv.city.loadChildren(!node.level ? 0 : node.value,resolve );
                     }
                 }
             }
@@ -46,7 +32,7 @@
                 handler(value) {
                     var code = value && value.code || "";
                     jv.city.confirm(code, it => {
-                        this.cityValue = jv.city.getEachCitys(code).map(it => it.code);
+                        this.cityValue = jv.city.getEachCitys(code).map(it => it.value);
                     })
                 }
             }

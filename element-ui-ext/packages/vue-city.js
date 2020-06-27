@@ -1,8 +1,6 @@
 import jv from "libjv"
 
 (function () {
-
-
   jv.cityData = [{
     c: 110100,
     n: '北京',
@@ -76,12 +74,6 @@ import jv from "libjv"
   };
 
 
-  jv.cityData.recursion(it => it.s || it.children, it => {
-    translateCityData(it);
-  });
-
-
-
   jv.city = {};
 
   jv.city.zhixiaData = [11, 12, 31, 50];
@@ -89,7 +81,6 @@ import jv from "libjv"
   jv.city.isZhixia = function (code) {
     return jv.city.zhixiaData.indexOf(parseInt(code / 10000)) >= 0;
   };
-
 
   /**
    * 1级：河北，2级：沧州，3级：献县
@@ -103,6 +94,23 @@ import jv from "libjv"
     if (code % 10000) return 2;
     return 1;
   };
+
+
+
+  jv.cityData.recursion(it => it.s || it.children, it => {
+
+    var code = it.c;
+    var codeLevel = jv.city.getLevel(code);
+
+
+    if (codeLevel == 3) {
+      it.leaf = true;
+    }
+
+    translateCityData(it);
+  });
+
+
 
   /**
    * 根据 code,找数据项。
@@ -156,39 +164,52 @@ import jv from "libjv"
   jv.city.loadChildren = function (code, resolve) {
     resolve = resolve || jv.noop;
     code = parseInt(code);
+
     if (!code) {
       resolve(jv.cityData);
       return;
     }
+
     if (code % 100) {
       resolve();
       return;
     }
+
+    var codeLevel = jv.city.getLevel(code);
+
+    //下一级是否是叶子
+    var subIsleaf = codeLevel == 2;
+
+
     var city = jv.city.getByCode(code);
     if (city && city.children && city.children.length) {
+      if (subIsleaf) {
+        city.children.forEach(it => {
+          it.leaf = true;
+        })
+      }
+
       resolve(city.children);
+
       return;
     }
+
 
     jv.ajax.post(jv.child_citys_url + "?pcode=" + code, {}, {cache: "page"})
       .then(res => {
         var json = res.data.data;
 
-        if (!(city.value % 10000)) {
+        if (subIsleaf) {
           json.forEach(it => {
-            it.s = [];
-          });
-
-          json.forEach(it =>  translateCityData(it));
-
-          city.children = json;
-          resolve(json);
-
-          return;
+            it.leaf = true;
+          })
         }
 
 
-        resolve();
+        json.forEach(it => translateCityData(it));
+        city.children = json;
+        resolve(city.children);
+
       });
   };
 
@@ -243,5 +264,6 @@ import jv from "libjv"
     return ret;
   }
 
-});
+})();
+
 export default jv;

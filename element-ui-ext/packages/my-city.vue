@@ -1,5 +1,5 @@
 <template>
-  <el-cascader style="width:100%" placeholder="请选择地区"
+  <el-cascader class="my-city" placeholder="请选择地区"
                :props="props_data"
                :emitPath="false"
                @change="cityChange"
@@ -20,7 +20,7 @@
                 props_data: {
                     lazy: true,
                     lazyLoad(node, resolve) {
-                        jv.city.loadChildren(!node.level ? 0 : node.value,resolve );
+                        jv.city.loadChildren(!node.level ? 0 : node.value, resolve);
                     }
                 }
             }
@@ -46,7 +46,10 @@
         }
     }
 </script>
-<style>
+<style scoped>
+  .my-city {
+    width: 100%;
+  }
 
 
 </style>

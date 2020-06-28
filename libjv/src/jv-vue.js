@@ -185,6 +185,10 @@ jv.initVue = (setting) => {
 
 // Add a request interceptor
     axios.interceptors.request.use(function (config) {
+        if (config.url.startsWith("http://") || config.url.startsWith("https://")) {
+            config.baseURL = "";
+        }
+
         console.log((new Date()).valueOf().toDateString() + " [" + config.method + "] " + config.baseURL + config.url);
 
 
@@ -194,24 +198,24 @@ jv.initVue = (setting) => {
         if (!config.data.ObjectType && !["array", "set"].includes(type)) return config;
 
         //处理Java的布尔类型
-        jv.recursionJson(config.data, (target) => {
-            Object.keys(target).forEach(key1 => {
-                var value = target[key1];
-
-                if (value !== false && value !== true) {
-                    return;
-                }
-
-                //转为 isUpper 形式。
-                if (key1.length > 2 && (key1.slice(0, 2) == "is" && key1.charCodeAt(2).Between(65, 90))) {
-                    var key2 = key1[0].toLowerCase() + key1.slice(1);
-                    if ((key2 in target) == false) {
-                        target[key2] = value;
-                        delete target[key1];
-                    }
-                }
-            });
-        });
+        // jv.recursionJson(config.data, (target) => {
+        //     Object.keys(target).forEach(key1 => {
+        //         var value = target[key1];
+        //
+        //         if (value !== false && value !== true) {
+        //             return;
+        //         }
+        //
+        //         //转为 isUpper 形式。
+        //         if (key1.length > 2 && (key1.slice(0, 2) == "is" && key1.charCodeAt(2).Between(65, 90))) {
+        //             var key2 = key1[0].toLowerCase() + key1.slice(1);
+        //             if ((key2 in target) == false) {
+        //                 target[key2] = value;
+        //                 delete target[key1];
+        //             }
+        //         }
+        //     });
+        // });
 
 
         return config;

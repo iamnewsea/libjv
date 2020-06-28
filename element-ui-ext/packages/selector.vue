@@ -54,6 +54,7 @@
         props: {
             // url 优先级 大于 data
             url: {type: String, default: ""},
+            urlMethod: {type: String, default: "post"},
             urlDataPath: {type: String, default: "data"},   //数据在返回json的路径
             // data 如果是数组，对象深度只能是一级或零级： [{id,name } , ...]  ,["中学","小学",...]
             // 到 data2的时候，全部是一级对象。
@@ -65,10 +66,19 @@
             clearable: {type: Boolean, default: true},
             enum: {type: String, default: ""},
             tagType: {type: String, default: ""},
-            //当data是Array的时候，需要指定 field的两个值,第一个是 key , 第2个是 value
+            /**
+             * 当data是Array的时候，需要指定 field的两个值,第一个是 key , 第2个是 value
+             *
+             * 返回值是选择对象的哪个属性。
+             * 如果是 枚举, valueIsBoolean ,valueArray ,valueIsObject 那么 $emit的值是 item.value。
+             * 如果想返回值是某个值， fields的值部分，使用 #开头。一般第一项是返回的keyField。
+             *
+             * 如果在卡片上： <selector  v-model="info.park" url="url" fields="code,name" />
+             * 如果是查询条件： <selector  v-model="info.park" url="url" fields="#code,name"/>
+             */
             fields: {
                 type: String, default() {
-                    return ""
+                    return ""       //enum时默认是name,remark ， array时默认是value,label
                 }
             },
             readOnly: {type: Boolean, default: false},
@@ -80,7 +90,7 @@
                 type: [String, Array, Boolean, Number, Object], default() {
                     return "";
                 }
-            },
+            }
             // valueIsBoolean: {
             //     type: Boolean, default() {
             //         return false
@@ -96,7 +106,9 @@
                     if (!v) {
                         return;
                     }
-                    this.$http.post(v).then(res => {
+                    var method = (this.urlMethod || "post").toLowerCase();
+
+                    this.$http[method](v).then(res => {
                         this.setData(jv.evalExpression(res.data, this.urlDataPath));
                     });
                 }
@@ -113,8 +125,10 @@
             enum(v) {
                 this.setData();
             },
-            fields(v) {
-                this.setFields()
+            fields: {
+                immediate: true, handler(v) {
+                    this.setFields()
+                }
             },
             value: {
                 deep: true, immediate: true, handler(v) {
@@ -184,6 +198,7 @@
                 dataIsValueArray: false,
                 dataIsObject: false,
                 valueIsBoolean: false,    //如果 type=radio 且 data 包含 true,false 或 value值为boolean
+                returnValueField: "",     //获取 fields 中[]包裹项
                 value1_click_v1: "", //click下会有两次点击，记录第一次点击时的值
             };
         },
@@ -212,7 +227,8 @@
             },
             init() {
                 if (this.url) {
-                    this.$http.post(this.url).then(res => {
+                    var method = (this.urlMethod || "post").toLowerCase();
+                    this.$http[method](this.url).then(res => {
                         this.setData(res.data.data);
                     });
                 } else {
@@ -226,39 +242,56 @@
                         v = this.value1;
                     }
 
-                    if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
-                        ret = v;
 
+                    if (this.valueIsBoolean) {
+                        ret = jv.asBoolean(ret)
+                    } else if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
+                        ret = v;
                     } else {
-                        ret = this.data2.find(it => it[this.keyField] == v)
+                        if (this.keyField == this.returnValueField) {
+                            ret = v;
+                        } else {
+                            ret = this.data2.find(it => it[this.keyField] == v)
+
+                            if (this.returnValueField) {
+                                ret = jv.evalExpression(ret, this.returnValueField);
+                            }
+                        }
                         // if (this.valueField) {
                         //     ret = ret[this.valueField]
                         // }
                     }
 
-                    if (this.valueIsBoolean) {
-                        ret = jv.asBoolean(ret)
-                    }
+
                 } else {
                     if (jv.isNull(v)) {
                         v = this.value2;
                     }
 
-                    if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
+
+                    if (this.valueIsBoolean) {
+                        ret = ret.map(it => jv.asBoolean(it))
+                    } else if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
                         ret = v;
                     } else {
-                        ret = this.data2.filter(it => v.includes(it[this.keyField]));
+                        if (this.keyField == this.returnValueField) {
+                            ret = v;
+                        } else {
+                            ret = this.data2.filter(it => v.includes(it[this.keyField]));
+
+                            if (this.returnValueField) {
+                                ret = ret.map(it => jv.evalExpression(it, this.returnValueField));
+                            }
+                        }
                         // if (this.valueField) {
                         //     ret = ret.map(it => it[this.valueField])
                         // }
                     }
 
-                    if (this.valueIsBoolean) {
-                        ret = ret.map(it => jv.asBoolean(it))
-                    }
+
                 }
                 this.$emit("input", ret);
-                this.$emit("change", ret)
+                this.$emit("change", ret);
                 return;
             },
             dblclick() {
@@ -281,7 +314,7 @@
                         return;
                     }
 
-                    if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray || !this.keyField) {
+                    if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray || (this.returnValueField == this.keyField) ) {
                         if (this.valueIsBoolean) {
                             this.value1 = jv.asString(v)
                         } else {
@@ -310,7 +343,7 @@
 
 
                 //解决 boolean类型问题
-                if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
+                if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray || (this.returnValueField == this.keyField)) {
                     if (this.valueIsBoolean) {
                         this.value2 = v.map(it => jv.asBoolean(it));
                     } else {
@@ -327,15 +360,36 @@
                 });
             },
             setFields() {
-                var def_fields = "";
+                var fields = (this.fields || "").split(",");
+                var keyField = "";
+                var valueField = "";
                 if (this.dataIsEnum) {
-                    def_fields = "name,remark";
+                    keyField = fields[0] || "name";
+                    valueField = fields[1] || "remark";
+
                 } else if (this.dataIsValueArray || this.dataIsObject) {
-                    def_fields = "value,label"
+                    keyField = fields[0] || "value";
+                    valueField = fields[1] || "label";
+                } else {
+                    keyField = fields[0] || "id";
+                    valueField = fields[1] || "name";
                 }
-                var fields = (this.fields || def_fields).split(",");
-                this.keyField = fields[0];
-                this.labelField = fields[1];
+
+                keyField = keyField.trim();
+                valueField = valueField.trim();
+
+                if (keyField.startsWith("#")) {
+                    keyField = keyField.slice(1);
+                    this.returnValueField = keyField;
+                }
+
+                if (valueField.startsWith("#")) {
+                    valueField = valueField.slice(1);
+                    this.returnValueField = valueField;
+                }
+
+                this.keyField = keyField;
+                this.labelField = valueField;
             },
             setData(data) {
                 if (this.enum) {

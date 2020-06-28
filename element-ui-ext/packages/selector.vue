@@ -53,9 +53,21 @@
         name: "selector",
         props: {
             // url 优先级 大于 data
-            url: {type: String, default: ""},
-            urlMethod: {type: String, default: "post"},
-            urlDataPath: {type: String, default: "data"},   //数据在返回json的路径
+            url: {
+                type: String, default() {
+                    return ""
+                }
+            },
+            urlMethod: {
+                type: String, default() {
+                    return "post"
+                }
+            },
+            urlDataPath: {
+                type: String, default() {
+                    return "data"
+                }
+            },   //数据在返回json的路径
             // data 如果是数组，对象深度只能是一级或零级： [{id,name } , ...]  ,["中学","小学",...]
             // 到 data2的时候，全部是一级对象。
             data: {
@@ -63,9 +75,21 @@
                     return []
                 }
             },
-            clearable: {type: Boolean, default: true},
-            enum: {type: String, default: ""},
-            tagType: {type: String, default: ""},
+            clearable: {
+                type: Boolean, default() {
+                    return true
+                }
+            },
+            enum: {
+                type: String, default() {
+                    return ""
+                }
+            },
+            tagType: {
+                type: String, default() {
+                    return ""
+                }
+            },
             /**
              * 当data是Array的时候，需要指定 field的两个值,第一个是 key , 第2个是 value
              *
@@ -81,10 +105,22 @@
                     return ""       //enum时默认是name,remark ， array时默认是value,label
                 }
             },
-            readOnly: {type: Boolean, default: false},
-            enumCount: {type: Number, default: 3}, //使用 enum方式的个数
+            readOnly: {
+                type: Boolean, default() {
+                    return false
+                }
+            },
+            enumCount: {
+                type: Number, default() {
+                    return 3
+                }
+            }, //使用 enum方式的个数
             //radio,checkbox
-            type: {type: String, default: "radio"},
+            type: {
+                type: String, default() {
+                    return "radio"
+                }
+            },
             //如果是多选，是数组， 如果是单选是对象或值。
             value: {
                 type: [String, Array, Boolean, Number, Object], default() {
@@ -314,7 +350,7 @@
                         return;
                     }
 
-                    if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray || (this.returnValueField == this.keyField) ) {
+                    if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray || (this.returnValueField == this.keyField)) {
                         if (this.valueIsBoolean) {
                             this.value1 = jv.asString(v)
                         } else {

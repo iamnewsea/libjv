@@ -27,9 +27,15 @@
     export default {
         name: "kv",
         props: {
-            label: {type: String, default: ""},
-            effect: {type: String, default: "dark"},
-            placement: {type: String, default: "top-end"}
+            label: {
+                type: String, default: () => ""
+            },
+            effect: {
+                type: String, default: () => "dark"
+            },
+            placement: {
+                type: String, default: () => "top-end"
+            }
         },
         data() {
             return {tooltip: ""};

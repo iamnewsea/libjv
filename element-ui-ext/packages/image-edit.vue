@@ -198,11 +198,13 @@
                         // }
                     }
 
-                    if (value.preview_show && value.type == 'video' && value.url) {
-                        document.getElementById("video_dom").pause();
-                    }
+                    this.$nextTick(it=>{
+                        if (value.preview_show && value.type == 'video' && value.url) {
+                            document.getElementById("video_dom").pause();
+                        }
 
-                    this.Image_Scale_Change();
+                        this.Image_Scale_Change();
+                    });
                 }
             }
         },

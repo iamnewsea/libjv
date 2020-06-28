@@ -23,17 +23,20 @@
         name: "number-range",
         props: {
             map: {
-                type: Object, default: function () {
-                    return {}
+                type: Object, default: () => {
                 }
             },
-            readOnly: {type: Boolean, default: false},
-            min: {type: Number, default: -Infinity},
-            max: {type: Number, default: Infinity},
+            readOnly: {
+                type: Boolean, default: () => false
+            },
+            min: {
+                type: Number, default: () => -Infinity
+            },
+            max: {
+                type: Number, default: () => Infinity
+            },
             value: {
-                type: Array, default: function () {
-                    return [0,0]
-                }
+                type: Array, default: () => [0, 0]
             }
         },
         data() {
@@ -50,7 +53,7 @@
                 this.rangeValue = Object.assign([], this.value);
             }
         },
-        created(){
+        created() {
         },
         methods: {
             change1(value) {

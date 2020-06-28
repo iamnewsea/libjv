@@ -48,9 +48,15 @@
         name: "my-list",
         inheritAttrs: false,
         props: {
-            store: {type: Boolean, default: true}, //是否存储 页码，总页数,lastRowId
-            pageSize: {type: Number, default: 10},
-            url: {type: String, default: ""},
+            store: {
+                type: Boolean, default:()=>true
+            }, //是否存储 页码，总页数,lastRowId
+            pageSize: {
+                type: Number, default:()=>10
+            },
+            url: {
+                type: String, default:()=>""
+            },
             // query: {
             //     type: Object, default() {
             //         return {};
@@ -58,9 +64,7 @@
             // },
             //列表数据
             value: {
-                type: Object, default() {
-                    return {};
-                }
+                type: Object, default:()=>{}
             }
         },
         data() {
@@ -204,8 +208,8 @@
                 });
 
                 var para_ret;
-                this.$emit("param", para,v=>para = v);
-                if( para_ret === false){
+                this.$emit("param", para, v => para = v);
+                if (para_ret === false) {
                     return;
                 }
                 this.loading = true;

@@ -61,7 +61,9 @@
         extends: inputNumber,
         name: 'my-number-input',
         props: {
-            readOnly: {type: Boolean, default: false},
+            readOnly: {
+                type: Boolean, default:()=>false
+            },
             map: {
                 type: Object
             }

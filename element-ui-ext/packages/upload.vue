@@ -26,7 +26,7 @@
             <i class="el-icon-delete" v-if="!readOnly"
                @click="$event.target.closest('.el-upload-preview').classList.add('deleting')"></i>
           </div>
-          <div v-if="maxCount>1" v-if="!readOnly">
+          <div v-if="maxCount>1 && !readOnly">
             <i class="el-icon-arrow-left" @click="move_left(index)" v-if="index>0"></i>
             <i class="el-icon-arrow-right" @click="move_right(index)" v-if="index < myValue.length -1"></i>
           </div>
@@ -54,25 +54,39 @@
         name: "Upload",
         props: {
             value: {
-                type: [Array, Object], default: function () {
-                    var ret = [];
-                    return ret;
-                }
+                type: [Array, Object], default: () => []
             },
-            readOnly: {type: Boolean, default: false},
-            uid: {type: null, default: 0},     // 表示该图片所属的表的行Id.
-            db: {type: String, default: ""},   // 表名.列表. 定义了 db ,自动调用服务器Api
+            readOnly: {
+                type: Boolean, default: () => false
+            },
+            uid: {
+                type: null, default: () => 0
+            },     // 表示该图片所属的表的行Id.
+            db: {
+                type: String, default: () => ""
+            },   // 表名.列表. 定义了 db ,自动调用服务器Api
             scales: {
-                type: [String, Array], default: function () {
-                    return [];  //"1:1", "16:9"
-                }
+                //"1:1", "16:9"
+                type: [String, Array], default: () => []
             }, //空表示保持原始 宽:高
             // withRemark: {type: Boolean, default: false},
-            maxCount: {type: Number, default: 1},
-            maxWidth: {type: Number, default: 0},
-            fileType: {type: String, default: "img"}, //上传的要求
-            maxSize: {type: String, default: "5M"},
-            axiosConfig: {type: Object, default: {}}
+            maxCount: {
+                type: Number, default: () => 1
+            },
+            maxWidth: {
+                type: Number, default: () => 0
+            },
+            fileType: {
+                type: String, default: () => "img"
+            }, //上传的要求
+            maxSize: {
+                type: String, default: () => "5M"
+            },
+            axiosConfig: {
+                type: Object, default: () => {
+                    return {};
+                }
+            }
         },
         data() {
             return {
@@ -227,8 +241,18 @@
 
                 var fileName = rawFile.name, fileType = jv.getFileType(fileName);
 
-                var item = {percentage: 0, name: fileName};
+                var item = {percentage: 0, name: fileName, fileType: fileType.type};
                 this.myValue.push(item);
+
+                //如果定义了 @upload , 则调用自己的函数 。
+                if (this.$listeners.upload) {
+                    return new Promise((resolve, reject) => {
+                        this.$emit("upload", rawFile, item, it => {
+                            resolve(it);
+                        });
+                    })
+                }
+
 
                 if (fileType.type == "img" && this.scales_value.length == 0 && this.maxWidth > 0) {
                     return this.doUpload(rawFile, null, fileName, item);

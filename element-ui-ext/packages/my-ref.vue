@@ -69,23 +69,35 @@
         components: {MyList},
         name: "my-ref",
         props: {
-            readOnly: {type: Boolean, default: false},
-            open: {type: Boolean, default: false},
-            multi: {type: Boolean, default: false}, //多选
-            url: {type: String, default: ""},
-            pageSize: {type: Number, default: 10},
+            readOnly: {
+                type: Boolean, default:()=>false
+            },
+            open: {
+                type: Boolean, default:()=>false
+            },
+            multi: {
+                type: Boolean, default:()=>false
+            }, //多选
+            url: {
+                type: String, default:()=>""
+            },
+            pageSize: {
+                type: Number, default:()=>10
+            },
             // minNumber: {type: Number, default: 3},
-            name: {type: String, default: ""}, //显示的主体名称
-            id: {type: [Object, String, Number], default: ""},    //标志数据，在change时传回。
+            name: {
+                type: String, default:()=>""
+            }, //显示的主体名称
+            id: {
+                type: [Object, String, Number], default:()=>""
+            },    //标志数据，在change时传回。
             // query: {
             //     type: Object, default: function () {
             //         return {}
             //     }
             // },
             value: {
-                type: [Object, Array], default: function () {
-                    return []
-                }
+                type: [Object, Array], default:()=>[]
             }
         },
         data() {

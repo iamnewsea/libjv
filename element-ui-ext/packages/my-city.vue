@@ -13,10 +13,14 @@
     export default {
         name: 'my-city',
         props: {
-            multiple: {type: Boolean, default: false},
+            multiple: {
+                type: Boolean, default: () => false
+            },
             value: {
                 type: [Object, Array]
-                , default: {code: "", name: ""}
+                , default: () => {
+                    return {code: "", name: ""}
+                }
             }
         },
         data() {

@@ -1,6 +1,9 @@
 import "spark-md5"
 import jv from './vue-chk'
 
+jv.check_upload_url = "/sys/check_upload"
+jv.upload_url = "/sys/upload";
+
 jv.getFileMd5 = (file) => {
     return new Promise((resolve, reject) => {
         if (typeof (SparkMD5) == "undefined") {
@@ -173,6 +176,7 @@ jv.compressImage = (op) => {
     });
 };
 
+
 jv.uploadFileAjaxPost = (file, fileName, axios, post_param, axiosConfig, percentCallback) => {
     // file.name = file.name || "file";
 
@@ -182,7 +186,7 @@ jv.uploadFileAjaxPost = (file, fileName, axios, post_param, axiosConfig, percent
         formData.append(key, post_param[key]);
     }
 
-    return axios.post("/sys/upload", formData, Object.assign({}, {
+    return axios.post(jv.upload_url, formData, Object.assign({}, {
         onUploadProgress: e => {
             if (e.total > 0) {
                 e.percent = parseInt(e.loaded / e.total * 90);
@@ -246,7 +250,7 @@ jv.doUploadFile = option => {
             .then(md5 => {
                 process_callback(5);
 
-                if (!md5) {
+                if (!md5 || !jv.check_upload_url) {
                     return jv.uploadFileAjaxPost(file, fileName, axios, post_param, axiosConfig, process_callback)
                 }
 
@@ -257,7 +261,7 @@ jv.doUploadFile = option => {
                 // }
 
                 // 8.检查服务器文件的 Md5值。
-                return axios.post("/sys/check_upload", param, Object.assign({}, axiosConfig))
+                return axios.post(jv.check_upload_url, param, Object.assign({}, axiosConfig))
                     .then(res => {
                         process_callback(10);
                         // 8.1 如果服务器存在该文件，返回 data 属性，且 data 属性有 id

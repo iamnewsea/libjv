@@ -15,7 +15,8 @@ import number_range from '../packages/number-range.vue';
 
 import image_edit from '../packages/image-edit.vue';
 
-// import jv from "./jv_vue"
+//引入即可
+import "./jv_vue"
 
 const components = [
   c, e,

@@ -245,41 +245,41 @@ jv.initVue = (setting) => {
 
         return response;
     }, (error) => {
-        var msg = "";
-        try {
-            msg = (error.message || "网络错误") + ":" + error.config.url;
-        } catch (e) {
-            // eval("debugger")
-            console.error(e);
-            msg = "网络错误"
-        }
-        if (msg) {
-            console.error(msg);
-        }
 
-        if (!error.response) {
-            jv.error("连接失败,请检查网络设置。", "", "ajax");
-            return Promise.reject(error);
-        }
+        //如果网络有返回
         var resp = error.response;
-        var status = resp.status;
-        if (status == 401) {
-            return Promise.reject(error);
-        }
-        if (status == 403) {
-            jv.error("由于系统的权限限制，禁止您的访问");
-            return Promise.reject(error);
-        }
-        if (status == 404) {
-            jv.error("找不到请求！");
+        if (resp) {
+            var status = resp.status;
+            if (status == 401) {
+                return Promise.reject(error);
+            }
+            if (status == 403) {
+                jv.error("由于系统的权限限制，禁止您的访问");
+                return Promise.reject(error);
+            }
+            if (status == 404) {
+                jv.error("找不到请求！");
+                return Promise.reject(error);
+            }
+
+            var data = resp.data;
+            /*{"timestamp":1502603323197,"status":500,"error":"Internal Server Error","exception":"java.lang.Exception","message":"更新条件为空，不允许更新","path":"/sys/synchroMenuAndPermiss"}*/
+            var errorMsg = (data && (data.msg || data.message)) || "系统错误:" + JSON.stringify(data);
+
+            jv.error(errorMsg.slice(0, 100));
             return Promise.reject(error);
         }
 
-        var data = resp.data;
-        /*{"timestamp":1502603323197,"status":500,"error":"Internal Server Error","exception":"java.lang.Exception","message":"更新条件为空，不允许更新","path":"/sys/synchroMenuAndPermiss"}*/
-        var errorMsg = (data && (data.msg || data.message)) || "系统错误:" + JSON.stringify(data);
+        //网络没有返回， 网络连接问题。
+        var msg = "";
 
-        jv.error(errorMsg.slice(0, 100));
+        if (error.config) {
+            msg += "<div>" + error.config.baseURL + error.config.url + "</div>";
+        }
+        msg += (error.message || "网络连接失败,请检查网络再试。");
+
+        console.error(msg);
+        document.write(msg);
         return Promise.reject(error);
     });
 

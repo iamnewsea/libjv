@@ -196,7 +196,6 @@
                     this.total = 0;
                 }
 
-                this.loading = true;
 
                 let para = Object.assign({}, this.query, {
                     pageNumber: this.pageNumber,
@@ -204,7 +203,12 @@
                     take: this.pageSize
                 });
 
-
+                var para_ret;
+                this.$emit("param", para,v=>para = v);
+                if( para_ret === false){
+                    return;
+                }
+                this.loading = true;
                 this.$http.post(this.url, para).then(res => {
                     this.$emit("loaded", res, para);
                     this.tableData = res.data.data;

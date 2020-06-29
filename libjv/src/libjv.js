@@ -310,8 +310,7 @@ jv.JvEnum = function JvEnum(typeName, json) {
                 return v.remark || "";
             },
             enumerable: false,
-            configurable: true,
-            writable: true
+            configurable: true
         });
     };
 }
@@ -505,11 +504,13 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
 
     if (ignoreBoolean && ignoreDate) return;
 
-    var res1 = (key1, value, target, args1) => {
+    var res1 = (target, key1,  args1) => {
         if (!target) {
             return;
         }
-        if ((key + "_res") in target) {
+
+
+        if ((key1 + "_res") in target) {
             return;
         }
 
@@ -518,6 +519,7 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
         //     return;
         // }
 
+        var value = target[key1];
         var type = value.Type;
 
         if (!ignoreBoolean && (type == "boolean")) {
@@ -525,6 +527,7 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
 
             Object.defineProperty(target, key1 + "_res", {
                 get() {
+                    var value = this[key1];
                     var stringValue = "";
                     var res_values = args1.split(",");
                     if (value) {
@@ -536,8 +539,7 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
                     return stringValue;
                 },
                 enumerable: false,
-                configurable: true,
-                writable: true
+                configurable: true
             });
 
             // target[key1 + "_res"] = stringValue;
@@ -552,23 +554,23 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
             //     }
             // }
             return true;
-        } else if (!ignoreDate && (type == "string")) {
-            if (value.IsDateFormat()) {
-                target[key1 + "_res"] = value;
-                return true;
-            } else if (value.IsDateTimeFormat()) {
-                target[key1 + "_res"] = Date.from(value).toDateString(args1, "local");
-                return true;
-            }
         }
+        // else if (!ignoreDate && (type == "string")) {
+        //     if (value.IsDateFormat()) {
+        //         target[key1 + "_res"] = value;
+        //         return true;
+        //     } else if (value.IsDateTimeFormat()) {
+        //         target[key1 + "_res"] = Date.from(value).toDateString(args1, "local");
+        //         return true;
+        //     }
+        // }
     };
 
 
     if (key) {
         jv.recursionJson(obj, (json) => {
             if (Object.keys(json).includes(key)) {
-                var v = json[key];
-                res1(key, v, json, args);
+                res1(json, key, args);
             }
         });
         return;
@@ -576,7 +578,7 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
 
     jv.recursionJson(obj, (json) => {
         Object.keys(json).forEach(key => {
-            res1(key, json[key], json, args);
+            res1(json, key, args);
         })
     });
 };

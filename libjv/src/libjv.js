@@ -294,17 +294,25 @@ jv.JvEnum = function JvEnum(typeName, json) {
         if (key in obj == false) {
             return;
         }
-        var value = obj[key];
-        if (jv.isNull(value)) {
-            return;
-        }
 
-        var v = this.getData(value);
-        if (!v || !v.name) {
-            return;
-        }
+        Object.defineProperty(obj, key + "_res", {
+            get() {
+                var value = this[key];
+                if (jv.isNull(value)) {
+                    return "";
+                }
 
-        obj[key + "_res"] = v.remark || "";
+                var v = this.getData(value);
+                if (!v || !v.name) {
+                    return "";
+                }
+
+                return v.remark || "";
+            },
+            enumerable: false,
+            configurable: true,
+            writable: true
+        });
     };
 }
 
@@ -505,34 +513,44 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
             return;
         }
 
-        if (jv.isNull(value)) {
-            target[key1 + "_res"] = "";
-            return;
-        }
+        // if (jv.isNull(value)) {
+        //     target[key1 + "_res"] = "";
+        //     return;
+        // }
 
         var type = value.Type;
 
         if (!ignoreBoolean && (type == "boolean")) {
             args1 = args1 || "";  //.replace(/，/g,",")
 
-            var stringValue = "";
-            var res_values = args1.split(",");
-            if (value) {
-                stringValue = res_values[0] || "是"
-            } else {
-                stringValue = res_values[1] || "否"
-            }
+            Object.defineProperty(target, key1 + "_res", {
+                get() {
+                    var stringValue = "";
+                    var res_values = args1.split(",");
+                    if (value) {
+                        stringValue = res_values[0] || "是"
+                    } else {
+                        stringValue = res_values[1] || "否"
+                    }
 
-            target[key1 + "_res"] = stringValue;
+                    return stringValue;
+                },
+                enumerable: false,
+                configurable: true,
+                writable: true
+            });
 
-            if (key1.startsWith("is")) {
-                var key2 = key1.slice(2);
-                if (key2) {
-                    key2 = key2[0].toLowerCase() + key2.slice(1);
-                    target[key2] = value;
-                    target[key2 + "_res"] = stringValue;
-                }
-            }
+            // target[key1 + "_res"] = stringValue;
+
+            //暂不处理 Java 的 boolean 字段。
+            // if (key1.startsWith("is")) {
+            //     var key2 = key1.slice(2);
+            //     if (key2) {
+            //         key2 = key2[0].toLowerCase() + key2.slice(1);
+            //         target[key2] = value;
+            //         target[key2 + "_res"] = stringValue;
+            //     }
+            // }
             return true;
         } else if (!ignoreDate && (type == "string")) {
             if (value.IsDateFormat()) {

@@ -295,6 +295,11 @@ jv.JvEnum = function JvEnum(typeName, json) {
             return;
         }
 
+        if ((key + "_res") in obj) {
+            return;
+        }
+
+        var self = this;
         Object.defineProperty(obj, key + "_res", {
             get() {
                 var value = this[key];
@@ -302,7 +307,7 @@ jv.JvEnum = function JvEnum(typeName, json) {
                     return "";
                 }
 
-                var v = this.getData(value);
+                var v = self.getData(value);
                 if (!v || !v.name) {
                     return "";
                 }
@@ -504,7 +509,7 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
 
     if (ignoreBoolean && ignoreDate) return;
 
-    var res1 = (target, key1,  args1) => {
+    var res1 = (target, key1, args1) => {
         if (!target) {
             return;
         }

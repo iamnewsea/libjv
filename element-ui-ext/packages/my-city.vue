@@ -50,7 +50,8 @@
             cityChange(vals) {
                 var code = vals.last();
                 var city = jv.city.getByCode(code);
-                this.$emit("input", {code: city.value, name: city.label});
+                //不传 name , 服务器自动设置name
+                this.$emit("input", {code: city.value});
             }
         }
     }

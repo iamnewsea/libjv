@@ -165,11 +165,17 @@
                 var row = this.tableData.find(it => it[key] == id);
                 if (!row) return;
 
-                this.loading = true;
 
                 let para = {};
                 para[key || "id"] = id;
 
+                var para_ret;
+                this.$emit("param", para, v => para = v);
+                if (para_ret === false) {
+                    return;
+                }
+
+                this.loading = true;
                 if (this.url) {
                     this.$http.post(this.url, para).then(res => {
                         this.$emit("loaded", res, para);

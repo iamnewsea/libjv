@@ -4,7 +4,7 @@
 
     <el-tabs type="card" style="margin-top:20px;" v-model="activeName">
       <el-tab-pane label="商品信息" name="info">
-        <product-detail-info v-model="info" @changed="infoChanged"
+        <product-detail-info v-model="info" @change="infoChanged"
                              :action="action"></product-detail-info>
       </el-tab-pane>
       <el-tab-pane label="图片" name="image" v-if="productId">

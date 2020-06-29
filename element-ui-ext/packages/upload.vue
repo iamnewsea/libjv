@@ -384,11 +384,11 @@
                         };
                         this.$http.post("/image/set", param).then(res => {
                             this.$emit("input", value);
-                            this.$emit("changed", value, this.uid);
+                            this.$emit("change", value, this.uid);
                         });
                     } else {
                         this.$emit("input", value);
-                        this.$emit("changed", value, this.uid);
+                        this.$emit("change", value, this.uid);
                     }
                 } else {
                     if (action == "add") {
@@ -412,13 +412,13 @@
                         if (this.myValue.every(it => it.id)) {
                             this.$http.post("/image/change", param).then(res => {
                                 this.$emit("input", this.myValue);
-                                this.$emit("changed", this.myValue, this.uid, action, para);
+                                this.$emit("change", this.myValue, this.uid, action, para);
                             });
                         }
                     } else {
                         if (this.myValue.every(it => it.id)) {
                             this.$emit("input", this.myValue);
-                            this.$emit("changed", this.myValue, this.uid, action, para);
+                            this.$emit("change", this.myValue, this.uid, action, para);
                         }
                     }
                 }

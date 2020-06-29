@@ -171,7 +171,7 @@
             return;
           }
 
-          this.$emit("changed");
+          this.$emit("change");
         });
       },
       loadCategories() {

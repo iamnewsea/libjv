@@ -5,20 +5,21 @@
 
     <div class="el-upload" :class="'el-upload-' + index" v-for="(item,index) in myValue">
       <div class="el-upload-preview" v-if="item.id && item.url" onmouseleave="this.classList.remove('deleting')">
-        <img class="avatar-uploader-icon" :src="item.url" v-if="item.fileType=='img'"/>
+        <div class="avatar-uploader-icon preview--img" :style="{backgroundImage: 'url(' + item.url + ')'}"
+             v-if="item.fileType=='img'"/>
         <video v-else-if="item.fileType=='video'" :src="item.url" class="avatar-uploader-icon"
                controls="controls"></video>
-        <div v-else class="avatar-uploader-icon upload-fill el-icon-document"
+        <div v-else class="avatar-uploader-icon upload-fill el-icon-document preview--sub"
              :class="'upload-icon-'+ item.fileType">
           {{item.showName}}
         </div>
-        <div class="el-upload-bg">
+        <div class="el-upload-bg preview--sub">
         </div>
-        <div class="el-upload-icon confirm-icon" v-if="!readOnly">
+        <div class="el-upload-icon confirm-icon preview--sub" v-if="!readOnly">
           <el-tag type="danger" @click="onRemove(index,$event)" style="padding-left:12px;padding-right:12px;">确认删除?
           </el-tag>
         </div>
-        <div class="el-upload-icon hover-icon" style="flex-direction: column;">
+        <div class="el-upload-icon hover-icon preview--sub" style="flex-direction: column;">
           <div>
             <i class="el-icon-view" @click="file_preview(index)"
                v-if="item.fileType == 'img' || item.fileType == 'video'"></i>
@@ -241,7 +242,7 @@
 
                 var fileName = rawFile.name, fileType = jv.getFileType(fileName);
 
-                var item = {percentage: 0, name: fileName, fileType: fileType.type};
+                var item = {percentage: 0, name: fileName, fileType: fileType.type, ext: fileType.ext};
                 this.myValue.push(item);
 
                 //如果定义了 @upload , 则调用自己的函数 。
@@ -521,13 +522,21 @@
     min-width: 146px;
   }
 
-  .avatar-uploader .el-upload-preview > div {
+  /**子级元素标志*/
+  .avatar-uploader .el-upload-preview .preview--sub {
     display: none;
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+  }
+
+  /**背景预览图*/
+  .avatar-uploader .el-upload-preview .preview--img {
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
   }
 
   .avatar-uploader .el-upload-preview .upload-fill {

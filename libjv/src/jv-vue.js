@@ -8,7 +8,7 @@ import jv from "./file-upload"
  ajaxIgnoreResType ： 默认为false , 系统默认对 boolean,date添加 _res 额外键，设置这个字段，会忽略指定的类型。该值是逗号分隔的字符串，有如下值：boolean,date
  */
 jv.initVue = (setting) => {
-    var {vue, axios, router, ajaxIgnoreJavaBooleanKey, ajaxIgnoreResType} = setting;
+    var {vue, axios, router, ajaxIgnoreJavaBooleanKey, ajaxIgnoreResType, ignoreMsg} = setting;
     jv.Vue = vue;
     //关闭环境给出的提示.
     // vue.config.productionTip = false;
@@ -18,6 +18,7 @@ jv.initVue = (setting) => {
     vueProtype.$http = axios;
 
     jv.initVue_setting = {ajaxIgnoreJavaBooleanKey, ajaxIgnoreResType};
+
 
     window.BASE_URL = process.env.BASE_URL;
     Object.keys(process.env).forEach(key => {
@@ -228,7 +229,7 @@ jv.initVue = (setting) => {
     axios.interceptors.response.use((response) => {
         // Do something with response data
         var json = response.body = response.data;
-        if (json && json.msg) {
+        if (!ignoreMsg && json && json.msg) {
             jv.error(json.msg);
             return Promise.reject({config: response.config, request: response.request, response, message: json.msg});
         }

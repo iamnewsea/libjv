@@ -390,6 +390,9 @@ jv.asBoolean = (value) => {
     if (value === "null" ||
         value === "undefined") return null;
 
+    //选择数据源，可能是空。
+    if (value === "") return "";
+
     if (value === false ||
         value === "false" ||
         value === 0) return false;
@@ -398,7 +401,7 @@ jv.asBoolean = (value) => {
         value === "true" ||
         value === 1) return true;
 
-    return null;
+    return value;
 }
 
 jv.asString = (value, format) => {
@@ -929,7 +932,7 @@ jv.query2Json = (query) => {
 //用法： jv.evalExpression({a:{b:[{c:1}]}} , "a.b[0].c")
 //如果有错误 会设置到 jv.evalExpressionError，请先检查这个错误。
 jv.evalExpression = (obj, path) => {
-    if( path === 0) return obj[path];
+    if (path === 0) return obj[path];
 
     if (!path) return obj;
 

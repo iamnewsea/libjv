@@ -233,7 +233,8 @@
                 dataIsEnum: false,
                 dataIsValueArray: false,
                 dataIsObject: false,
-                valueIsBoolean: false,    //如果 type=radio 且 data 包含 true,false 或 value值为boolean
+                valueIsBoolean: false,    //如果 data 包含 true,false 或 value值为boolean
+                valueIsNumber: false,    //如果 data 只包含 数字Key！
                 returnValueField: "",     //获取 fields 中[]包裹项
                 value1_click_v1: "", //click下会有两次点击，记录第一次点击时的值
             };
@@ -278,10 +279,7 @@
                         v = this.value1;
                     }
 
-
-                    if (this.valueIsBoolean) {
-                        ret = jv.asBoolean(ret)
-                    } else if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
+                    if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
                         ret = v;
                     } else {
                         if (this.keyField == this.returnValueField) {
@@ -299,32 +297,40 @@
                     }
 
 
+                    if (this.valueIsBoolean) {
+                        ret = jv.asBoolean(ret)
+                    } else if (this.valueIsNumber) {
+                        ret = jv.asInt(ret);
+                    }
+
                 } else {
                     if (jv.isNull(v)) {
                         v = this.value2;
                     }
 
 
+                    // if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray || (this.keyField == this.returnValueField)) {
+                    //     ret = v;
+                    // } else {
+                    //
+                    //
+                    //     if (this.returnValueField) {
+                    //         ret = ret.map(it => jv.evalExpression(it, this.returnValueField));
+                    //     }
+                    //     else{
+                    //         ret = this.data2.filter(it => v.includes(it[this.keyField]));
+                    //     }
+                    //
+                    //     // if (this.valueField) {
+                    //     //     ret = ret.map(it => it[this.valueField])
+                    //     // }
+                    // }
+
                     if (this.valueIsBoolean) {
                         ret = ret.map(it => jv.asBoolean(it))
-                    } else if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
-                        ret = v;
-                    } else {
-                        if (this.keyField == this.returnValueField) {
-                            ret = v;
-                        } else {
-                            ret = this.data2.filter(it => v.includes(it[this.keyField]));
-
-                            if (this.returnValueField) {
-                                ret = ret.map(it => jv.evalExpression(it, this.returnValueField));
-                            }
-                        }
-                        // if (this.valueField) {
-                        //     ret = ret.map(it => it[this.valueField])
-                        // }
+                    } else if (this.valueIsNumber) {
+                        ret = ret.map(it => jv.asInt(it))
                     }
-
-
                 }
                 this.$emit("input", ret);
                 this.$emit("change", ret);
@@ -341,6 +347,7 @@
                 }
                 this.changed();
             },
+            //可能是对象，也可能是值。在处理之前，先转成值。
             setValue(v) {
                 v = jv.isNull(v) ? this.value : v;
 
@@ -350,23 +357,40 @@
                         return;
                     }
 
-                    if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray || (this.returnValueField == this.keyField)) {
-                        if (this.valueIsBoolean) {
-                            this.value1 = jv.asString(v)
-                        } else {
-                            this.value1 = v;
+                    //如果 v 是对象，先转成值
+                    var type = v.Type;
+                    if( ["map","object"].includes(type)){
+                        if(!this.keyField){
+                            return ;
                         }
-                        return;
+
+                        v = v[this.keyField];
                     }
 
-                    var v2 = v[this.keyField];
+                    if (this.valueIsBoolean) {
+                        v = jv.asBoolean(v)
+                    } else if (this.valueIsNumber) {
+                        v = jv.asInt(v);
+                    }
+                    // if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray || (this.returnValueField == this.keyField)) {
+                    //
+                    // }
+                    //
+                    //
+                    // var v2 = v[this.keyField];
 
-                    this.value1 = this.valueIsBoolean ? jv.asString(v2) : v2;
+                    this.value1 = v;
                     return;
                 }
 
                 if (v === null) {
                     v = [];
+                }
+
+                var type = v.Type;
+                //如果 v 是对象，先转成值
+                if( ["array","set"].includes(type)){
+                    v = v.map(it=>it[this.keyField]);
                 }
 
                 if (jv.dataEquals(v, this.value2)) {
@@ -379,21 +403,31 @@
 
 
                 //解决 boolean类型问题
-                if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray || (this.returnValueField == this.keyField)) {
-                    if (this.valueIsBoolean) {
-                        this.value2 = v.map(it => jv.asBoolean(it));
-                    } else {
-                        this.value2 = v;
-                    }
-                    return;
+                // if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray || (this.returnValueField == this.keyField)) {
+                //     if (this.valueIsBoolean) {
+                //         this.value2 = v.map(it => jv.asBoolean(it));
+                //     } else {
+                //         this.value2 = v;
+                //     }
+                //     return;
+                // }
+                //
+                // this.value2 = v.map(it => {
+                //     var rv = it[this.keyField];
+                //     if (this.valueIsBoolean) {
+                //         return jv.asBoolean(rv);
+                //     }
+                //     return rv;
+                // });
+
+
+                if (this.valueIsBoolean) {
+                    v.map(it => jv.asBoolean(it))
+                } else if (this.valueIsNumber) {
+                    v.map(it => jv.asInt(it))
                 }
-                this.value2 = v.map(it => {
-                    var rv = it[this.keyField];
-                    if (this.valueIsBoolean) {
-                        return jv.asBoolean(rv);
-                    }
-                    return rv;
-                });
+
+                this.value2 = v;
             },
             setFields() {
                 var fields = (this.fields || "").split(",");
@@ -448,28 +482,48 @@
 
                 if (["object", "map"].includes(type)) {
                     this.dataIsObject = true;
-
-                    if (this.type == "radio" && ((!this.value && ("true" in data) && ("false" in data))
-                        || (this.value && this.value.Type == "boolean"))) {
+                    var keys = Object.keys(data);
+                    if (( "true" in data) && ("false" in data) && keys.length <4)
+                      {
                         this.valueIsBoolean = true;
+                    } else if (keys.every(it => it.IsNumberFormat())) {
+                        this.valueIsNumber = true;
                     }
 
+                    this.setFields();
                 } else if (["array", "set"].includes(type)) {
+                    this.setFields();
                     var v0 = data[0];
                     if (jv.isNull(v0) == false) {
                         this.dataIsValueArray = !v0.ObjectType;
                     }
+
+                    var keys = data.map(it => it[this.keyField].toString());
+                    if (keys.filter(it => {
+                        return (it === "true") || (it === "false");
+                    }).length == 2) {
+                        this.valueIsBoolean = true;
+                    } else if (keys.every(it => it.IsNumberFormat())) {
+                        this.valueIsNumber = true;
+                    }
                 }
 
-                this.setFields();
                 this.setValue();
 
                 var d2 = [];
                 if (this.dataIsObject) {
-                    for (var key of Object.keys(data)) {
+                    var keys = Object.keys(data)
+                    for (var key of keys) {
                         var value = data[key];
+
                         var item = {};
-                        item[this.keyField] = key;
+                        if (this.valueIsBoolean) {
+                            item[this.keyField] = jv.asBoolean(key);
+                        } else if (this.valueIsNumber) {
+                            item[this.keyField] = jv.asInt(key);
+                        } else {
+                            item[this.keyField] = key;
+                        }
                         item[this.labelField] = value;
                         d2.push(item);
                     }

@@ -19,7 +19,7 @@
             return new Date(year.replace(/-/g, '\/').trim());
         }
 
-        return new Date(new Date(now.getFullYear(), 0, 1).valueOf() + (dates - 1) * 86400000);
+        return new Date(new Date(year, 0, 1).valueOf() + (dates - 1) * 86400000);
     };
 
     /**

@@ -384,11 +384,11 @@
                         };
                         this.$http.post("/image/set", param).then(res => {
                             this.$emit("input", value);
-                            this.$emit("change", value, this.uid);
+                            this.$emit("change", value, this.uid, action);
                         });
                     } else {
                         this.$emit("input", value);
-                        this.$emit("change", value, this.uid);
+                        this.$emit("change", value, this.uid, action);
                     }
                 } else {
                     if (action == "add") {

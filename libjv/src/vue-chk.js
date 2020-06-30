@@ -106,10 +106,11 @@ import jv from "./libjv"
         },
         //*号必填
         "*": function (chk_body, value) {
-            if (!value.length) {
-                return false;
-            }
-            return true;
+            var ret = jv.hasValue(value);
+            if (ret === 0) return true;
+            if (ret === false) return true;
+
+            return !!ret;
         },
         //文本类型，返回 true,可空.
         "": function () {
@@ -377,7 +378,7 @@ import jv from "./libjv"
 
             var r2 = jv.chk_types[chk_type](chk_body, value);
 
-            if (r2 === false) {
+            if (!r2) {
                 ret.result = false;
                 if (chk_type == "*") {
                     ret.detail = "必填项!";
@@ -464,9 +465,11 @@ import jv from "./libjv"
 
         list = Array.from(container.$el.querySelectorAll("[chk]"));
 
-        var inSect = function(){
+        var inSect = function () {
             var vueDom = chk_dom.$Closest();
-            if( !vueDom){ return;}
+            if (!vueDom) {
+                return;
+            }
             return vueDom.$Closest("sect");
         }
 

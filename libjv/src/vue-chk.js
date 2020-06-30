@@ -239,11 +239,11 @@ import jv from "./libjv"
         if (jv.isNull(v)) {
             v = "";
         }
-        if (v.Type == "date") {
-            v = v.toDateString();
-        } else {
-            v = v.toString();
-        }
+        // if (v.Type == "date") {
+        //     v = v.toDateString();
+        // } else {
+        //     v = v.toString();
+        // }
         return v;
     };
     //查找dom下第一个绑定 v-model 的值.返回 { vnode : v-model 对象, value : v-model 的值, data }

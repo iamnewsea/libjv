@@ -297,7 +297,10 @@
                     }
 
 
-                    if (this.valueIsBoolean) {
+                    //保留空值不转换
+                    if (jv.isNull(ret) || (ret === "")) {
+                        ret = "";
+                    } else if (this.valueIsBoolean) {
                         ret = jv.asBoolean(ret)
                     } else if (this.valueIsNumber) {
                         ret = jv.asInt(ret);
@@ -352,16 +355,16 @@
                 v = jv.isNull(v) ? this.value : v;
 
                 if (this.type == "radio") {
-                    if (jv.isNull(v)) {
+                    if (jv.isNull(v) || (v === "")) {
                         this.value1 = "";
                         return;
                     }
 
                     //如果 v 是对象，先转成值
                     var type = v.Type;
-                    if( ["map","object"].includes(type)){
-                        if(!this.keyField){
-                            return ;
+                    if (["map", "object"].includes(type)) {
+                        if (!this.keyField) {
+                            return;
                         }
 
                         v = v[this.keyField];
@@ -389,8 +392,8 @@
 
                 var type = v.Type;
                 //如果 v 是对象，先转成值
-                if( ["array","set"].includes(type)){
-                    v = v.map(it=>it[this.keyField]);
+                if (["array", "set"].includes(type)) {
+                    v = v.map(it => it[this.keyField]);
                 }
 
                 if (jv.dataEquals(v, this.value2)) {
@@ -483,8 +486,7 @@
                 if (["object", "map"].includes(type)) {
                     this.dataIsObject = true;
                     var keys = Object.keys(data);
-                    if (( "true" in data) && ("false" in data) && keys.length <4)
-                      {
+                    if (("true" in data) && ("false" in data) && keys.length < 4) {
                         this.valueIsBoolean = true;
                     } else if (keys.every(it => it.IsNumberFormat())) {
                         this.valueIsNumber = true;

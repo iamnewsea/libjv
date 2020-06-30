@@ -380,7 +380,7 @@ import jv from "./libjv"
             if (r2 === false) {
                 ret.result = false;
                 if (chk_type == "*") {
-                    ret.detail = "必填项不能为空";
+                    ret.detail = "必填项!";
                 } else {
                     ret.detail = "需要 " + chk_type + " 类型";
                 }

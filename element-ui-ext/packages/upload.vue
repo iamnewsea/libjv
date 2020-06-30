@@ -247,8 +247,13 @@
                 //如果定义了 @upload , 则调用自己的函数 。
                 if (this.$listeners.upload) {
                     return new Promise((resolve, reject) => {
-                        this.$emit("upload", rawFile, this.myValue, it => {
-                            resolve(it);
+                        this.$emit("upload", rawFile, this.myValue, () => {
+                            if (item.percentage == 100) {
+                                this.emit(item, "add");
+                                resolve();
+                            } else {
+                                return reject();
+                            }
                         });
                     })
                 }

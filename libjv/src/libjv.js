@@ -236,7 +236,15 @@ jv.store = {
 };
 
 
-jv.cache_db = {};
+//缓存在内存的数据
+jv.cache = {};
+// jv.getCacheData = function(url){
+//     return
+// };
+//
+// jv.setCacheData = function(url,value){
+//
+// };
 
 // /**
 //  * jv.cache.get("/info/getCitys").then(res=> this.citys_data = res.data.data);
@@ -276,17 +284,17 @@ jv.cache_db = {};
  * @param json
  * @constructor
  */
-jv.JvEnum = function JvEnum(typeName, json) {
+jv.JvEnum = function JvEnum(typeName, json, keyCallback) {
     this.typeName = typeName;
-
+    keyCallback = keyCallback || (it => it);
     var index = 0;
     this.list = Object.keys(json).map(key => {
-        return {name: key, index: index++, remark: json[key]}
+        return {name: keyCallback(key), index: index++, remark: json[key]}
     });
 
     this.getData = (key) => {
         if (!jv.isNull(key)) {
-            return this.list.filter(it => it.name == key)[0] || {};
+            return this.list.filter(it => it.name == keyCallback(key))[0] || {};
         }
         return this.list;
     };
@@ -478,8 +486,8 @@ jv.recursionJson = (json, eachJsonItemCallback, deepth) => {
 定义枚举, 生成 jv.枚举 = {}
 使用 对象.Enumer(键,jv.枚举)  对对象的key进行枚举化。
  */
-jv.defEnum = (typeName, json) => {
-    jv.enum[typeName] = new jv.JvEnum(typeName, json);
+jv.defEnum = (typeName, json, keyCallback) => {
+    jv.enum[typeName] = new jv.JvEnum(typeName, json, keyCallback);
 };
 
 
@@ -509,7 +517,7 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
 
     if (ignoreBoolean && ignoreDate) return;
 
-    var res1 = (target, key1, args1) => {
+    var res1 = (target, key1, args1, must) => {
         if (!target) {
             return;
         }
@@ -525,6 +533,14 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
         // }
 
         var value = target[key1];
+
+        if (jv.isNull(value)) {
+            if (must) {
+                target[key1 + "_res"] = "";
+            }
+            return;
+        }
+
         var type = value.Type;
 
         if (!ignoreBoolean && (type == "boolean")) {
@@ -575,7 +591,7 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
     if (key) {
         jv.recursionJson(obj, (json) => {
             if (Object.keys(json).includes(key)) {
-                res1(json, key, args);
+                res1(json, key, args, true);
             }
         });
         return;

@@ -67,7 +67,15 @@
                 type: String, default() {
                     return "data"
                 }
-            },   //数据在返回json的路径
+            },
+            //如果是 url ，是否启用缓存，缓存对象 jv.cache
+            cache: {
+                type: Boolean, default() {
+                    return false
+                }
+            },
+
+            //数据在返回json的路径
             // data 如果是数组，对象深度只能是一级或零级： [{id,name } , ...]  ,["中学","小学",...]
             // 到 data2的时候，全部是一级对象。
             data: {
@@ -144,8 +152,19 @@
                     }
                     var method = (this.urlMethod || "post").toLowerCase();
 
+                    if (this.cache) {
+                        var data = jv.cache["[selector]" + this.url];
+                        if (data) {
+                            return this.setData(data);
+                        }
+                    }
+
                     this.$http[method](v).then(res => {
-                        this.setData(jv.evalExpression(res.data, this.urlDataPath));
+                        var data = jv.evalExpression(res.data, this.urlDataPath);
+                        if (this.cache) {
+                            jv.cache["[selector]" + this.url] = data;
+                        }
+                        this.setData(data);
                     });
                 }
             },
@@ -436,13 +455,16 @@
                 var fields = (this.fields || "").split(",");
                 var keyField = "";
                 var valueField = "";
+                var returnValueField = "";
                 if (this.dataIsEnum) {
                     keyField = fields[0] || "name";
                     valueField = fields[1] || "remark";
+                    returnValueField = keyField;
 
                 } else if (this.dataIsValueArray || this.dataIsObject) {
                     keyField = fields[0] || "value";
                     valueField = fields[1] || "label";
+                    returnValueField = keyField;
                 } else {
                     keyField = fields[0] || "id";
                     valueField = fields[1] || "name";
@@ -450,17 +472,21 @@
 
                 keyField = keyField.trim();
                 valueField = valueField.trim();
+                if (returnValueField) {
+                    returnValueField = returnValueField.trim();
+                }
 
                 if (keyField.startsWith("#")) {
                     keyField = keyField.slice(1);
-                    this.returnValueField = keyField;
+                    returnValueField = keyField;
                 }
 
                 if (valueField.startsWith("#")) {
                     valueField = valueField.slice(1);
-                    this.returnValueField = valueField;
+                    returnValueField = valueField;
                 }
 
+                this.returnValueField = returnValueField;
                 this.keyField = keyField;
                 this.labelField = valueField;
             },

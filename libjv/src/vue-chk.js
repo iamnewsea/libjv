@@ -172,31 +172,31 @@ import jv from "./libjv"
     //     return getVueFromUp(dom.parentElement);
     // };
     //
-    var getVueTooltipFromUp = function (vueDom, deep) {
-        if (!vueDom) return;
-        deep = deep || 0;
+    // var getVueTooltipFromUp = function (vueDom, deep) {
+    //     if (!vueDom) return;
+    //     deep = deep || 0;
+    //
+    //     if (deep > 9) return;
+    //
+    //     if (vueDom.$options._componentTag == "el-tooltip") {
+    //         return vueDom;
+    //     }
+    //     return getVueTooltipFromUp(vueDom.$options.parent);
+    // };
 
-        if (deep > 9) return;
-
-        if (vueDom.$options._componentTag == "el-tooltip") {
-            return vueDom;
-        }
-        return getVueTooltipFromUp(vueDom.$options.parent);
-    };
-
-    var getHtmlTooltipFromUp = function (html_dom, deep) {
-        if (!html_dom) return;
-        deep = deep || 0;
-
-        if (deep > 9) return;
-
-        if (html_dom.__vue__) {
-            if (html_dom.__vue__.$options._componentTag == "el-tooltip") {
-                return html_dom;
-            }
-        }
-        return getHtmlTooltipFromUp(html_dom.parentNode);
-    };
+    // var getHtmlTooltipFromUp = function (html_dom, deep) {
+    //     if (!html_dom) return;
+    //     deep = deep || 0;
+    //
+    //     if (deep > 9) return;
+    //
+    //     if (html_dom.__vue__) {
+    //         if (html_dom.__vue__.$options._componentTag == "el-tooltip") {
+    //             return html_dom;
+    //         }
+    //     }
+    //     return getHtmlTooltipFromUp(html_dom.parentNode);
+    // };
     // var getInputValue = function (dom) {
     //     if (!dom.tagName) {
     //         return null;
@@ -442,21 +442,20 @@ import jv from "./libjv"
             });
 
 
-            var tooltip = getVueTooltipFromUp(chk_dom);
-            if (tooltip) {
-                tooltip.$emit(chkEvent.type, chkEvent);
-            } else {
-                chk_dom.$emit(chkEvent.type, chkEvent);
-            }
+            chk_dom.$emit(chkEvent.type, chkEvent);
+            chk_dom.$el.trigger(chkEvent);
+
+            var sect = chk_dom.$Closest("sect");
+            sect.$emit(chkEvent.type, chkEvent);
 
 
             if (chk_result.result) {
-                chk_dom.$el.classList.remove("chk_error");
+                chk_dom.$el.classList.remove("chk-error");
                 continue;
             }
 
             ret &= false;
-            chk_dom.$el.classList.add("chk_error");
+            chk_dom.$el.classList.add("chk-error");
 
             if (singleShow) {
                 return ret;
@@ -465,8 +464,14 @@ import jv from "./libjv"
 
         list = Array.from(container.$el.querySelectorAll("[chk]"));
 
+        var inSect = function(){
+            var vueDom = chk_dom.$Closest();
+            if( !vueDom){ return;}
+            return vueDom.$Closest("sect");
+        }
+
         for (var chk_dom of list) {
-            if (chk_dom.parentNode.closest("[chk]")) continue;
+            if (inSect(chk_dom)) continue;
 
             var chk_result = chk_html_item(chk_dom);
 
@@ -477,22 +482,16 @@ import jv from "./libjv"
             });
 
 
-            var tooltip = getHtmlTooltipFromUp(chk_dom);
-            if (tooltip) {
-                tooltip.trigger(chkEvent);
-            } else {
-                //想要触发元素上的 chked 事件，必须用 addEventListener 绑定事件
-                chk_dom.trigger(chkEvent);
-            }
-
+            //想要触发元素上的 chked 事件，必须用 addEventListener 绑定事件
+            chk_dom.trigger(chkEvent);
 
             if (chk_result.result) {
-                chk_dom.classList.remove("chk_error");
+                chk_dom.classList.remove("chk-error");
                 continue;
             }
 
             ret &= false;
-            chk_dom.classList.add("chk_error");
+            chk_dom.classList.add("chk-error");
 
             if (singleShow) {
                 return ret;

@@ -7,8 +7,7 @@
       <div class="el-upload-preview" v-if="item.id && item.url" onmouseleave="this.classList.remove('deleting')">
         <div class="avatar-uploader-icon preview--img" :style="{backgroundImage: 'url(' + item.url + ')'}"
              v-if="item.fileType=='img'"/>
-        <video v-else-if="item.fileType=='video'" :src="item.url" class="avatar-uploader-icon"
-               controls="controls"></video>
+        <video v-else-if="item.fileType=='video'" :src="item.url" class="avatar-uploader-icon"></video>
         <div v-else class="avatar-uploader-icon upload-fill el-icon-document preview--sub"
              :class="'upload-icon-'+ item.fileType">
           {{item.showName}}

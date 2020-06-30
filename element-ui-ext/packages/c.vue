@@ -1,5 +1,5 @@
 <template>
-  <span>
+  <span v-bind="[attrs]">
     <slot></slot>
   </span>
 </template>

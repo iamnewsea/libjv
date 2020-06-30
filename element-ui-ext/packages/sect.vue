@@ -1,11 +1,11 @@
 <template>
-  <span v-bind="[attrs]">
+  <div v-bind="[attrs]">
     <slot></slot>
-  </span>
+  </div>
 </template>
 <script>
   export default {
-    name: "e",
+    name: "sect",
     data() {
       return {};
     }

@@ -102,9 +102,10 @@ jv.initVue = (setting) => {
         }
     });
 
+    /*向下找 tag*/
     Object.defineProperty(vueProtype, "$Find", {
         value(ele) {
-            if (this.$el == ele) {
+            if (this.$vnode.componentOptions.tag == ele) {
                 return this;
             }
             for (var i in this.$children) {
@@ -117,11 +118,11 @@ jv.initVue = (setting) => {
     });
 
     //向上找元素.
-    Object.defineProperty(vueProtype, "closest", {
+    Object.defineProperty(vueProtype, "$Closest", {
         value(ele) {
             let cur = this;
             while (cur) {
-                if (cur.$el == ele) {
+                if (cur.$vnode.componentOptions.tag == ele) {
                     return cur;
                 }
                 cur = cur.$parent;
@@ -129,6 +130,18 @@ jv.initVue = (setting) => {
         }, enumerable: false
     });
 
+    /*Html元素向上找Vue元素*/
+    Object.defineProperty(HTMLElement.prototype, "$Closest", {
+        value() {
+            let cur = this;
+            while (cur) {
+                if (cur.__vue__) {
+                    return cur;
+                }
+                cur = cur.parentNode;
+            }
+        }, enumerable: false
+    });
     //----------------------------------- axios
     //代理 post
 

@@ -579,9 +579,6 @@
     }
 </script>
 <style scoped>
-  .v .enum {
-    margin-left: 8px;
-  }
 
   >>> .ri4c .el-radio__input.is-checked .el-radio__inner:hover {
     border-radius: 0;

@@ -11,11 +11,9 @@
     </template>
 
 
-    <el-tooltip class="v" ref="tooltip" :effect="effect" :manual="true" :value="!!tooltip" :content="tooltip"
-                @chked="e=>tooltip = e.detail.result ? '': ( e.detail.msg || e.detail.detail)"
-                :placement="placement">
+    <sect class="v" @chked="chked" ref="v">
       <slot></slot>
-    </el-tooltip>
+    </sect>
   </div>
 </template>
 <script>
@@ -24,30 +22,29 @@
      * <kv :label> <input /> </kv>
      * <kv> <template slot="k"> 姓名 </template> <input /> </kv>
      */
+    import sect from "./sect"
+
     export default {
+        components: {sect},
         name: "kv",
         props: {
             label: {
                 type: String, default: () => ""
-            },
-            effect: {
-                type: String, default: () => "dark"
-            },
-            placement: {
-                type: String, default: () => "top-end"
             }
         },
         data() {
-            return {tooltip: ""};
+            return {
+                // tooltip: "", effect: jv.chk_effect || "dark", placement: jv.chk_placement || "top-end"
+            };
         },
         mounted() {
-            this.$nextTick(() => {
-                if (this.$refs.tooltip) {
-                    this.$refs.tooltip.$refs.popper.ondblclick = (e) => {
-                        this.tooltip = "";
-                    }
-                }
-            });
+            // this.$nextTick(() => {
+            //     if (this.$refs.tooltip) {
+            //         this.$refs.tooltip.$refs.popper.ondblclick = (e) => {
+            //             this.tooltip = "";
+            //         }
+            //     }
+            // });
         },
         computed: {
             slotk() {
@@ -76,6 +73,92 @@
             //     }
             //     return "";
             // }
+        },
+        methods: {
+            chked(e) {
+                var tooltip = e.detail.result ? '' : (e.detail.msg || e.detail.detail);
+                var v = this.$refs.v.$el;
+                this.$nextTick(() => {
+                    var msg_dom;
+                    for (var it of v.children) {
+                        if (it.classList.contains("chk-msg")) {
+                            msg_dom = it;
+                            break;
+                        }
+                    }
+
+                    if (!tooltip) {
+                        if (msg_dom) {
+                            v.removeChild(msg_dom);
+                        }
+
+                        return;
+                    }
+
+                    if (!msg_dom) {
+                        msg_dom = document.createElement("div");
+                        msg_dom.classList.add("chk-msg");
+                        v.append(msg_dom)
+                    }
+
+                    msg_dom.innerHTML = tooltip;
+                });
+
+            },
         }
     }
 </script>
+<style>
+
+  .kv {
+    display: flex;
+    padding: 10px;
+  }
+
+  .kv > * {
+    display: flex;
+    align-items: center; /*垂直居中*/
+  }
+
+  /**
+  tinymce显示错乱
+   */
+  /*.kv *{*/
+  /*  flex:1;*/
+  /*}*/
+
+  .kv > *:first-child {
+    justify-content: flex-end;
+    text-align: right;
+    flex: 3;
+  }
+
+  .kv > *:first-child:after {
+    content: "：";
+    display: inline-block;
+  }
+
+  .kv > *:last-child {
+    flex: 7;
+    justify-content: flex-start;
+  }
+
+
+  .important {
+    zoom: 1.2;
+  }
+
+  .important .v, .important .v * {
+    color: red;
+  }
+
+  .kv .v>*:first-child{
+    max-width:400px;
+  }
+
+  .chk-msg{
+    color: red;
+    padding:0 4px;
+  }
+
+</style>

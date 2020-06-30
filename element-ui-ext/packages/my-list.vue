@@ -49,13 +49,13 @@
         inheritAttrs: false,
         props: {
             store: {
-                type: Boolean, default:()=>true
+                type: Boolean, default: () => true
             }, //是否存储 页码，总页数,lastRowId
             pageSize: {
-                type: Number, default:()=>10
+                type: Number, default: () => 10
             },
             url: {
-                type: String, default:()=>""
+                type: String, default: () => ""
             },
             // query: {
             //     type: Object, default() {
@@ -64,7 +64,8 @@
             // },
             //列表数据
             value: {
-                type: Object, default:()=>{}
+                type: Object, default: () => {
+                }
             }
         },
         data() {
@@ -214,7 +215,10 @@
                 });
 
                 var para_ret;
-                this.$emit("param", para, v => para = v);
+                /**
+                 * 如果要阻止继续请求， param 事件需要调用第2个回调参数 ： @param="(param,callback)=> callback(false)"
+                 */
+                this.$emit("param", para, v => para_ret = v);
                 if (para_ret === false) {
                     return;
                 }

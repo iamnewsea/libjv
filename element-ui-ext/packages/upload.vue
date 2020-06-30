@@ -247,14 +247,22 @@
                 //如果定义了 @upload , 则调用自己的函数 。
                 if (this.$listeners.upload) {
                     return new Promise((resolve, reject) => {
-                        this.$emit("upload", rawFile, this.myValue, () => {
-                            if (item.percentage == 100) {
-                                this.emit(item, "add");
-                                resolve();
-                            } else {
-                                return reject();
-                            }
+                        /**
+                         * 如果要阻止继续处理,upload事件需要处理第3个回调参数： @upload="(rawFile,myValue,callback)=>callback(false)"
+                         * 也可以  @upload="(rawFile,myValue)=>myValue[0].percentage=0"
+                         */
+                        var callback_ret;
+                        this.$emit("upload", rawFile, this.myValue, ret => {
+                            callback_ret = ret;
                         });
+
+
+                        if ((item.percentage != 100) || (callback_ret === false)) {
+                            return reject();
+                        } else {
+                            this.emit(item, "add");
+                            resolve();
+                        }
                     })
                 }
 

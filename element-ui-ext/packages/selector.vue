@@ -291,23 +291,23 @@
                     this.setData();
                 }
             },
-            changed(v) {
-                var ret;
+            changed(set_v) {
+                var v = set_v;
                 if (this.type == "radio") {
                     if (jv.isNull(v)) {
                         v = this.value1;
                     }
 
                     if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
-                        ret = v;
+
                     } else {
                         if (this.keyField == this.returnValueField) {
-                            ret = v;
+
                         } else {
-                            ret = this.data2.find(it => it[this.keyField] == v)
+                            v = this.data2.find(it => it[this.keyField] == v)
 
                             if (this.returnValueField) {
-                                ret = jv.evalExpression(ret, this.returnValueField);
+                                v = jv.evalExpression(v, this.returnValueField);
                             }
                         }
                         // if (this.valueField) {
@@ -317,12 +317,12 @@
 
 
                     //保留空值不转换
-                    if (jv.isNull(ret) || (ret === "")) {
-                        ret = "";
+                    if (jv.isNull(v) || (v === "")) {
+                        v = "";
                     } else if (this.valueIsBoolean) {
-                        ret = jv.asBoolean(ret)
+                        v = jv.asBoolean(v)
                     } else if (this.valueIsNumber) {
-                        ret = jv.asInt(ret);
+                        v = jv.asInt(v);
                     }
 
                 } else {
@@ -348,14 +348,15 @@
                     //     // }
                     // }
 
+                    v = v.filter(it => !jv.isNull(v));
                     if (this.valueIsBoolean) {
-                        ret = ret.map(it => jv.asBoolean(it))
+                        v = v.map(it => jv.asBoolean(it))
                     } else if (this.valueIsNumber) {
-                        ret = ret.map(it => jv.asInt(it))
+                        v = v.map(it => jv.asInt(it))
                     }
                 }
-                this.$emit("input", ret);
-                this.$emit("change", ret);
+                this.$emit("input", v);
+                this.$emit("change", v);
                 return;
             },
             dblclick() {
@@ -371,10 +372,16 @@
             },
             //可能是对象，也可能是值。在处理之前，先转成值。
             setValue(v) {
-                v = jv.isNull(v) ? this.value : v;
-
                 if (this.type == "radio") {
-                    if (jv.isNull(v) || (v === "")) {
+                    if (jv.isNull(v)) {
+                        v = this.value1;
+
+                        if (jv.isNull(v)) {
+                            v = "";
+                        }
+                    }
+
+                    if (v === "") {
                         this.value1 = "";
                         return;
                     }
@@ -405,19 +412,35 @@
                     return;
                 }
 
-                if (v === null) {
-                    v = [];
+                if (jv.isNull(v)) {
+                    v = this.value2;
+
+                    if (jv.isNull(v)) {
+                        v = [];
+                    }
                 }
 
-                var type = v.Type;
+                v = v.filter(it => !jv.isNull(it));
+
+                if (!v.length) {
+                    this.value2 = [];
+                    return;
+                }
+
                 //如果 v 是对象，先转成值
-                if (["array", "set"].includes(type)) {
+                if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
+                } else {
                     v = v.map(it => it[this.keyField]);
                 }
 
-                if (jv.dataEquals(v, this.value2)) {
-                    return;
-                }
+                // var type = v.Type;
+                // if (["array", "set"].includes(type)) {
+                //
+                // }
+
+                // if (jv.dataEquals(v, this.value2)) {
+                //     return;
+                // }
                 // if (jv.isNull(v)) {
                 //     this.value2 = [];
                 //     return;

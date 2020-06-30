@@ -1,15 +1,13 @@
 <template>
   <div class="kv">
-    <template v-if="label">
-        <span class="k">
-          {{label}}
-        </span>
-    </template>
-
-    <template v-else-if="slotk">
-      <slot name="k"></slot>
-    </template>
-
+    <div class="k">
+      <template v-if="label">
+        {{label}}
+      </template>
+      <template v-else>
+        <slot name="k"></slot>
+      </template>
+    </div>
 
     <sect class="v" @chked="chked" ref="v">
       <slot></slot>
@@ -115,10 +113,10 @@
     padding: 10px;
   }
 
-  .kv > * {
-    display: flex;
-    align-items: center; /*垂直居中*/
-  }
+  /*.kv > * {*/
+  /*  display: flex;*/
+  /*  align-items: center; !*垂直居中*!*/
+  /*}*/
 
   /**
   tinymce显示错乱
@@ -127,38 +125,41 @@
   /*  flex:1;*/
   /*}*/
 
-  .kv > *:first-child {
+  .kv > .k {
     justify-content: flex-end;
     text-align: right;
     flex: 3;
   }
 
-  .kv > *:first-child:after {
+  .kv > .k:first-child:after {
     content: "：";
     display: inline-block;
   }
 
-  .kv > *:last-child {
+  .kv > .v {
     flex: 7;
     justify-content: flex-start;
   }
 
 
-  .important {
-    zoom: 1.2;
+  .v > *:first-child {
+    max-width: 600px;
   }
 
-  .important .v, .important .v * {
+  .chk-msg {
     color: red;
+    padding: 0 5px;
   }
 
-  .kv .v>*:first-child{
-    max-width:400px;
+  .link {
+    color: #007aff;
+    text-decoration: underline;
+    cursor: pointer;
   }
 
-  .chk-msg{
-    color: red;
-    padding:0 4px;
+  html input.chk-error, html .chk-error input {
+    background-color: #f4dfeb4d;
+    border: dashed 1px deeppink;
   }
 
 </style>

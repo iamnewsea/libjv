@@ -199,7 +199,7 @@ jv.initVue = (setting) => {
 
 // Add a request interceptor
     axios.interceptors.request.use(function (config) {
-        if (config.url.startsWith("http://") || config.url.startsWith("https://")) {
+        if (config.url.startsWith("http://") || config.url.startsWith("https://") || config.url.startsWith("//")) {
             config.baseURL = "";
         }
 

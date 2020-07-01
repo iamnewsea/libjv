@@ -310,9 +310,6 @@
                                 v = jv.evalExpression(v, this.returnValueField);
                             }
                         }
-                        // if (this.valueField) {
-                        //     ret = ret[this.valueField]
-                        // }
                     }
 
 
@@ -329,24 +326,6 @@
                     if (jv.isNull(v)) {
                         v = this.value2;
                     }
-
-
-                    // if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray || (this.keyField == this.returnValueField)) {
-                    //     ret = v;
-                    // } else {
-                    //
-                    //
-                    //     if (this.returnValueField) {
-                    //         ret = ret.map(it => jv.evalExpression(it, this.returnValueField));
-                    //     }
-                    //     else{
-                    //         ret = this.data2.filter(it => v.includes(it[this.keyField]));
-                    //     }
-                    //
-                    //     // if (this.valueField) {
-                    //     //     ret = ret.map(it => it[this.valueField])
-                    //     // }
-                    // }
 
                     v = v.filter(it => !jv.isNull(v));
                     if (this.valueIsBoolean) {
@@ -370,109 +349,15 @@
                 }
                 this.changed();
             },
+
             //可能是对象，也可能是值。在处理之前，先转成值。
             setValue(v) {
                 if (this.type == "radio") {
-                    if (jv.isNull(v)) {
-                        v = this.value1;
-
-                        if (jv.isNull(v)) {
-                            v = "";
-                        }
-                    }
-
-                    if (v === "") {
-                        this.value1 = "";
-                        return;
-                    }
-
-                    //如果 v 是对象，先转成值
-                    var type = v.Type;
-                    if (["map", "object"].includes(type)) {
-                        if (!this.keyField) {
-                            return;
-                        }
-
-                        v = v[this.keyField];
-                    }
-
-                    if (this.valueIsBoolean) {
-                        v = jv.asBoolean(v)
-                    } else if (this.valueIsNumber) {
-                        v = jv.asInt(v);
-                    }
-                    // if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray || (this.returnValueField == this.keyField)) {
-                    //
-                    // }
-                    //
-                    //
-                    // var v2 = v[this.keyField];
-
-                    this.value1 = v;
+                    this.setValue_1(v);
                     return;
                 }
 
-                if (jv.isNull(v)) {
-                    v = this.value2;
-
-                    if (jv.isNull(v)) {
-                        v = [];
-                    }
-                }
-
-                v = v.filter(it => !jv.isNull(it));
-
-                if (!v.length) {
-                    this.value2 = [];
-                    return;
-                }
-
-                //如果 v 是对象，先转成值
-                if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
-                } else {
-                    v = v.map(it => it[this.keyField]);
-                }
-
-                // var type = v.Type;
-                // if (["array", "set"].includes(type)) {
-                //
-                // }
-
-                // if (jv.dataEquals(v, this.value2)) {
-                //     return;
-                // }
-                // if (jv.isNull(v)) {
-                //     this.value2 = [];
-                //     return;
-                // }
-
-
-                //解决 boolean类型问题
-                // if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray || (this.returnValueField == this.keyField)) {
-                //     if (this.valueIsBoolean) {
-                //         this.value2 = v.map(it => jv.asBoolean(it));
-                //     } else {
-                //         this.value2 = v;
-                //     }
-                //     return;
-                // }
-                //
-                // this.value2 = v.map(it => {
-                //     var rv = it[this.keyField];
-                //     if (this.valueIsBoolean) {
-                //         return jv.asBoolean(rv);
-                //     }
-                //     return rv;
-                // });
-
-
-                if (this.valueIsBoolean) {
-                    v.map(it => jv.asBoolean(it))
-                } else if (this.valueIsNumber) {
-                    v.map(it => jv.asInt(it))
-                }
-
-                this.value2 = v;
+                this.setValue_2(v);
             },
             setFields() {
                 var fields = (this.fields || "").split(",");
@@ -597,7 +482,113 @@
                     this.value1 = d2[0][this.keyField];
                     this.changed();
                 }
-            }
+            },
+
+
+            //设置单选值
+            setValue_1(v){
+                if (jv.isNull(v)) {
+                    v = this.value1;
+
+                    if (jv.isNull(v)) {
+                        v = "";
+                    }
+                }
+
+                if (v === "") {
+                    this.value1 = "";
+                    return;
+                }
+
+                //如果 v 是对象，先转成值
+                var type = v.Type;
+                if (["map", "object"].includes(type)) {
+                    if (!this.keyField) {
+                        return;
+                    }
+
+                    v = v[this.keyField];
+                }
+
+                if (this.valueIsBoolean) {
+                    v = jv.asBoolean(v)
+                } else if (this.valueIsNumber) {
+                    v = jv.asInt(v);
+                }
+                // if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray || (this.returnValueField == this.keyField)) {
+                //
+                // }
+                //
+                //
+                // var v2 = v[this.keyField];
+
+                this.value1 = v;
+            },
+
+            //设置多选值
+            setValue_2(v){
+                if (jv.isNull(v)) {
+                    v = this.value2;
+
+                    if (jv.isNull(v)) {
+                        v = [];
+                    }
+                }
+
+                v = v.filter(it => !jv.isNull(it));
+
+                if (!v.length) {
+                    this.value2 = [];
+                    return;
+                }
+
+                //如果 v 是对象，先转成值
+                if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
+                } else {
+                    v = v.map(it => it[this.keyField]);
+                }
+
+                // var type = v.Type;
+                // if (["array", "set"].includes(type)) {
+                //
+                // }
+
+                // if (jv.dataEquals(v, this.value2)) {
+                //     return;
+                // }
+                // if (jv.isNull(v)) {
+                //     this.value2 = [];
+                //     return;
+                // }
+
+
+                //解决 boolean类型问题
+                // if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray || (this.returnValueField == this.keyField)) {
+                //     if (this.valueIsBoolean) {
+                //         this.value2 = v.map(it => jv.asBoolean(it));
+                //     } else {
+                //         this.value2 = v;
+                //     }
+                //     return;
+                // }
+                //
+                // this.value2 = v.map(it => {
+                //     var rv = it[this.keyField];
+                //     if (this.valueIsBoolean) {
+                //         return jv.asBoolean(rv);
+                //     }
+                //     return rv;
+                // });
+
+
+                if (this.valueIsBoolean) {
+                    v.map(it => jv.asBoolean(it))
+                } else if (this.valueIsNumber) {
+                    v.map(it => jv.asInt(it))
+                }
+
+                this.value2 = v;
+            },
         }
     }
 </script>

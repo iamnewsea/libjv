@@ -36,13 +36,13 @@
             };
         },
         mounted() {
-            // this.$nextTick(() => {
-            //     if (this.$refs.tooltip) {
-            //         this.$refs.tooltip.$refs.popper.ondblclick = (e) => {
-            //             this.tooltip = "";
-            //         }
-            //     }
-            // });
+            this.$nextTick(() => {
+                var el = this.$el;
+                var chk_dom = el.querySelector("[chk]");
+                if (chk_dom && chk_dom.getAttribute("chk")) {
+                    el.classList.add("must");
+                }
+            });
         },
         computed: {
             slotk() {
@@ -111,6 +111,11 @@
   .kv {
     display: flex;
     padding: 10px;
+  }
+
+  .must .k:before {
+    content: "*";
+    color: red;
   }
 
   /*.kv > * {*/

@@ -486,7 +486,7 @@
 
 
             //设置单选值
-            setValue_1(v){
+            setValue_1(v) {
                 if (jv.isNull(v)) {
                     v = this.value1;
 
@@ -526,13 +526,17 @@
             },
 
             //设置多选值
-            setValue_2(v){
+            setValue_2(v) {
                 if (jv.isNull(v)) {
                     v = this.value2;
 
                     if (jv.isNull(v)) {
                         v = [];
                     }
+                }
+
+                if (["array", "set"].includes(v.Type) == false) {
+                    v = [];
                 }
 
                 v = v.filter(it => !jv.isNull(it));

@@ -381,7 +381,7 @@ jv.resize = (callback, time) => {
  * isNaN 函数，参数是字符串会返回 true,不准。
  * @type {JvObject.hasValue}
  */
-jv.isNaN = (value)=>{
+jv.isNaN = (value) => {
     if (jv.isNull(value)) return false;
     return value.Type == "number" && isNaN(value);
 }
@@ -395,14 +395,15 @@ jv.isNaN = (value)=>{
  */
 jv.hasValue = (value) => {
     if (jv.isNull(value)) return false;
-    if (value.Type == "number" && isNaN(value)) return false;
+    var type = value.Type;
+    if (type == "number" && isNaN(value)) return false;
     if (value === Infinity) return false;
     if (value === -Infinity) return false;
 
-    if (["array", "set", "object", "map"].includes(value.Type)) {
+    if (["array", "set", "object", "map"].includes(type)) {
         return !!Object.keys(value).length;
     }
-    return  value;
+    return value;
 };
 
 jv.isEmpty = (value) => !jv.hasValue(value);
@@ -415,7 +416,8 @@ jv.isNull = (value) => {
 
 jv.asBoolean = (value) => {
     if (jv.isNull(value)) return null;
-    if (isNaN(NaN)) return false;
+    var type = value.Type;
+    if (type == "number" && isNaN(value)) return false;
     if (value === Infinity) return false;
     if (value === -Infinity) return false;
 
@@ -434,7 +436,7 @@ jv.asBoolean = (value) => {
         value === 1) return true;
 
     return value;
-}
+};
 
 jv.asString = (value, format) => {
     if (jv.isNull(value)) return "";

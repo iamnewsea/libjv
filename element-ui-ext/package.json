@@ -1,6 +1,6 @@
 {
   "name": "element-ui-ext",
-  "version": "0.10.9",
+  "version": "0.10.10",
   "description": "基于element-ui的vue扩展",
   "author": "于新海 <13466396863@163.com>",
   "scripts": {
@@ -21,7 +21,7 @@
     "core-js": "^3.6.0",
     "element-ui": "^2.13.0",
     "file-loader": "^1.1.11",
-    "libjv": "latest",
+    "libjv": "^0.10.7",
     "node-sass": "^4.13.1",
     "sass-loader": "^7.3.1",
     "vue": "^2.6.10",

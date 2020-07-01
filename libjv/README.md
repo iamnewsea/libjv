@@ -241,3 +241,44 @@ mobile{value[0]}[1]  //手机号格式,第一位必须是1
 * file-upload
 * jv-vue
 * index
+
+
+非自有项目中 main.js 配置
+```js
+import Vue from 'vue';
+import axios from 'axios'
+
+window.Server_Host = "http://apis.lwljuyang.cn/api-activity";
+
+axios.interceptors.response.use((response) => {
+    //第一个拦截器
+    // 转消息机制，底层提醒
+    var body = response.data.data;
+    if( body && body.resp_msg){
+        body.msg = body.resp_msg;
+    }
+    return response;
+});
+
+
+import jv from "libjv";
+import ElementUIExt from 'element-ui-ext'
+Vue.use(ElementUIExt);
+
+jv.initVue({vue: Vue, axios: axios, router: router});
+jv.ajax.interceptors.request.use(
+    config => {
+        if (config.url.startsWith("/") && localStorage.getItem('Authorization')) {
+            config.headers.Authorization = localStorage.getItem('Authorization');
+        }
+        return config
+    },
+    error => {
+        // 发送失败
+        // console.log(error)
+        Promise.reject(error)
+    }
+);
+
+jv.defEnum("RaceStageEnum",{1:'初赛',2:'复赛',3:'决赛'},it=>jv.asInt(it));
+```

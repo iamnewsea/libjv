@@ -363,7 +363,10 @@ jv.initVue = (setting) => {
 
     jv.Vue.mixin({
         updated() {
-            var tagName = this.$vnode.componentOptions.tag;
+            var tagName = this.$vnode && this.$vnode.vnode.componentOptions.tag;
+            if (!tagName) {
+                return;
+            }
             //有的时候不灵，很奇怪。
             if (tagName == "el-button") {
                 if (!this.size) {

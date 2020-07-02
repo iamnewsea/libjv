@@ -328,6 +328,35 @@ jv.JvEnum = function JvEnum(typeName, json, keyCallback) {
     };
 }
 
+
+/**
+ * 在枚举的基础上，定义一个多重状态设置
+ */
+jv.enumAllSet = function (enumType, enumValue, callback) {
+    if (!(enumType in jv.enum)) {
+        throw new Error("找不到枚举： jv.enum." + enumType)
+        return;
+    }
+    var key = "_" + enumType + "_";
+    var set;
+    jv.cache[key]
+    if (!set) {
+        set = new Set();
+        jv.cache[key] = set;
+    }
+
+    var enum_items = jv.enum[enumType].getData().map(it => it.name);
+
+    if (enum_items.includes(enumValue)) {
+        set.push(enumValue);
+    }
+
+    if (set.length == enum_items.length) {
+        callback();
+    }
+}
+
+
 /**
  * meta标签
  * @param where

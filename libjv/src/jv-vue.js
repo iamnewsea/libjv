@@ -70,6 +70,7 @@ jv.initVue = (setting) => {
         }
     };
 
+
     Object.defineProperty(vueProtype, "chk", {
         value(singleShow) {
             return jv.chk_vue_dom(this, singleShow);
@@ -358,6 +359,31 @@ jv.initVue = (setting) => {
             style.innerHTML = cssContent;
         }
     };
+
+
+    jv.Vue.mixin({
+        updated() {
+            var tagName = this.$vnode.componentOptions.tag;
+            //有的时候不灵，很奇怪。
+            if (tagName == "el-button") {
+                if (!this.size) {
+                    this.size = "mini";
+                }
+
+            } else if (tagName == "el-table") {
+                // if (this.$vnode.componentOptions.tag == "my-list") {
+                //     return;
+                // }
+
+                if (jv.isNull(this.border)) {
+                    this.border = true;
+                }
+                if (jv.isNull(this.stripe)) {
+                    this.stripe = true;
+                }
+            }
+        }
+    });
 
     // router.afterEach((to, from, next) => {
     //   jv.loadAllJson(to.fullPath);

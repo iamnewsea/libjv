@@ -333,6 +333,10 @@ jv.JvEnum = function JvEnum(typeName, json, keyCallback) {
  * 在枚举的基础上，定义一个多重状态设置
  */
 jv.enumAllSet = function (enumType, enumValue) {
+    if(!enumValue){
+        return;
+    }
+
     if (!(enumType in jv.enum)) {
         throw new Error("找不到枚举： jv.enum." + enumType)
         return;

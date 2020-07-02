@@ -369,8 +369,17 @@ jv.initVue = (setting) => {
     jv.vue_spa_render_event = "render-event";
     jv.vue_spa_enum = "SpaAjaxEnum";
 
-    jv.Vue.prototype.$done = function (value) {
-        if (!jv.enumAllSet(jv.vue_spa_enum, value)) return;
+    jv.Vue.prototype.$done = function (spa_enum,value) {
+        if(!value){
+            value = spa_enum;
+            spa_enum = jv.vue_spa_enum;
+        }
+
+        if(!value){
+            return;
+        }
+
+        if (!jv.enumAllSet(spa_enum, value)) return;
 
         this.$nextTick(() => {
             setTimeout(() => {

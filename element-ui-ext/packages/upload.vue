@@ -241,28 +241,34 @@
 
                 var fileName = rawFile.name, fileType = jv.getFileType(fileName);
 
-                var item = {percentage: 0, name: fileName, fileType: fileType.type, ext: fileType.ext};
+                var item = {percentage: 1, name: fileName, fileType: fileType.type, ext: fileType.ext};
                 this.myValue.push(item);
 
                 //如果定义了 @upload , 则调用自己的函数 。
                 if (this.$listeners.upload) {
                     return new Promise((resolve, reject) => {
                         /**
-                         * 如果要阻止继续处理,upload事件需要处理第3个回调参数： @upload="(rawFile,myValue,callback)=>callback(false)"
-                         * 也可以  @upload="(rawFile,myValue)=>myValue[0].percentage=0"
+                         * 如果要阻止继续处理,upload事件需要处理第3个回调参数： @upload="(rawFile,item)"
+                         * 通过设置 item.percentage = 0  取消上传。
+                         * 通过设置 item.percentage = 100  完成上传。
                          */
-                        var callback_ret;
-                        this.$emit("upload", rawFile, this.myValue, ret => {
-                            callback_ret = ret;
+                        item.percentage = 2;
+
+                        this.$emit("upload", rawFile, item);
+
+                        //循环兼听
+                        jv.await(500, -1, () => {
+                            if (item.percentage === 0) {
+                                this.myValue.removeItem(item);
+                                reject();
+                                return false;
+                            }
+                            if (item.percentage === 100) {
+                                this.emit(item, "add");
+                                resolve();
+                                return false;
+                            }
                         });
-
-
-                        if ((item.percentage != 100) || (callback_ret === false)) {
-                            return reject();
-                        } else {
-                            this.emit(item, "add");
-                            resolve();
-                        }
                     })
                 }
 

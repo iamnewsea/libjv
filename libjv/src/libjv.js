@@ -333,7 +333,7 @@ jv.JvEnum = function JvEnum(typeName, json, keyCallback) {
  * 在枚举的基础上，定义一个多重状态设置
  */
 jv.enumAllSet = function (enumType, enumValue) {
-    if(!enumValue){
+    if (!enumValue) {
         return;
     }
 
@@ -826,7 +826,7 @@ jv.random = (length, depth) => {
  *
  * @param delayTime  循环暂停时间
  * @param action     每次循环的回调。返回 false 停止循环。
- * @param times      最多循环次数， 默认为 100
+ * @param times      最多循环次数， 负数为一直循环
  * @returns {*}
  */
 jv.await = (delayTime, times, action) => {
@@ -835,12 +835,14 @@ jv.await = (delayTime, times, action) => {
         return;
     }
 
-    if (action() !== false) {
-        return setTimeout(() => {
-            jv.await(delayTime, times - 1, action);
-        }, delayTime);
+    if (action() === false) {
+        return;
     }
-}
+
+    return setTimeout(() => {
+        jv.await(delayTime, times - 1, action);
+    }, delayTime);
+};
 
 
 /**Java方式的序列化。

@@ -361,9 +361,28 @@ jv.initVue = (setting) => {
     };
 
 
+    /** PrerenderSPAPlugin 插件，需要手动触发完成事件
+     *  但是，在实际项目中，会有多次Ajax调用，在所有Ajax调用完成后再触发事件进行渲染。
+     *  定义一个 SpaAjaxEnum 枚举，每次回发完成后进行设置，
+     *  this.$done("SpaAjaxEnum枚举值")
+     */
+    jv.vue_spa_render_event = "render-event";
+    jv.vue_spa_enum = "SpaAjaxEnum";
+
+    jv.Vue.prototype.$done = function (value) {
+        if (!jv.enumAllSet(jv.vue_spa_enum, value)) return;
+
+        this.$nextTick(() => {
+            setTimeout(() => {
+                document.dispatchEvent(new Event(jv.vue_spa_render_event));
+            })
+        }, 200);
+    };
+
+
     jv.Vue.mixin({
         updated() {
-            var tagName = this.$vnode && this.$vnode.vnode.componentOptions.tag;
+            var tagName = this.$vnode && this.$vnode.componentOptions.tag;
             if (!tagName) {
                 return;
             }

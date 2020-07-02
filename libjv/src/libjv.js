@@ -332,14 +332,13 @@ jv.JvEnum = function JvEnum(typeName, json, keyCallback) {
 /**
  * 在枚举的基础上，定义一个多重状态设置
  */
-jv.enumAllSet = function (enumType, enumValue, callback) {
+jv.enumAllSet = function (enumType, enumValue) {
     if (!(enumType in jv.enum)) {
         throw new Error("找不到枚举： jv.enum." + enumType)
         return;
     }
     var key = "_" + enumType + "_";
-    var set;
-    jv.cache[key]
+    var set = jv.cache[key];
     if (!set) {
         set = new Set();
         jv.cache[key] = set;
@@ -351,10 +350,8 @@ jv.enumAllSet = function (enumType, enumValue, callback) {
         set.push(enumValue);
     }
 
-    if (set.length == enum_items.length) {
-        callback();
-    }
-}
+    return set.length == enum_items.length;
+};
 
 
 /**

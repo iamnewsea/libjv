@@ -24,4 +24,10 @@
         }, enumerable: false
     });
 
+    Object.defineProperty(Set.prototype, "length", {
+        get() {
+            return this.size;
+        }, enumerable: false
+    });
+
 })();

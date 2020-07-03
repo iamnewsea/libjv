@@ -5,7 +5,7 @@
     </template>
 
     <template v-if="readOnly">
-      <el-tag v-for="item in value_displays" :key="item" :type="tagType">{{item}}</el-tag>
+      <label v-for="item in value_displays" :key="item">{{item}}</label>
     </template>
 
     <template v-else>
@@ -89,11 +89,6 @@
                 }
             },
             enum: {
-                type: String, default() {
-                    return ""
-                }
-            },
-            tagType: {
                 type: String, default() {
                     return ""
                 }

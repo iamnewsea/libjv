@@ -389,32 +389,34 @@ jv.initVue = (setting) => {
     };
 
 
-    jv.Vue.mixin({
-        updated() {
-            var tagName = this.$vnode && this.$vnode.componentOptions.tag;
-            if (!tagName) {
-                return;
-            }
-            //有的时候不灵，很奇怪。
-            if (tagName == "el-button") {
-                if (!this.size) {
-                    this.size = "mini";
-                }
-
-            } else if (tagName == "el-table") {
-                // if (this.$vnode.componentOptions.tag == "my-list") {
-                //     return;
-                // }
-
-                if (jv.isNull(this.border)) {
-                    this.border = true;
-                }
-                if (jv.isNull(this.stripe)) {
-                    this.stripe = true;
-                }
-            }
-        }
-    });
+    // jv.Vue.mixin({
+    //     updated() {
+    //         var tagName = this.$vnode && this.$vnode.componentOptions.tag;
+    //         if (!tagName) {
+    //             return;
+    //         }
+    //         // var p = this.$vnode.componentOptions;
+    //         var p = this;
+    //         //有的时候不灵，很奇怪。
+    //         if (tagName == "el-button") {
+    //             if (!p.size) {
+    //                 p.size = "mini";
+    //             }
+    //
+    //         } else if (tagName == "el-table") {
+    //             // if (this.$vnode.componentOptions.tag == "my-list") {
+    //             //     return;
+    //             // }
+    //
+    //             if (jv.isNull(p.border)) {
+    //                 p.border = true;
+    //             }
+    //             if (jv.isNull(p.stripe)) {
+    //                 p.stripe = true;
+    //             }
+    //         }
+    //     }
+    // });
 
     // router.afterEach((to, from, next) => {
     //   jv.loadAllJson(to.fullPath);

@@ -131,8 +131,9 @@
         methods: {
             setItem(fileItemData) {
                 delete fileItemData.percentage;
-                fileItemData.fileType = jv.getFileType(fileItemData.url).type;
-                fileItemData.showName = (fileItemData.name || fileItemData.url.split("/").last()).slice(-7);
+                var name = fileItemData.name || (fileItemData.url && fileItemData.url.split("/").last());
+                fileItemData.fileType = jv.getFileType(name).type;
+                fileItemData.showName = name.slice(-12);
             },
             setMyValue(v) {
                 if (this.maxCount == 1) {

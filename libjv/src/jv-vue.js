@@ -200,7 +200,7 @@ jv.initVue = (setting) => {
 
 // Add a request interceptor
     axios.interceptors.request.use(function (config) {
-        if (config.url.startsWith("http://") || config.url.startsWith("https://") || config.url.startsWith("//")) {
+        if (config.url && (config.url.startsWith("http://") || config.url.startsWith("https://") || config.url.startsWith("//"))) {
             config.baseURL = "";
         }
 
@@ -369,13 +369,13 @@ jv.initVue = (setting) => {
     jv.vue_spa_render_event = "render-event";
     jv.vue_spa_enum = "SpaAjaxEnum";
 
-    jv.Vue.prototype.$done = function (spa_enum,value) {
-        if(!value){
+    jv.Vue.prototype.$done = function (spa_enum, value) {
+        if (!value) {
             value = spa_enum;
             spa_enum = jv.vue_spa_enum;
         }
 
-        if(!value){
+        if (!value) {
             return;
         }
 

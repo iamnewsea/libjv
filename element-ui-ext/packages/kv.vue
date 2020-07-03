@@ -134,6 +134,7 @@
     justify-content: flex-end;
     text-align: right;
     flex: 3;
+    white-space: nowrap;
   }
 
   .kv > .k:first-child:after {

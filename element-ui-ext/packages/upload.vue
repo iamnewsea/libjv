@@ -12,25 +12,27 @@
              :class="'upload-icon-'+ item.fileType">
           {{item.showName}}
         </div>
-        <div class="el-upload-bg preview--sub">
-        </div>
-        <div class="el-upload-icon confirm-icon preview--sub" v-if="!readOnly">
-          <el-tag type="danger" @click="onRemove(index,$event)" style="padding-left:12px;padding-right:12px;">确认删除?
-          </el-tag>
-        </div>
-        <div class="el-upload-icon hover-icon preview--sub" style="flex-direction: column;">
-          <div>
-            <i class="el-icon-view" @click="file_preview(index)"
-               v-if="item.fileType == 'img' || item.fileType == 'video'"></i>
-            <i class="el-icon-download" @click="file_download(index)" v-else></i>
-            <i class="el-icon-delete" v-if="!readOnly"
-               @click="$event.target.closest('.el-upload-preview').classList.add('deleting')"></i>
+        <slot name="hover">
+          <div class="el-upload-bg preview--sub">
           </div>
-          <div v-if="maxCount>1 && !readOnly">
-            <i class="el-icon-arrow-left" @click="move_left(index)" v-if="index>0"></i>
-            <i class="el-icon-arrow-right" @click="move_right(index)" v-if="index < myValue.length -1"></i>
+          <div class="el-upload-icon confirm-icon preview--sub" v-if="!readOnly">
+            <el-tag type="danger" @click="onRemove(index,$event)" style="padding-left:12px;padding-right:12px;">确认删除?
+            </el-tag>
           </div>
-        </div>
+          <div class="el-upload-icon hover-icon preview--sub" style="flex-direction: column;">
+            <div>
+              <i class="el-icon-view" @click="file_preview(index)"
+                 v-if="item.fileType == 'img' || item.fileType == 'video'"></i>
+              <i class="el-icon-download" @click="file_download(index)" v-else></i>
+              <i class="el-icon-delete" v-if="!readOnly"
+                 @click="$event.target.closest('.el-upload-preview').classList.add('deleting')"></i>
+            </div>
+            <div v-if="maxCount>1 && !readOnly">
+              <i class="el-icon-arrow-left" @click="move_left(index)" v-if="index>0"></i>
+              <i class="el-icon-arrow-right" @click="move_right(index)" v-if="index < myValue.length -1"></i>
+            </div>
+          </div>
+        </slot>
       </div>
       <!--      <div v-if="withRemark" class="withRemark">-->
       <!--        {{item.remark}}-->
@@ -593,6 +595,7 @@
 
   .avatar-uploader .el-upload-preview:hover .el-upload-bg {
     display: block;
+    border-radius: 6px;
   }
 
   .avatar-uploader .el-upload-preview:hover .hover-icon {

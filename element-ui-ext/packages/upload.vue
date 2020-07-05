@@ -5,14 +5,24 @@
 
     <div class="el-upload" :class="'el-upload-' + index" v-for="(item,index) in myValue">
       <div class="el-upload-preview" v-if="item.id && item.url" onmouseleave="this.classList.remove('deleting')">
-        <div class="avatar-uploader-icon preview--img" :style="{backgroundImage: 'url(' + item.url + ')'}"
+        <div class="avatar-uploader-icon preview--img" @click="img_click(index)"
+             :style="{backgroundImage: 'url(' + item.url + ')'}"
              v-if="item.fileType=='img'"/>
-        <video v-else-if="item.fileType=='video'" :src="item.url" class="avatar-uploader-icon"></video>
+        <video v-else-if="item.fileType=='video'" @click="video_click(index)" :src="item.url"
+               class="avatar-uploader-icon"></video>
         <div v-else class="avatar-uploader-icon upload-fill el-icon-document preview--sub"
              :class="'upload-icon-'+ item.fileType">
           {{item.showName}}
         </div>
-        <slot name="hover">
+
+        <template v-if="h5">
+          <div class="h5-remove" @click="onRemove(index,$event)" v-if="!readOnly">
+            <slot name="remove">
+              <i class="el-icon-circle-close"></i>
+            </slot>
+          </div>
+        </template>
+        <template v-else>
           <div class="el-upload-bg preview--sub">
           </div>
           <div class="el-upload-icon confirm-icon preview--sub" v-if="!readOnly">
@@ -32,7 +42,8 @@
               <i class="el-icon-arrow-right" @click="move_right(index)" v-if="index < myValue.length -1"></i>
             </div>
           </div>
-        </slot>
+        </template>
+
       </div>
       <!--      <div v-if="withRemark" class="withRemark">-->
       <!--        {{item.remark}}-->
@@ -84,6 +95,10 @@
             maxSize: {
                 type: String, default: () => "5M"
             },
+            h5: {
+                //h5模式，没有浮层。
+                type: Boolean, default: false
+            },
             axiosConfig: {
                 type: Object, default: () => {
                     return {};
@@ -131,6 +146,14 @@
             }
         },
         methods: {
+            video_click(index) {
+                if (!this.h5) return;
+                this.file_preview(index);
+            },
+            img_click(index) {
+                if (!this.h5) return;
+                this.file_preview(index);
+            },
             setItem(fileItemData) {
                 delete fileItemData.percentage;
                 var name = fileItemData.name || (fileItemData.url && fileItemData.url.split("/").last());
@@ -456,7 +479,7 @@
             }
             ,
             file_preview(index) {
-                jv.openPreview({type: this.myValue[index].fileType, url: this.myValue[index].url});
+                jv.openPreview({type: this.myValue[index].fileType, h5:this.h5, url: this.myValue[index].url});
             },
             file_download(index) {
                 jv.downloadFile(this.myValue[index].url)
@@ -465,6 +488,12 @@
     }
 </script>
 <style>
+  .h5-remove .el-icon-circle-close {
+    position: absolute;
+    right: -9px;
+    top: -9px;
+  }
+
   .avatar-uploader {
     display: flex;
     flex-wrap: wrap;

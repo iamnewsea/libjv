@@ -1,6 +1,8 @@
 <template>
   <div>
-    <el-dialog title="预览"  :visible.sync="p.preview_show" top="auto" width="auto" :center="true" @close="preview_closed">
+
+    <el-dialog title="预览" :fullscreen="p.h5" :class="p.h5? 'h5':'pc' " :visible.sync="p.preview_show" top="auto"
+               width="auto" :center="true" @close="preview_closed">
       <img :src="p.url" v-if="p.type=='img'" class="preview_dom" id="preview_image_dom"/>
       <video :src="p.url" @loadeddata="loaded=false" class="preview_dom" v-if="p.type=='video'"
              controls="controls" id="video_dom"></video>
@@ -62,13 +64,24 @@
     margin: auto;
   }
 
-  >>> .preview_dom {
-    max-width: 80vw;
-    max-height: 80vh;
+  >>> .el-dialog__body{
+    text-align: center;
+  }
+
+  .preview_dom {
     width: auto;
     height: auto;
   }
 
+  .pc .preview_dom {
+    max-width: 80vw;
+    max-height: 60vh;
+  }
+
+  .h5 .preview_dom {
+    max-width: 95vw;
+    max-height: 85vh;
+  }
 </style>
 <script>
     import VueCropper from 'vue-cropperjs';
@@ -198,7 +211,7 @@
                         // }
                     }
 
-                    this.$nextTick(it=>{
+                    this.$nextTick(it => {
                         if (value.preview_show && value.type == 'video' && value.url) {
                             document.getElementById("video_dom").pause();
                         }

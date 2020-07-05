@@ -8,6 +8,7 @@ import jv from "./file-upload"
  ajaxIgnoreResType ： 默认为false , 系统默认对 boolean,date添加 _res 额外键，设置这个字段，会忽略指定的类型。该值是逗号分隔的字符串，有如下值：boolean,date
  */
 jv.initVue = (setting) => {
+    window.jv = jv;
     var {vue, axios, router, ajaxIgnoreJavaBooleanKey, ajaxIgnoreResType, ignoreMsg} = setting;
     jv.Vue = vue;
     //关闭环境给出的提示.
@@ -302,26 +303,35 @@ jv.initVue = (setting) => {
         return Promise.reject(error);
     });
 
+    jv.getIdFromUrl = function (url) {
+        return url.replace(/\//g, "-").replace(/[^0-9a-zA-Z]/g, "");
+    };
 
     //----------------------router
-    //添加外部的 script 标签
-    jv.addScriptFile = (id, fileName, attributes) => {
+    /**
+     * 添加外部的 script 标签
+     */
+    jv.addScriptFile = (fileName, attributes) => {
         if (!fileName) return;
 
-        var script = id && document.getElementById(id);
-        if (!script) {
-            script = document.createElement("script");
-            document.head.appendChild(script);
+        var id = jv.getIdFromUrl(fileName);
+
+        var script = document.getElementById(id);
+        if (script) {
+            return;
         }
+
+        script = document.createElement("script");
+        document.head.appendChild(script);
+
         attributes = attributes || {};
 
         if (!attributes.type) {
             attributes.type = "text/javascript";
         }
 
-        if (id) {
-            attributes.id = id;
-        }
+        attributes.id = id;
+
 
         attributes.src = fileName;
 
@@ -330,9 +340,43 @@ jv.initVue = (setting) => {
         });
     };
 
+    /**
+     * 添加 link css的文件引用。
+     */
+    jv.addLinkCssFile = (fileName, attributes) => {
+        if (!fileName) return;
+
+        var id = jv.getIdFromUrl(fileName);
+
+        var link = document.getElementById(id);
+        if (link) {
+            return;
+        }
+
+        link = document.createElement("link");
+        document.head.appendChild(link);
+
+        attributes = attributes || {};
+
+        if (!attributes.type) {
+            attributes.type = "text/css";
+        }
+        if (!attributes.rel) {
+            attributes.rel = "stylesheet";
+        }
+        attributes.id = id;
+
+        attributes.href = fileName;
+
+        Object.keys(attributes).forEach(it => {
+            link.setAttribute(it, attributes[it]);
+        });
+    };
+
     //添加 style 标签
     jv.addStyleDom = (id, cssContent, attributes) => {
         if (!cssContent) return;
+
 
         var style = id && document.getElementById(id);
         if (!style) {
@@ -384,8 +428,8 @@ jv.initVue = (setting) => {
         this.$nextTick(() => {
             setTimeout(() => {
                 document.dispatchEvent(new Event(jv.vue_spa_render_event));
-            })
-        }, 200);
+            }, 200)
+        });
     };
 
 

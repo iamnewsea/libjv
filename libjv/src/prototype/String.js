@@ -100,6 +100,43 @@
         }, enumerable: false
     });
 
+    /**
+     *
+     */
+    Object.defineProperty(String.prototype, 'toCharArray', {
+        value() {
+            return this.split("")
+        }, enumerable: false
+    });
+
+    /**
+     * 是否是大写字母
+     */
+    Object.defineProperty(String.prototype, 'IsUpperLetter', {
+        value() {
+            return this.toCharArray().every(it => it >= 65 && it <= 90);
+        }, enumerable: false
+    });
+
+    /**
+     * 是否是小写字母
+     */
+    Object.defineProperty(String.prototype, 'IsLowerLetter', {
+        value() {
+            return this.toCharArray().every(it => it >= 97 && it <= 122);
+        }, enumerable: false
+    });
+
+    /**
+     * 是否是数字，0-9
+     */
+    Object.defineProperty(String.prototype, 'IsDigit', {
+        value() {
+            return this.toCharArray().every(it => it >= 48 && it <= 57);
+        }, enumerable: false
+    });
+
+
     Object.defineProperty(String.prototype, 'findIndex', {
         value() {
             //第一个是 action , 第二个是 index.

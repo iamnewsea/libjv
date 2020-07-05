@@ -64,7 +64,7 @@
     margin: auto;
   }
 
-  >>> .el-dialog__body{
+  >>> .el-dialog__body {
     text-align: center;
   }
 
@@ -102,7 +102,10 @@
         components: {VueCropper},
         name: "image-edit",
         props: {
-            option: {edit_show: true},
+            option: {
+                type: Object, default: () => {
+                }
+            },
 //      image_url: "",
 //      video_url: "",
 //      image_scale: "", // 宽:高

@@ -395,7 +395,7 @@ import jv from "./libjv"
             var chk_result = chk_vue_item(chk_dom);
 
             var chkEvent = jv.createEvent("chked", {
-                msg: chk_result.msg || chk_result.detail || "",
+                msg: chk_result.msg || chk_dom.placeholder || chk_result.detail || "",
                 target: chk_dom.$el
             });
 
@@ -443,7 +443,11 @@ import jv from "./libjv"
 
             var chk_result = chk_html_item(chk_dom);
 
-            var chkEvent = jv.createEvent("chked", {msg: chk_result.msg || chk_result.detail || "", target: chk_dom});
+            var chkEvent = jv.createEvent("chked", {
+                msg: chk_result.msg ||
+                    chk_dom.placeholder ||
+                    chk_result.detail || "", target: chk_dom
+            });
 
             //想要触发元素上的 chked 事件，必须用 addEventListener 绑定事件
             chk_dom.trigger(chkEvent);

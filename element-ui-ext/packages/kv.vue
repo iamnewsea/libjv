@@ -1,18 +1,18 @@
 <template>
-  <div class="kv">
-    <div class="k">
-      <template v-if="label">
-        {{label}}
-      </template>
-      <template v-else>
-        <slot name="k"></slot>
-      </template>
-    </div>
+    <div class="kv">
+        <div class="k">
+            <template v-if="label">
+                {{label}}
+            </template>
+            <template v-else>
+                <slot name="k"></slot>
+            </template>
+        </div>
 
-    <sect class="v sect">
-      <slot></slot>
-    </sect>
-  </div>
+        <sect class="v sect">
+            <slot></slot>
+        </sect>
+    </div>
 </template>
 <script>
     /**
@@ -108,63 +108,63 @@
 </script>
 <style>
 
-  .kv {
-    display: flex;
-  }
+    .kv {
+        display: flex;
+    }
 
-  .must .k:before {
-    content: "*";
-    color: red;
-  }
+    .must .k:before {
+        content: "*";
+        color: red;
+    }
 
-  /*.kv > * {*/
-  /*  display: flex;*/
-  /*  align-items: center; !*垂直居中*!*/
-  /*}*/
+    /*.kv > * {*/
+    /*  display: flex;*/
+    /*  align-items: center; !*垂直居中*!*/
+    /*}*/
 
-  /**
-  tinymce显示错乱
-   */
-  /*.kv *{*/
-  /*  flex:1;*/
-  /*}*/
+    /**
+    tinymce显示错乱
+     */
+    /*.kv *{*/
+    /*  flex:1;*/
+    /*}*/
 
-  .kv > .k {
-    justify-content: flex-end;
-    text-align: right;
-    flex: 3;
-    white-space: nowrap;
-  }
+    .kv > .k {
+        justify-content: flex-end;
+        text-align: right;
+        flex: 3;
+        white-space: nowrap;
+    }
 
-  .kv > .k:first-child:after {
-    content: "：";
-    display: inline-block;
-  }
+    .kv > .k:first-child:after {
+        content: "：";
+        display: inline-block;
+    }
 
-  .kv > .v {
-    flex: 7;
-    justify-content: flex-start;
-  }
+    .kv > .v {
+        flex: 7;
+        justify-content: flex-start;
+    }
 
 
-  .v > *:first-child {
-    max-width: 600px;
-  }
+    .v > *:first-child {
+        max-width: 600px;
+    }
 
-  .chk-msg {
-    color: red;
-    padding: 0 5px;
-  }
+    .chk-msg {
+        color: red;
+        padding: 5px 0;
+    }
 
-  .link {
-    color: #007aff;
-    text-decoration: underline;
-    cursor: pointer;
-  }
+    .link {
+        color: #007aff;
+        text-decoration: underline;
+        cursor: pointer;
+    }
 
-  html input.chk-error, html .chk-error input {
-    background-color: #f4dfeb4d;
-    border: dashed 1px deeppink;
-  }
+    html input.chk-error, html .chk-error input {
+        background-color: #f4dfeb4d;
+        border: dashed 1px deeppink;
+    }
 
 </style>

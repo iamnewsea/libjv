@@ -4,6 +4,12 @@ import jv from "./libjv"
     if (typeof (HTMLElement) === "undefined") return;
 
 
+    //vue 验证在 sect 组件中处理 msg
+    jv.chk_msg_vue_tag = "sect";
+
+    //html 验证在 .sect 元素中处理 msg
+    jv.chk_msg_html_class = ".sect";
+
 // jv.chk_show = function (dom, msg) {
 //   //dom.addClass("chk-error");
 //   jv.error(msg);
@@ -139,84 +145,6 @@ import jv from "./libjv"
 
         return false;
     };
-
-    // var getInputDom = function (dom) {
-    //     if (dom.tagName == "INPUT") {
-    //         return dom;
-    //     }
-    //     if (dom.tagName == "TEXTAREA") {
-    //         return dom;
-    //     }
-    //
-    //     if (!dom.childNodes.length) return null;
-    //
-    //     var domInput = dom.querySelector("input[type=hidden]")
-    //     if (!domInput) {
-    //         domInput = dom.querySelector("input");
-    //     }
-    //     if (!domInput) {
-    //         domInput = dom.querySelector("textarea");
-    //     }
-    //     return domInput;
-    // };
-    //
-    // var getVueFromUp =function(dom,deep){
-    //     if(!dom) return ;
-    //     deep = deep || 0;
-    //
-    //     if( deep > 9) return ;
-    //
-    //     var vueDom = dom.__vue__;
-    //     if( vueDom){
-    //         return vueDom;
-    //     }
-    //     return getVueFromUp(dom.parentElement);
-    // };
-    //
-    // var getVueTooltipFromUp = function (vueDom, deep) {
-    //     if (!vueDom) return;
-    //     deep = deep || 0;
-    //
-    //     if (deep > 9) return;
-    //
-    //     if (vueDom.$options._componentTag == "el-tooltip") {
-    //         return vueDom;
-    //     }
-    //     return getVueTooltipFromUp(vueDom.$options.parent);
-    // };
-
-    // var getHtmlTooltipFromUp = function (html_dom, deep) {
-    //     if (!html_dom) return;
-    //     deep = deep || 0;
-    //
-    //     if (deep > 9) return;
-    //
-    //     if (html_dom.__vue__) {
-    //         if (html_dom.__vue__.$options._componentTag == "el-tooltip") {
-    //             return html_dom;
-    //         }
-    //     }
-    //     return getHtmlTooltipFromUp(html_dom.parentNode);
-    // };
-    // var getInputValue = function (dom) {
-    //     if (!dom.tagName) {
-    //         return null;
-    //     }
-    //
-    //     if (dom.tagName == "INPUT" || dom.tagName == "TEXTAREA") {
-    //         return dom.value;
-    //     }
-    //
-    //     var ret;
-    //     for (var item of dom.children) {
-    //         ret = getInputValue(item);
-    //         if (ret) {
-    //             return ret;
-    //         }
-    //     }
-    //     return null;
-    // }
-
 
 //-------------------------------------------------------------------------------------
     //找到后，就不再查找子元素了。
@@ -407,6 +335,35 @@ import jv from "./libjv"
         return ret;
     };
 
+    var chked_dom_msg = (htmlDom, chkEvent) => {
+        var tooltip = chkEvent.detail.msg;
+
+        var msg_dom;
+        for (var it of htmlDom.children) {
+            if (it.classList.contains("chk-msg")) {
+                msg_dom = it;
+                break;
+            }
+        }
+
+        if (!tooltip) {
+            if (msg_dom) {
+                htmlDom.removeChild(msg_dom);
+            }
+
+            return;
+        }
+
+        if (!msg_dom) {
+            msg_dom = document.createElement("div");
+            msg_dom.classList.add("chk-msg");
+            htmlDom.append(msg_dom)
+        }
+
+        msg_dom.innerHTML = tooltip;
+    };
+
+
     //校验器
     /**
      * chk="reg:/^[+-]?[0-9]+$/"
@@ -431,24 +388,33 @@ import jv from "./libjv"
     //     chk_show:如何显示的回调.
     //     value: function (singleShow) {
     jv.chk_vue_dom = function (container, singleShow) {
-        var index = 0, ret = true, list = getAllVuesChkDom(container);
+        var ret = true, list = getAllVuesChkDom(container);
 
         for (var chk_dom of list) {
             var chk_result = chk_vue_item(chk_dom);
 
             var chkEvent = jv.createEvent("chked", {
-                result: chk_result.result,
-                msg: chk_result.msg,
-                detail: chk_result.detail
+                msg: chk_result.msg || chk_result.detail || "",
+                target: chk_dom.$el
             });
 
-
             chk_dom.$emit(chkEvent.type, chkEvent);
-            chk_dom.$el.trigger(chkEvent);
+            // chk_dom.$el.trigger(chkEvent);
 
-            var sect = chk_dom.$Closest("sect");
-            sect.$emit(chkEvent.type, chkEvent);
-
+            //优先使用指定的 tag 显示消息，如果没指定tag,则用 html 的 class 元素显示消息。
+            if (jv.chk_msg_vue_tag) {
+                var sect = chk_dom.$Closest(jv.chk_msg_vue_tag);
+                if (sect) {
+                    chked_dom_msg(sect.$el, chkEvent);
+                    sect.$emit(chkEvent.type, chkEvent);
+                }
+            } else if (jv.chk_msg_html_class) {
+                var sect = chk_dom.$el.closest(jv.chk_msg_html_class);
+                if (sect) {
+                    chked_dom_msg(sect, chkEvent);
+                    sect.trigger(chkEvent);
+                }
+            }
 
             if (chk_result.result) {
                 chk_dom.$el.classList.remove("chk-error");
@@ -463,30 +429,33 @@ import jv from "./libjv"
             }
         }
 
+
+        //原生Dom检测，原生Dom需要使用 @chked 定义事件。
         list = Array.from(container.$el.querySelectorAll("[chk]"));
 
-        var inSect = function () {
-            var vueDom = chk_dom.$Closest();
-            if (!vueDom) {
-                return;
-            }
-            return vueDom.$Closest("sect");
-        }
-
         for (var chk_dom of list) {
-            if (inSect(chk_dom)) continue;
+            //如果该组件是 vue 组件，并且已处理过，就不用再处理了。
+            if (jv.chk_msg_vue_tag) {
+                if (chk_dom.$Closest(jv.chk_msg_vue_tag))
+                    continue;
+            }
 
             var chk_result = chk_html_item(chk_dom);
 
-            var chkEvent = jv.createEvent("chked", {
-                result: chk_result.result,
-                msg: chk_result.msg,
-                detail: chk_result.detail
-            });
-
+            var chkEvent = jv.createEvent("chked", {msg: chk_result.msg || chk_result.detail || "", target: chk_dom});
 
             //想要触发元素上的 chked 事件，必须用 addEventListener 绑定事件
             chk_dom.trigger(chkEvent);
+
+            //用 html 的 class 元素显示消息。
+            if (jv.chk_msg_html_class) {
+                var sect = chk_dom.closest(jv.chk_msg_html_class);
+                if (sect) {
+                    chked_dom_msg(sect, chkEvent);
+                    sect.trigger(chkEvent);
+                }
+            }
+
 
             if (chk_result.result) {
                 chk_dom.classList.remove("chk-error");

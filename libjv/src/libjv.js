@@ -29,6 +29,12 @@ jv.noop = () => {
 jv.enum = {};
 
 
+/**
+ *
+ * @param eventName
+ * @param evDetail 必须是 {detail: 数据 }
+ * @returns {CustomEvent<any>}
+ */
 jv.createEvent = (eventName, evDetail) => {
     if (jv.inBrowser) {
         var chkEvent;

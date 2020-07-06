@@ -107,7 +107,7 @@ jv.initVue = (setting) => {
     /*向下找 tag*/
     Object.defineProperty(vueProtype, "$Find", {
         value(ele) {
-            if (this.$vnode.componentOptions.tag == ele) {
+            if (this.$vnode && this.$vnode.componentOptions.tag == ele) {
                 return this;
             }
             for (var i in this.$children) {
@@ -121,10 +121,10 @@ jv.initVue = (setting) => {
 
     //向上找元素.
     Object.defineProperty(vueProtype, "$Closest", {
-        value(ele) {
+        value(vueTagName) {
             let cur = this;
             while (cur) {
-                if (cur.$vnode.componentOptions.tag == ele) {
+                if (cur.$vnode && cur.$vnode.componentOptions.tag == vueTagName) {
                     return cur;
                 }
                 cur = cur.$parent;
@@ -134,11 +134,15 @@ jv.initVue = (setting) => {
 
     /*Html元素向上找Vue元素*/
     Object.defineProperty(HTMLElement.prototype, "$Closest", {
-        value() {
+        value(vueTagName) {
             let cur = this;
             while (cur) {
-                if (cur.__vue__) {
-                    return cur;
+                if( !cur){
+                    break;
+                }
+                var v = cur.__vue__;
+                if (v) {
+                    return v.$Closest(vueTagName);
                 }
                 cur = cur.parentNode;
             }

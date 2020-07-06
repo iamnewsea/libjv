@@ -9,7 +9,7 @@
       </template>
     </div>
 
-    <sect class="v" @chked="chked" ref="v">
+    <sect class="v sect">
       <slot></slot>
     </sect>
   </div>
@@ -73,36 +73,36 @@
             // }
         },
         methods: {
-            chked(e) {
-                var tooltip = e.detail.result ? '' : (e.detail.msg || e.detail.detail);
-                var v = this.$refs.v.$el;
-                this.$nextTick(() => {
-                    var msg_dom;
-                    for (var it of v.children) {
-                        if (it.classList.contains("chk-msg")) {
-                            msg_dom = it;
-                            break;
-                        }
-                    }
-
-                    if (!tooltip) {
-                        if (msg_dom) {
-                            v.removeChild(msg_dom);
-                        }
-
-                        return;
-                    }
-
-                    if (!msg_dom) {
-                        msg_dom = document.createElement("div");
-                        msg_dom.classList.add("chk-msg");
-                        v.append(msg_dom)
-                    }
-
-                    msg_dom.innerHTML = tooltip;
-                });
-
-            },
+            // chked(e) {
+            //     var tooltip = e.detail.result ? '' : (e.detail.msg || e.detail.detail);
+            //     var v = this.$refs.v.$el;
+            //     this.$nextTick(() => {
+            //         var msg_dom;
+            //         for (var it of v.children) {
+            //             if (it.classList.contains("chk-msg")) {
+            //                 msg_dom = it;
+            //                 break;
+            //             }
+            //         }
+            //
+            //         if (!tooltip) {
+            //             if (msg_dom) {
+            //                 v.removeChild(msg_dom);
+            //             }
+            //
+            //             return;
+            //         }
+            //
+            //         if (!msg_dom) {
+            //             msg_dom = document.createElement("div");
+            //             msg_dom.classList.add("chk-msg");
+            //             v.append(msg_dom)
+            //         }
+            //
+            //         msg_dom.innerHTML = tooltip;
+            //     });
+            //
+            // },
         }
     }
 </script>

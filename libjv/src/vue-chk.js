@@ -113,11 +113,9 @@ import jv from "./libjv"
         },
         //*号必填
         "*": function (chk_body, value) {
-            var ret = jv.hasValue(value);
-            if (ret === 0) return true;
-            if (ret === false) return true;
-
-            return !!ret;
+            if (value === 0) return true;
+            if (value === false) return true;
+            return jv.hasValue(value);
         },
         //文本类型，返回 true,可空.
         "": function () {
@@ -392,24 +390,30 @@ import jv from "./libjv"
         var ret = true, list = getAllVuesChkDom(container);
 
         for (var chk_dom of list) {
+            chk_dom.$el.chk_vue_proced = true;
+
             var chk_result = chk_vue_item(chk_dom);
 
             var chkEvent = jv.createEvent("chked", {
-                msg: chk_result.msg || chk_dom.placeholder || chk_result.detail || "",
+                msg: !chk_result.result && (chk_result.msg || chk_dom.$attrs.placeholder || chk_result.detail) || "",
                 target: chk_dom.$el
             });
 
             chk_dom.$emit(chkEvent.type, chkEvent);
             // chk_dom.$el.trigger(chkEvent);
 
+            var up_finded = false;
             //优先使用指定的 tag 显示消息，如果没指定tag,则用 html 的 class 元素显示消息。
             if (jv.chk_msg_vue_tag) {
                 var sect = chk_dom.$Closest(jv.chk_msg_vue_tag);
                 if (sect) {
+                    up_finded = true;
                     chked_dom_msg(sect.$el, chkEvent);
                     sect.$emit(chkEvent.type, chkEvent);
                 }
-            } else if (jv.chk_msg_html_class) {
+            }
+
+            if (!up_finded && jv.chk_msg_html_class) {
                 var sect = chk_dom.$el.closest(jv.chk_msg_html_class);
                 if (sect) {
                     chked_dom_msg(sect, chkEvent);
@@ -421,6 +425,8 @@ import jv from "./libjv"
                 chk_dom.$el.classList.remove("chk-error");
                 continue;
             }
+
+
 
             ret &= false;
             chk_dom.$el.classList.add("chk-error");
@@ -436,17 +442,16 @@ import jv from "./libjv"
 
         for (var chk_dom of list) {
             //如果该组件是 vue 组件，并且已处理过，就不用再处理了。
-            if (jv.chk_msg_vue_tag) {
-                if (chk_dom.$Closest(jv.chk_msg_vue_tag))
-                    continue;
+            if (chk_dom.chk_vue_proced) {
+                continue;
             }
 
             var chk_result = chk_html_item(chk_dom);
 
             var chkEvent = jv.createEvent("chked", {
-                msg: chk_result.msg ||
+                msg: !chk_result.result && (chk_result.msg ||
                     chk_dom.placeholder ||
-                    chk_result.detail || "", target: chk_dom
+                    chk_result.detail) || "", target: chk_dom
             });
 
             //想要触发元素上的 chked 事件，必须用 addEventListener 绑定事件

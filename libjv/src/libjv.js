@@ -415,7 +415,6 @@ jv.resize = (callback, time) => {
 
 /**
  * isNaN 函数，参数是字符串会返回 true,不准。
- * @type {JvObject.hasValue}
  */
 jv.isNaN = (value) => {
     if (jv.isNull(value)) return false;
@@ -439,7 +438,7 @@ jv.hasValue = (value) => {
     if (["array", "set", "object", "map"].includes(type)) {
         return !!Object.keys(value).length;
     }
-    return value;
+    return !!value;
 };
 
 jv.isEmpty = (value) => !jv.hasValue(value);

@@ -137,7 +137,7 @@ jv.initVue = (setting) => {
         value(vueTagName) {
             let cur = this;
             while (cur) {
-                if( !cur){
+                if (!cur) {
                     break;
                 }
                 var v = cur.__vue__;
@@ -179,6 +179,20 @@ jv.initVue = (setting) => {
     //         return ori_post.call(this, url, data, config);
     //     }
     // };
+
+    jv.Vue.mixin({
+        updated: function () {
+            if (!jv.chk_must_dom_class) {
+                return;
+            }
+
+            Array.from(this.$el.querySelectorAll(jv.chk_must_dom_class)).forEach(it => {
+                if (it.querySelector("[chk]")) {
+                    it.classList.add("must");
+                }
+            });
+        }
+    });
 
 
     jv.ajax = axios;

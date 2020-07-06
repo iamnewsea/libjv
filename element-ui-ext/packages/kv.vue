@@ -110,7 +110,6 @@
 
   .kv {
     display: flex;
-    padding: 10px;
   }
 
   .must .k:before {

@@ -6,7 +6,8 @@ import jv from "./libjv"
 
     //vue 验证在 sect 组件中处理 msg
     jv.chk_msg_vue_tag = "sect";
-
+    //初始化chk时，对 .kv 添加 must 样式。
+    jv.chk_must_dom_class = ".kv";
     //html 验证在 .sect 元素中处理 msg
     jv.chk_msg_html_class = ".sect";
 

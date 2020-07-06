@@ -4,7 +4,9 @@
                :multiple="multiple"
                :emitPath="false"
                @change="cityChange"
-               v-model="cityValue">
+               v-model="cityValue"
+               v-bind="$attrs"
+               v-on="$listeners">
   </el-cascader>
 </template>
 <script type="text/javascript">

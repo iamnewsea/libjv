@@ -1,5 +1,5 @@
 <template>
-    <div class="kv">
+    <div class="kv" v-bind="$attrs"  v-on="$listeners">
         <div class="k">
             <template v-if="label">
                 {{label}}

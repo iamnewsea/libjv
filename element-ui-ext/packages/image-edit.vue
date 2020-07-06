@@ -1,6 +1,5 @@
 <template>
-  <div>
-
+  <div v-bind="$attrs"  v-on="$listeners">
     <el-dialog title="预览" :fullscreen="p.h5" :class="p.h5? 'h5':'pc' " :visible.sync="p.preview_show" top="auto"
                width="auto" :center="true" @close="preview_closed">
       <img :src="p.url" v-if="p.type=='img'" class="preview_dom" id="preview_image_dom"/>

@@ -182,15 +182,14 @@ jv.initVue = (setting) => {
 
     jv.Vue.mixin({
         updated: function () {
-            if (!jv.chk_must_dom_class) {
-                return;
-            }
+            if (  jv.chk_must_dom_class && this.$el) {
 
-            Array.from(this.$el.querySelectorAll(jv.chk_must_dom_class)).forEach(it => {
-                if (it.querySelector("[chk]")) {
-                    it.classList.add("must");
-                }
-            });
+                Array.from(this.$el.querySelectorAll(jv.chk_must_dom_class)).forEach(it => {
+                    if (it.querySelector("[chk]")) {
+                        it.classList.add("must");
+                    }
+                });
+            }
         }
     });
 

@@ -8,15 +8,16 @@ https://github.com/krasimir/webpack-library-starter
 ## 发版 
 > npm publish
 
+> cnpm sync libjv
 
 # 验证
 ```html
 <div ref="form">
-  <div chk="" chk_msg="">
+  <div chk="*" chkmsg="请输入...">
     <input  />
   </div>
   
-  <div chk="" chk_msg="">
+  <div chk=": if(value.length<9) return '请输入...'">
     <input  />
   </div>
 </div>
@@ -31,85 +32,6 @@ if (document.querySelector("[ref=form]").chk() == false) {
 
 集成验证提示
 ```
-    jv._last_error_msg = "";
-    jv._last_error_title = "";
-    jv.showLastError = function () {
-        if (!jv._last_error_msg) return;
-        return jv.error(jv._last_error_msg, jv._last_error_title);
-    };
-
-    jv.error = function (msg, title, opt) {
-        if (opt == "ajax") {
-            document.write((title || "") + "<br />" + msg)
-            return;
-        }
-
-        var msg2 = msg;
-        if (title) {
-            msg2 = "[" + title + "] " + msg2;
-        }
-
-        console.error(msg2);
-
-        jv._last_error_msg = msg;
-        jv._last_error_title = title;
-
-        var ret = jv.main.$notify(Object.assign({
-            title: title || '错误',
-            message: msg,
-            type: 'error',
-            customClass: "popmsg error_msg"
-        }, opt));
-
-        return ret;
-    };
-
-    jv.confirm = function (msg, buttons, opt) {
-        var msgs = (buttons || "").split(",");
-        return jv.main.$confirm(msg, '提示', Object.assign({
-            confirmButtonText: msgs[0] || '确定',
-            cancelButtonText: msgs[1] || '取消',
-            type: 'warning'
-        }, opt));
-    };
-
-    jv.prompt = function (msg, title, opt) {
-        return jv.main.$prompt(msg, title || '提示', Object.assign({
-            confirmButtonText: '确定',
-            cancelButtonText: '取消'
-        }, opt));
-    };
-
-    jv.chk_clear = function (chk_opt) {
-        if (chk_opt && chk_opt.target) {
-            chk_opt.target.classList.remove("chk_error");
-        } else {
-            Array.from(document.body.getElementsByClassName("chk_error")).forEach(it => it.classList.remove("chk_error"));
-        }
-    };
-
-    jv.chk_error = function (chk_opt) {
-        if (!chk_opt || chk_opt.type != "chk") {
-            return;
-        }
-
-        var msg = chk_opt.msg;
-        if (!msg) {
-            var kv = chk_opt.target.closest(".kv");
-            if (kv) {
-                msg = ((kv.getElementsByClassName("k")[0] || {}).textContent || "").trim() + " " + chk_opt.detail;
-            }
-        }
-
-        // jv.chk_clear();
-        chk_opt.target.classList.add("chk_error");
-        console.error(msg);
-        //只提示第一个
-        if (!chk_opt.index) {
-            jv.pop_msg(msg, "数据校验失败", "chk");
-        }
-    };
-
     jv.pop_msg = function (msg, title, type) {
         var msg2 = msg;
         if (title) {

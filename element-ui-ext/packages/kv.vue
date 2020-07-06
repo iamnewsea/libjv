@@ -112,7 +112,7 @@
         display: flex;
     }
 
-    .must .k:before {
+    .kv.must .k:before {
         content: "*";
         color: red;
     }

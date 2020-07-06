@@ -11,27 +11,6 @@ import jv from "./libjv"
     //html 验证在 .sect 元素中处理 msg
     jv.chk_msg_html_class = ".sect";
 
-// jv.chk_show = function (dom, msg) {
-//   //dom.addClass("chk-error");
-//   jv.error(msg);
-// }
-
-    // jv.chk_show = function (chk_msg, inputDom, dom) {
-    //     var tip = dom.popTip(chk_msg);
-    //     if (chk_msg) {
-    //         var chkMsgOffset = dom.dataset.chkMsgOffset || dom.getAttribute("chk-msg-offset");
-    //         if (chkMsgOffset) {
-    //             chkMsgOffset = inputDom.closest(chkMsgOffset)
-    //
-    //             if (!chkMsgOffset) {
-    //                 chkMsgOffset = inputDom;
-    //             }
-    //         } else {
-    //             chkMsgOffset = inputDom;
-    //         }
-    //         tip.style.marginLeft = (chkMsgOffset.offset_pdom(dom).x || 0) + "px";
-    //     }
-    // };
 
     //如果返回字符串，则为验证消息， 另外返回布尔值，表示是否通过验证。
     jv.chk_range = function (chk_type, chk_body, value) {

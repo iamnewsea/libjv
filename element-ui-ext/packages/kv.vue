@@ -36,13 +36,13 @@
             };
         },
         mounted() {
-            this.$nextTick(() => {
-                var el = this.$el;
-                var chk_dom = el.querySelector("[chk]");
-                if (chk_dom && chk_dom.getAttribute("chk")) {
-                    el.classList.add("must");
-                }
-            });
+            // this.$nextTick(() => {
+            //     var el = this.$el;
+            //     var chk_dom = el.querySelector("[chk]");
+            //     if (chk_dom && chk_dom.getAttribute("chk")) {
+            //         el.classList.add("must");
+            //     }
+            // });
         },
         computed: {
             slotk() {

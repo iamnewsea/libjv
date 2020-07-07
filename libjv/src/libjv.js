@@ -147,9 +147,9 @@ jv.getUrlHost = (url) => {
  * 提供 基于 localStorage 的缓存数据，增加过期时间机制。额外多保存一个 key ，默认有效期是4个小时。
  * Vue 中使用原型方法
  */
-jv.store = {
+jv.store_db = {
     getStoreKey(key) {
-        return "jv.store." + key;
+        return "jv.store_db." + key;
     },
     getExpireKey(key) {
         return "jv.store_exp." + key;

@@ -16,7 +16,7 @@
                          :style="{backgroundImage: 'url(' + (item.logo || poster) + ')'}"/>
 
                     <video v-bind="video_attrs" v-else
-                           :src="item.url" controls
+                           :src="item.url"
                            :poster="item.logo || poster"
                            class="avatar-uploader-icon"></video>
                 </template>
@@ -654,9 +654,9 @@
             width: 146px;
             min-width: 146px;
 
-            video::-webkit-media-controls {
-                display: none !important;
-            }
+            /*video::-webkit-media-controls {*/
+            /*    display: none !important;*/
+            /*}*/
 
             /**子级元素标志*/
             .preview--sub {

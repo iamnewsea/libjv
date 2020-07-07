@@ -38,15 +38,15 @@ jv.initVue = (setting) => {
     // });
 
     //创建简单的 store
-    vueProtype.$my_store = {
+    jv.store = vueProtype.$my_store = {
         setGlobalJson(data) {
-            jv.store.setJson("global", Object.assign({}, this.getGlobal(), data));
+            jv.store_db.setJson("global", Object.assign({}, this.getGlobal(), data));
         },
         getGlobalJson() {
-            return jv.store.getJson("global");
+            return jv.store_db.getJson("global");
         },
         resetGlobalJson(data) {
-            jv.store.setJson("global", data);
+            jv.store_db.setJson("global", data);
         },
         setJson(key, v) {
             var data = {};
@@ -57,17 +57,17 @@ jv.initVue = (setting) => {
             } else {
                 data = key;
             }
-            jv.store.setJson(jv.main.$route.fullPath, Object.assign({}, this.getJson(), data));
+            jv.store_db.setJson(jv.main.$route.fullPath, Object.assign({}, this.getJson(), data));
         },
         getJson(key) {
-            var ret = jv.store.getJson(jv.main.$route.fullPath);
+            var ret = jv.store_db.getJson(jv.main.$route.fullPath);
             if (key) {
                 return ret[key] || {};
             }
             return ret;
         },
         resetJson(data) {
-            jv.store.setJson(jv.main.$route.fullPath, data);
+            jv.store_db.setJson(jv.main.$route.fullPath, data);
         }
     };
 
@@ -182,8 +182,7 @@ jv.initVue = (setting) => {
 
     jv.Vue.mixin({
         updated: function () {
-            if (  jv.chk_must_dom_class && this.$el) {
-
+            if (jv.chk_must_dom_class && this.$el && this.$el.querySelectorAll) {
                 Array.from(this.$el.querySelectorAll(jv.chk_must_dom_class)).forEach(it => {
                     if (it.querySelector("[chk]")) {
                         it.classList.add("must");

@@ -18,7 +18,6 @@
               @row-dblclick="dbClick"
               @row-click="tableRowClick"
               @rowKey="rowKey"
-              v-on="$listeners"
     >
       <slot></slot>
     </el-table>

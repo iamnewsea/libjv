@@ -27,7 +27,6 @@
                @row-dblclick="dbl_click"
                @row-click="tableRowClick"
                v-bind="[attrs]"
-               v-on="$listeners"
       >
         <slot></slot>
 

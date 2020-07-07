@@ -1,5 +1,5 @@
 <template>
-  <div style="display:flex;" v-bind="$attrs"  v-on="$listeners">
+  <div style="display:flex;" v-bind="$attrs">
     <my-number-input size="small" :min="min" :max="max" :map="map" :readOnly="readOnly"
                      v-model="rangeValue[0]" @change="change1">
       <template slot-scope="props">

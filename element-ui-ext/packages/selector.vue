@@ -1,5 +1,5 @@
 <template>
-  <div class="enum"  v-bind="$attrs"  v-on="$listeners">
+  <div class="enum"  v-bind="$attrs">
     <template v-if="!data2.length">
       <label>{{nodata_display}}</label>
     </template>

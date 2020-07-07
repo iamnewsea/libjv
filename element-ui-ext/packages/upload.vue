@@ -1,5 +1,5 @@
 <template>
-    <div class="avatar-uploader" v-bind="$attrs" v-on="$listeners">
+    <div class="avatar-uploader" v-bind="$attrs">
         <input type="file" name="file" style="display: none" @change="file_change" @click="file_click" v-bind="fileAttr"
                v-if="!readOnly">
 

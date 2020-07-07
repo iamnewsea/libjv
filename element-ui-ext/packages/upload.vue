@@ -8,10 +8,19 @@
                 <div v-bind="img_attrs" class="avatar-uploader-icon preview--img" @click="img_click(index)"
                      :style="{backgroundImage: 'url(' + item.url + ')'}"
                      v-if="item.fileType=='img'"/>
-                <video v-bind="video_attrs" v-else-if="item.fileType=='video'" @click="video_click(index)"
-                       :src="item.url"
-                       controls :poster="poster" @loadeddata="video_load($event)"
-                       class="avatar-uploader-icon"></video>
+
+                <template v-else-if="item.fileType=='video'">
+
+                    <div v-bind="img_attrs" v-if="h5" class="avatar-uploader-icon preview--img"
+                         @click="video_click(index)"
+                         :style="{backgroundImage: 'url(' + (item.logo || poster) + ')'}"/>
+
+                    <video v-bind="video_attrs" v-else
+                           :src="item.url" controls
+                           :poster="item.logo || poster"
+                           class="avatar-uploader-icon"></video>
+                </template>
+
                 <div v-bind="file_attrs" v-else class="avatar-uploader-icon upload-fill el-icon-document preview--sub"
                      :class="'upload-icon-'+ item.fileType">
                     {{item.showName}}
@@ -103,6 +112,10 @@
                 //h5模式，没有浮层。
                 type: Boolean, default: false
             },
+            poster: {
+                //默认的封面。如果找不到，使用默认的。
+                type: String, default: () => ""
+            },
             axiosConfig: {
                 type: Object, default: () => {
                     return {};
@@ -113,7 +126,6 @@
             return {
                 myValue: [],
                 fileAttr: {},
-                poster: "",         //video 封面。
                 // imageRemark: "", //添加时使用.添加的图片文字
                 scales_value: this.scales
             };
@@ -128,7 +140,7 @@
                     .filter(key => !key.startsWith("video-") &&
                         !key.startsWith("img-") &&
                         !key.startsWith("file-"))
-                    .forEach(key=>{
+                    .forEach(key => {
                         ret[key] = this.$attrs[key];
                     });
 
@@ -137,8 +149,8 @@
             video_attrs() {
                 var ret = {};
                 Object.keys(this.$attrs)
-                    .filter(key =>  key.startsWith("video-") )
-                    .forEach(key=>{
+                    .filter(key => key.startsWith("video-"))
+                    .forEach(key => {
                         ret[key.slice(6)] = this.$attrs[key];
                     });
 
@@ -147,8 +159,8 @@
             img_attrs() {
                 var ret = {};
                 Object.keys(this.$attrs)
-                    .filter(key =>  key.startsWith("img-") )
-                    .forEach(key=>{
+                    .filter(key => key.startsWith("img-"))
+                    .forEach(key => {
                         ret[key.slice(4)] = this.$attrs[key];
                     });
 
@@ -157,8 +169,8 @@
             file_attrs() {
                 var ret = {};
                 Object.keys(this.$attrs)
-                    .filter(key =>  key.startsWith("file-") )
-                    .forEach(key=>{
+                    .filter(key => key.startsWith("file-"))
+                    .forEach(key => {
                         ret[key.slice(5)] = this.$attrs[key];
                     });
 
@@ -195,15 +207,32 @@
             }
         },
         methods: {
-            video_load(e) {
-                var video = e.target;
-                var canvas = document.createElement('canvas');
-                canvas.width = video.clientWidth;
-                canvas.height = video.clientHeight;
-
-                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height)
-                this.poster = canvas.toDataURL('image/png');
-            },
+            // video_load(e, index) {
+            //     var item = this.myValue[index];
+            //     //如果有logo用logo
+            //     if (item.logo) {
+            //         return;
+            //     }
+            //
+            //     setTimeout(() => {
+            //         var video = e.target;
+            //         var canvas = document.createElement('canvas');
+            //         canvas.width = video.videoWidth;
+            //         canvas.height = video.videoHeight;
+            //
+            //         canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            //
+            //         var poster = canvas.toDataURL('image/png');
+            //
+            //         //可能是 data:base64
+            //         if (poster.length < 16) {
+            //             poster = this.poster;
+            //         }
+            //
+            //         item.poster = poster;
+            //         this.myValue.pushAll();
+            //     }, 50);
+            // },
             video_click(index) {
                 if (!this.h5) return;
                 this.file_preview(index);
@@ -545,161 +574,167 @@
         }
     }
 </script>
-<style>
-    .h5-remove .el-icon-circle-close {
-        position: absolute;
-        right: -12px;
-        top: -12px;
-        font-size: 24px;
-        opacity: 0.6;
-    }
+<style lang="scss">
 
     .avatar-uploader {
         display: flex;
         flex-wrap: wrap;
+
+        .avatar-uploader * {
+            flex: 0;
+        }
+
+        .el-upload {
+            cursor: pointer;
+            position: relative;
+            display: flex;
+            margin: 0 8px 8px 0;
+            /*overflow: hidden*/
+        }
+
+
+        .el-upload:hover {
+            border-color: #20a0ff
+        }
+
+
+        .avatar-uploader-icon {
+            border: 1px dashed #d9d9d9;
+            border-radius: 6px;
+            vertical-align: top;
+            font-size: 14px;
+            color: #8c939d;
+            width: 146px;
+            text-align: center;
+            height: 146px;
+            min-height: 120px;
+        }
+
+        .avatar-uploader-icon:before {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /*width: 140px;*/
+            /*height: 140px;*/
+            margin: 10px;
+        }
+
+        .avatar-uploader-icon:hover {
+            cursor: pointer;
+            border-color: #20a0ff
+        }
+
+        .el-icon-plus {
+            display: flex;
+            justify-items: center;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+        }
+
+
+        .el-icon-document:before {
+            font-size: 64px;
+        }
+
+        .h5-remove {
+            .el-icon-circle-close {
+                position: absolute;
+                right: -12px;
+                top: -12px;
+                font-size: 24px;
+                opacity: 0.6;
+            }
+        }
+
+
+        .el-upload-preview {
+            position: relative;
+            width: 146px;
+            min-width: 146px;
+
+            video::-webkit-media-controls {
+                display: none !important;
+            }
+
+            /**子级元素标志*/
+            .preview--sub {
+                display: none;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+            }
+
+            /**背景预览图*/
+            .preview--img {
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-position: center center;
+            }
+
+            .upload-fill {
+                position: relative;
+                display: flex;
+                justify-items: center;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .el-upload-bg {
+                background-color: #00000c;
+                opacity: 0.5;
+            }
+
+            .el-upload-icon {
+                font-size: 28px;
+                color: white;
+                width: 146px;
+                text-align: center;
+                display: none;
+                align-items: center;
+                justify-content: space-around;
+            }
+
+            .el-upload-icon i {
+                margin: 5px;
+            }
+        }
+
+        .el-upload-preview:hover {
+            .el-upload-bg {
+                display: block;
+                border-radius: 6px;
+            }
+
+            .hover-icon {
+                display: flex;
+            }
+
+            .confirm-icon {
+                display: none;
+            }
+        }
+
+        .deleting:hover {
+            .confirm-icon {
+                display: flex;
+            }
+
+
+            .hover-icon {
+                display: none;
+            }
+        }
     }
 
-    .avatar-uploader * {
-        flex: 0;
-    }
-
-    /*.avatar-uploader .withRemark {*/
-    /*  overflow: hidden;*/
-    /*  text-overflow: ellipsis;*/
-    /*  width: 140px;*/
-    /*  margin: auto;*/
-    /*  color: gray;*/
-    /*  -webkit-line-clamp: 1;*/
-    /*  -webkit-box-orient: vertical;*/
-    /*  display: -webkit-box;*/
-    /*  height: 36px;*/
-    /*}*/
-
-    .avatar-uploader .el-upload {
-        cursor: pointer;
-        position: relative;
-        display: flex;
-        margin: 0 8px 8px 0;
-        /*overflow: hidden*/
-    }
-
-    .avatar-uploader .el-upload:hover {
-        border-color: #20a0ff
-    }
-
-    .avatar-uploader .avatar-uploader-icon {
-        border: 1px dashed #d9d9d9;
-        border-radius: 6px;
-        vertical-align: top;
-        font-size: 14px;
-        color: #8c939d;
-        width: 146px;
-        text-align: center;
-        height: 146px;
-        min-height: 120px;
-    }
-
-    .avatar-uploader .el-icon-plus {
-        display: flex;
-        justify-items: center;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        font-size: 28px;
-    }
-
-    .avatar-uploader .avatar-uploader-icon:before {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        /*width: 140px;*/
-        /*height: 140px;*/
-        margin: 10px;
-    }
-
-    .el-upload .el-icon-document:before {
-        font-size: 64px;
-    }
-
-    .avatar-uploader .avatar-uploader-icon:hover {
-        cursor: pointer;
-        border-color: #20a0ff
-    }
-
-    .avatar-uploader .el-upload-preview {
-        position: relative;
-        width: 146px;
-        min-width: 146px;
-    }
-
-    /**子级元素标志*/
-    .avatar-uploader .el-upload-preview .preview--sub {
-        display: none;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-    }
-
-    /**背景预览图*/
-    .avatar-uploader .el-upload-preview .preview--img {
-        background-size: cover;
-        background-repeat: no-repeat;
-        background-position: center center;
-    }
-
-    .avatar-uploader .el-upload-preview .upload-fill {
-        position: relative;
-        display: flex;
-        justify-items: center;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .avatar-uploader .el-upload-preview .el-upload-bg {
-        background-color: #00000c;
-        opacity: 0.5;
-    }
-
-    .avatar-uploader .el-upload-preview .el-upload-icon {
-        font-size: 28px;
-        color: white;
-        width: 146px;
-        text-align: center;
-        display: none;
-        align-items: center;
-        justify-content: space-around;
-    }
 
     /*.avatar-uploader .el-upload-preview .el-upload-icon > div {*/
     /*height: 72px;*/
     /*line-height: 72px;*/
     /*}*/
 
-    .avatar-uploader .el-upload-preview .el-upload-icon i {
-        margin: 5px;
-    }
-
-    .avatar-uploader .el-upload-preview:hover .el-upload-bg {
-        display: block;
-        border-radius: 6px;
-    }
-
-    .avatar-uploader .el-upload-preview:hover .hover-icon {
-        display: flex;
-    }
-
-    .avatar-uploader .el-upload-preview:hover .confirm-icon {
-        display: none;
-    }
-
-    .avatar-uploader .deleting:hover .confirm-icon {
-        display: flex;
-    }
-
-    .avatar-uploader .deleting:hover .hover-icon {
-        display: none;
-    }
 </style>

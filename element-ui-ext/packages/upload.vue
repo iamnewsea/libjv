@@ -1,17 +1,18 @@
 <template>
-    <div class="avatar-uploader" v-bind="$attrs">
+    <div class="avatar-uploader" v-bind="c_attrs">
         <input type="file" name="file" style="display: none" @change="file_change" @click="file_click" v-bind="fileAttr"
                v-if="!readOnly">
 
         <div class="el-upload" :class="'el-upload-' + index" v-for="(item,index) in myValue">
             <div class="el-upload-preview" v-if="item.id && item.url" onmouseleave="this.classList.remove('deleting')">
-                <div class="avatar-uploader-icon preview--img" @click="img_click(index)"
+                <div v-bind="img_attrs" class="avatar-uploader-icon preview--img" @click="img_click(index)"
                      :style="{backgroundImage: 'url(' + item.url + ')'}"
                      v-if="item.fileType=='img'"/>
-                <video v-else-if="item.fileType=='video'" @click="video_click(index)" :src="item.url"
-                        controls
+                <video v-bind="video_attrs" v-else-if="item.fileType=='video'" @click="video_click(index)"
+                       :src="item.url"
+                       controls :poster="poster" @loadeddata="video_load($event)"
                        class="avatar-uploader-icon"></video>
-                <div v-else class="avatar-uploader-icon upload-fill el-icon-document preview--sub"
+                <div v-bind="file_attrs" v-else class="avatar-uploader-icon upload-fill el-icon-document preview--sub"
                      :class="'upload-icon-'+ item.fileType">
                     {{item.showName}}
                 </div>
@@ -112,13 +113,57 @@
             return {
                 myValue: [],
                 fileAttr: {},
-                // poster: "",         //video 封面。
+                poster: "",         //video 封面。
                 // imageRemark: "", //添加时使用.添加的图片文字
                 scales_value: this.scales
             };
         },
         mounted() {
             this.setMyValue(this.value);
+        },
+        computed: {
+            c_attrs() {
+                var ret = {};
+                Object.keys(this.$attrs)
+                    .filter(key => !key.startsWith("video-") &&
+                        !key.startsWith("img-") &&
+                        !key.startsWith("file-"))
+                    .forEach(key=>{
+                        ret[key] = this.$attrs[key];
+                    });
+
+                return ret;
+            },
+            video_attrs() {
+                var ret = {};
+                Object.keys(this.$attrs)
+                    .filter(key =>  key.startsWith("video-") )
+                    .forEach(key=>{
+                        ret[key.slice(6)] = this.$attrs[key];
+                    });
+
+                return ret;
+            },
+            img_attrs() {
+                var ret = {};
+                Object.keys(this.$attrs)
+                    .filter(key =>  key.startsWith("img-") )
+                    .forEach(key=>{
+                        ret[key.slice(4)] = this.$attrs[key];
+                    });
+
+                return ret;
+            },
+            file_attrs() {
+                var ret = {};
+                Object.keys(this.$attrs)
+                    .filter(key =>  key.startsWith("file-") )
+                    .forEach(key=>{
+                        ret[key.slice(5)] = this.$attrs[key];
+                    });
+
+                return ret;
+            }
         },
         watch: {
             maxCount: {
@@ -150,17 +195,15 @@
             }
         },
         methods: {
-            // video_load(e) {
-            //     var canvas = document.createElement('canvas');
-            //
-            //     var video = e.target;
-            //     canvas.width = video.clientWidth;
-            //     canvas.height = video.clientHeight;
-            //
-            //     canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height)
-            //     this.poster = canvas.toDataURL('image/png');
-            //
-            // },
+            video_load(e) {
+                var video = e.target;
+                var canvas = document.createElement('canvas');
+                canvas.width = video.clientWidth;
+                canvas.height = video.clientHeight;
+
+                canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height)
+                this.poster = canvas.toDataURL('image/png');
+            },
             video_click(index) {
                 if (!this.h5) return;
                 this.file_preview(index);

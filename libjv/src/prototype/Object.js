@@ -82,7 +82,7 @@
         }, enumerable: false
     });
 
-//移除Json的指定Keys，返回新对象。
+    //移除Json的指定Keys，返回新对象。
     Object.defineProperty(Object.prototype, "RemoveKeys", {
         value() {
             var ret = Object.assign({}, this);
@@ -94,16 +94,20 @@
     });
 
     /**
-     * 链式调用的判断
+     * 对 keys 的遍历
      */
-    Object.defineProperty(Object.prototype, "Run", {
-        value(callback) {
-            if (callback) {
-                return callback.apply(this);
-            }
-            return this;
-        }, enumerable: false
-    });
+    // Object.defineProperty(Object.prototype, "MapTo", {
+    //     value(callback) {
+    //
+    //         Object.keys(this).forEach(key=>{
+    //
+    //         });
+    //         if (callback) {
+    //             return callback.apply(this);
+    //         }
+    //         return this;
+    //     }, enumerable: false
+    // });
 
 })();
 

@@ -9,6 +9,7 @@
                      :style="{backgroundImage: 'url(' + item.url + ')'}"
                      v-if="item.fileType=='img'"/>
                 <video v-else-if="item.fileType=='video'" @click="video_click(index)" :src="item.url"
+                        controls
                        class="avatar-uploader-icon"></video>
                 <div v-else class="avatar-uploader-icon upload-fill el-icon-document preview--sub"
                      :class="'upload-icon-'+ item.fileType">
@@ -111,6 +112,7 @@
             return {
                 myValue: [],
                 fileAttr: {},
+                // poster: "",         //video 封面。
                 // imageRemark: "", //添加时使用.添加的图片文字
                 scales_value: this.scales
             };
@@ -148,6 +150,17 @@
             }
         },
         methods: {
+            // video_load(e) {
+            //     var canvas = document.createElement('canvas');
+            //
+            //     var video = e.target;
+            //     canvas.width = video.clientWidth;
+            //     canvas.height = video.clientHeight;
+            //
+            //     canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height)
+            //     this.poster = canvas.toDataURL('image/png');
+            //
+            // },
             video_click(index) {
                 if (!this.h5) return;
                 this.file_preview(index);

@@ -1,66 +1,68 @@
 <template>
-  <div class="avatar-uploader"  v-bind="$attrs"  v-on="$listeners">
-    <input type="file" name="file" style="display: none" @change="file_change" @click="file_click" v-bind="fileAttr"
-           v-if="!readOnly">
+    <div class="avatar-uploader" v-bind="$attrs" v-on="$listeners">
+        <input type="file" name="file" style="display: none" @change="file_change" @click="file_click" v-bind="fileAttr"
+               v-if="!readOnly">
 
-    <div class="el-upload" :class="'el-upload-' + index" v-for="(item,index) in myValue">
-      <div class="el-upload-preview" v-if="item.id && item.url" onmouseleave="this.classList.remove('deleting')">
-        <div class="avatar-uploader-icon preview--img" @click="img_click(index)"
-             :style="{backgroundImage: 'url(' + item.url + ')'}"
-             v-if="item.fileType=='img'"/>
-        <video v-else-if="item.fileType=='video'" @click="video_click(index)" :src="item.url"
-               class="avatar-uploader-icon"></video>
-        <div v-else class="avatar-uploader-icon upload-fill el-icon-document preview--sub"
-             :class="'upload-icon-'+ item.fileType">
-          {{item.showName}}
+        <div class="el-upload" :class="'el-upload-' + index" v-for="(item,index) in myValue">
+            <div class="el-upload-preview" v-if="item.id && item.url" onmouseleave="this.classList.remove('deleting')">
+                <div class="avatar-uploader-icon preview--img" @click="img_click(index)"
+                     :style="{backgroundImage: 'url(' + item.url + ')'}"
+                     v-if="item.fileType=='img'"/>
+                <video v-else-if="item.fileType=='video'" @click="video_click(index)" :src="item.url"
+                       class="avatar-uploader-icon"></video>
+                <div v-else class="avatar-uploader-icon upload-fill el-icon-document preview--sub"
+                     :class="'upload-icon-'+ item.fileType">
+                    {{item.showName}}
+                </div>
+
+                <template v-if="h5">
+                    <div class="h5-remove" @click="onRemove(index,$event)" v-if="!readOnly">
+                        <slot name="remove">
+                            <i class="el-icon-circle-close"></i>
+                        </slot>
+                    </div>
+                </template>
+                <template v-else>
+                    <div class="el-upload-bg preview--sub">
+                    </div>
+                    <div class="el-upload-icon confirm-icon preview--sub" v-if="!readOnly">
+                        <el-tag type="danger" @click="onRemove(index,$event)"
+                                style="padding-left:12px;padding-right:12px;">确认删除?
+                        </el-tag>
+                    </div>
+                    <div class="el-upload-icon hover-icon preview--sub" style="flex-direction: column;">
+                        <div>
+                            <i class="el-icon-view" @click="file_preview(index)"
+                               v-if="item.fileType == 'img' || item.fileType == 'video'"></i>
+                            <i class="el-icon-download" @click="file_download(index)" v-else></i>
+                            <i class="el-icon-delete" v-if="!readOnly"
+                               @click="$event.target.closest('.el-upload-preview').classList.add('deleting')"></i>
+                        </div>
+                        <div v-if="maxCount>1 && !readOnly">
+                            <i class="el-icon-arrow-left" @click="move_left(index)" v-if="index>0"></i>
+                            <i class="el-icon-arrow-right" @click="move_right(index)"
+                               v-if="index < myValue.length -1"></i>
+                        </div>
+                    </div>
+                </template>
+
+            </div>
+            <!--      <div v-if="withRemark" class="withRemark">-->
+            <!--        {{item.remark}}-->
+            <!--      </div>-->
+
+            <el-progress type="circle" :percentage="item.percentage"
+                         v-else-if="item.percentage>0 && item.percentage<100"></el-progress>
         </div>
 
-        <template v-if="h5">
-          <div class="h5-remove" @click="onRemove(index,$event)" v-if="!readOnly">
-            <slot name="remove">
-              <i class="el-icon-circle-close"></i>
-            </slot>
-          </div>
-        </template>
-        <template v-else>
-          <div class="el-upload-bg preview--sub">
-          </div>
-          <div class="el-upload-icon confirm-icon preview--sub" v-if="!readOnly">
-            <el-tag type="danger" @click="onRemove(index,$event)" style="padding-left:12px;padding-right:12px;">确认删除?
-            </el-tag>
-          </div>
-          <div class="el-upload-icon hover-icon preview--sub" style="flex-direction: column;">
-            <div>
-              <i class="el-icon-view" @click="file_preview(index)"
-                 v-if="item.fileType == 'img' || item.fileType == 'video'"></i>
-              <i class="el-icon-download" @click="file_download(index)" v-else></i>
-              <i class="el-icon-delete" v-if="!readOnly"
-                 @click="$event.target.closest('.el-upload-preview').classList.add('deleting')"></i>
+
+        <div class="el-upload" @click="upload_Click" v-if="!readOnly && ( !myValue ||  myValue.length < maxCount )">
+            <div class="el-upload-preview">
+                <slot>
+                    <i class="el-icon-plus avatar-uploader-icon"></i></slot>
             </div>
-            <div v-if="maxCount>1 && !readOnly">
-              <i class="el-icon-arrow-left" @click="move_left(index)" v-if="index>0"></i>
-              <i class="el-icon-arrow-right" @click="move_right(index)" v-if="index < myValue.length -1"></i>
-            </div>
-          </div>
-        </template>
-
-      </div>
-      <!--      <div v-if="withRemark" class="withRemark">-->
-      <!--        {{item.remark}}-->
-      <!--      </div>-->
-
-      <el-progress type="circle" :percentage="item.percentage"
-                   v-else-if="item.percentage>0 && item.percentage<100"></el-progress>
+        </div>
     </div>
-
-
-    <div class="el-upload" @click="upload_Click" v-if="!readOnly && ( !myValue ||  myValue.length < maxCount )">
-      <div class="el-upload-preview">
-        <slot>
-          <i class="el-icon-plus avatar-uploader-icon"></i></slot>
-      </div>
-    </div>
-  </div>
 </template>
 <script>
     export default {
@@ -479,7 +481,7 @@
             }
             ,
             file_preview(index) {
-                jv.openPreview({type: this.myValue[index].fileType, h5:this.h5, url: this.myValue[index].url});
+                jv.openPreview({type: this.myValue[index].fileType, h5: this.h5, url: this.myValue[index].url});
             },
             file_download(index) {
                 jv.downloadFile(this.myValue[index].url)
@@ -488,158 +490,160 @@
     }
 </script>
 <style>
-  .h5-remove .el-icon-circle-close {
-    position: absolute;
-    right: -9px;
-    top: -9px;
-  }
+    .h5-remove .el-icon-circle-close {
+        position: absolute;
+        right: -12px;
+        top: -12px;
+        font-size: 24px;
+        opacity: 0.6;
+    }
 
-  .avatar-uploader {
-    display: flex;
-    flex-wrap: wrap;
-  }
+    .avatar-uploader {
+        display: flex;
+        flex-wrap: wrap;
+    }
 
-  .avatar-uploader * {
-    flex: 0;
-  }
+    .avatar-uploader * {
+        flex: 0;
+    }
 
-  /*.avatar-uploader .withRemark {*/
-  /*  overflow: hidden;*/
-  /*  text-overflow: ellipsis;*/
-  /*  width: 140px;*/
-  /*  margin: auto;*/
-  /*  color: gray;*/
-  /*  -webkit-line-clamp: 1;*/
-  /*  -webkit-box-orient: vertical;*/
-  /*  display: -webkit-box;*/
-  /*  height: 36px;*/
-  /*}*/
+    /*.avatar-uploader .withRemark {*/
+    /*  overflow: hidden;*/
+    /*  text-overflow: ellipsis;*/
+    /*  width: 140px;*/
+    /*  margin: auto;*/
+    /*  color: gray;*/
+    /*  -webkit-line-clamp: 1;*/
+    /*  -webkit-box-orient: vertical;*/
+    /*  display: -webkit-box;*/
+    /*  height: 36px;*/
+    /*}*/
 
-  .avatar-uploader .el-upload {
-    cursor: pointer;
-    position: relative;
-    display: flex;
-    margin: 0 8px 8px 0;
-    /*overflow: hidden*/
-  }
+    .avatar-uploader .el-upload {
+        cursor: pointer;
+        position: relative;
+        display: flex;
+        margin: 0 8px 8px 0;
+        /*overflow: hidden*/
+    }
 
-  .avatar-uploader .el-upload:hover {
-    border-color: #20a0ff
-  }
+    .avatar-uploader .el-upload:hover {
+        border-color: #20a0ff
+    }
 
-  .avatar-uploader .avatar-uploader-icon {
-    border: 1px dashed #d9d9d9;
-    border-radius: 6px;
-    vertical-align: top;
-    font-size: 14px;
-    color: #8c939d;
-    width: 146px;
-    text-align: center;
-    height: 146px;
-    min-height: 120px;
-  }
+    .avatar-uploader .avatar-uploader-icon {
+        border: 1px dashed #d9d9d9;
+        border-radius: 6px;
+        vertical-align: top;
+        font-size: 14px;
+        color: #8c939d;
+        width: 146px;
+        text-align: center;
+        height: 146px;
+        min-height: 120px;
+    }
 
-  .avatar-uploader .el-icon-plus {
-    display: flex;
-    justify-items: center;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: 28px;
-  }
+    .avatar-uploader .el-icon-plus {
+        display: flex;
+        justify-items: center;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+    }
 
-  .avatar-uploader .avatar-uploader-icon:before {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    /*width: 140px;*/
-    /*height: 140px;*/
-    margin: 10px;
-  }
+    .avatar-uploader .avatar-uploader-icon:before {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        /*width: 140px;*/
+        /*height: 140px;*/
+        margin: 10px;
+    }
 
-  .el-upload .el-icon-document:before {
-    font-size: 64px;
-  }
+    .el-upload .el-icon-document:before {
+        font-size: 64px;
+    }
 
-  .avatar-uploader .avatar-uploader-icon:hover {
-    cursor: pointer;
-    border-color: #20a0ff
-  }
+    .avatar-uploader .avatar-uploader-icon:hover {
+        cursor: pointer;
+        border-color: #20a0ff
+    }
 
-  .avatar-uploader .el-upload-preview {
-    position: relative;
-    width: 146px;
-    min-width: 146px;
-  }
+    .avatar-uploader .el-upload-preview {
+        position: relative;
+        width: 146px;
+        min-width: 146px;
+    }
 
-  /**子级元素标志*/
-  .avatar-uploader .el-upload-preview .preview--sub {
-    display: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-  }
+    /**子级元素标志*/
+    .avatar-uploader .el-upload-preview .preview--sub {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
 
-  /**背景预览图*/
-  .avatar-uploader .el-upload-preview .preview--img {
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center center;
-  }
+    /**背景预览图*/
+    .avatar-uploader .el-upload-preview .preview--img {
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center center;
+    }
 
-  .avatar-uploader .el-upload-preview .upload-fill {
-    position: relative;
-    display: flex;
-    justify-items: center;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
+    .avatar-uploader .el-upload-preview .upload-fill {
+        position: relative;
+        display: flex;
+        justify-items: center;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
 
-  .avatar-uploader .el-upload-preview .el-upload-bg {
-    background-color: #00000c;
-    opacity: 0.5;
-  }
+    .avatar-uploader .el-upload-preview .el-upload-bg {
+        background-color: #00000c;
+        opacity: 0.5;
+    }
 
-  .avatar-uploader .el-upload-preview .el-upload-icon {
-    font-size: 28px;
-    color: white;
-    width: 146px;
-    text-align: center;
-    display: none;
-    align-items: center;
-    justify-content: space-around;
-  }
+    .avatar-uploader .el-upload-preview .el-upload-icon {
+        font-size: 28px;
+        color: white;
+        width: 146px;
+        text-align: center;
+        display: none;
+        align-items: center;
+        justify-content: space-around;
+    }
 
-  /*.avatar-uploader .el-upload-preview .el-upload-icon > div {*/
-  /*height: 72px;*/
-  /*line-height: 72px;*/
-  /*}*/
+    /*.avatar-uploader .el-upload-preview .el-upload-icon > div {*/
+    /*height: 72px;*/
+    /*line-height: 72px;*/
+    /*}*/
 
-  .avatar-uploader .el-upload-preview .el-upload-icon i {
-    margin: 5px;
-  }
+    .avatar-uploader .el-upload-preview .el-upload-icon i {
+        margin: 5px;
+    }
 
-  .avatar-uploader .el-upload-preview:hover .el-upload-bg {
-    display: block;
-    border-radius: 6px;
-  }
+    .avatar-uploader .el-upload-preview:hover .el-upload-bg {
+        display: block;
+        border-radius: 6px;
+    }
 
-  .avatar-uploader .el-upload-preview:hover .hover-icon {
-    display: flex;
-  }
+    .avatar-uploader .el-upload-preview:hover .hover-icon {
+        display: flex;
+    }
 
-  .avatar-uploader .el-upload-preview:hover .confirm-icon {
-    display: none;
-  }
+    .avatar-uploader .el-upload-preview:hover .confirm-icon {
+        display: none;
+    }
 
-  .avatar-uploader .deleting:hover .confirm-icon {
-    display: flex;
-  }
+    .avatar-uploader .deleting:hover .confirm-icon {
+        display: flex;
+    }
 
-  .avatar-uploader .deleting:hover .hover-icon {
-    display: none;
-  }
+    .avatar-uploader .deleting:hover .hover-icon {
+        display: none;
+    }
 </style>

@@ -116,6 +116,10 @@
                 //默认的封面。如果找不到，使用默认的。
                 type: String, default: () => ""
             },
+            videoTime: {
+                //单位是秒，上传视频的时长限制
+                type: Number, default: 0
+            },
             axiosConfig: {
                 type: Object, default: () => {
                     return {};
@@ -386,33 +390,49 @@
                 }
 
 
-                if (fileType.type == "img" && this.scales_value.length == 0 && this.maxWidth > 0) {
-                    return this.doUpload(rawFile, null, fileName, item);
-                } else if (fileType.type == "img" && this.scales_value.length) {
-                } else {
+                if (fileType.type == "img" && this.scales_value.length) {
+                    return jv.file2Base64Data(rawFile).then(base64Data => {
+                        jv.openEditImage({
+                            image: base64Data,
+                            scales: this.scales_value,
+                            fileName: fileName,
+                            // imageRemark: this.withRemark ? "" : null,
+                            //callback : 返回 base64 格式的图片数据
+                            callback: (imageData, imageRemark) => {
+                                if (!imageData) {
+                                    return Promise.reject("裁剪出错");
+                                }
+                                // this.imageRemark = imageRemark;
+
+                                return this.doUpload(null, imageData, fileName, item);
+                            },
+                            cancel: () => {
+                                this.myValue.splice(this.myValue.length - 1, 1);
+                            }
+                        });
+                    });
+                }
+                else if( fileType.type == "video" && this.videoTime){
+                    var self = this;
+                    return jv.file2Base64Data(rawFile).then(base64Data => {
+                        var video = document.createElement("video")
+                        video.src = base64;
+                        video.onloadeddata = e => {
+
+                            var video = e.target;
+                            if (video.duration >  self.videoTime) {
+                                jv.error("视频时长超过 " + self.videoTime + "秒");
+                                self.myValue.removeItem(item);
+                                return ;
+                            }
+
+                            this.doUpload(null, base64Data, fileName, item);
+                        };
+                    });
+                }
+                else {
                     return this.doUpload(rawFile, null, fileName, item);
                 }
-
-                return jv.file2Base64Data(rawFile).then(base64Data => {
-                    jv.openEditImage({
-                        image: base64Data,
-                        scales: this.scales_value,
-                        fileName: fileName,
-                        // imageRemark: this.withRemark ? "" : null,
-                        //callback : 返回 base64 格式的图片数据
-                        callback: (imageData, imageRemark) => {
-                            if (!imageData) {
-                                return Promise.reject("裁剪出错");
-                            }
-                            // this.imageRemark = imageRemark;
-
-                            return this.doUpload(null, imageData, fileName, item);
-                        },
-                        cancel: () => {
-                            this.myValue.splice(this.myValue.length - 1, 1);
-                        }
-                    });
-                });
             },
 
             //7.检查Md5,上传

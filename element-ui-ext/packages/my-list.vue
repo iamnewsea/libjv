@@ -1,46 +1,50 @@
 <template>
-  <div>
-    <div class="query">
-      <slot name="query" v-bind:query="query"></slot>
-      <div class="buttons">
-        <slot name="button">
-          <el-button size="mini" @click="loadData(1)" type="primary">查询</el-button>
-        </slot>
-        <slot name="other"></slot>
-      </div>
+    <div>
+        <div class="query">
+            <slot name="query" v-bind:query="query"></slot>
+            <div class="buttons">
+                <slot name="button">
+                    <el-button size="mini" @click="loadData(1)" type="primary">查询</el-button>
+                </slot>
+                <slot name="other"></slot>
+            </div>
+        </div>
+
+        <slot name="head"></slot>
+
+        <el-table :data="tableData"
+                  v-loading="url && loading"
+                  v-bind="[attrs]"
+                  @row-dblclick="dbClick"
+                  @row-click="tableRowClick"
+                  @rowKey="rowKey"
+        >
+            <slot></slot>
+        </el-table>
+        <el-pagination layout="prev, pager, next" v-if="total>pageSize"
+                       :total="total" :page-size="pageSize" :currentPage.sync="pageNumber" @current-change="loadData"
+                       style="text-align: right;margin-top:20px;">
+        </el-pagination>
     </div>
-
-    <slot name="head"></slot>
-
-    <el-table :data="tableData"
-              v-loading="url && loading"
-              v-bind="[attrs]"
-              @row-dblclick="dbClick"
-              @row-click="tableRowClick"
-              @rowKey="rowKey"
-    >
-      <slot></slot>
-    </el-table>
-    <el-pagination layout="prev, pager, next" v-if="total>pageSize"
-                   :total="total" :page-size="pageSize" :currentPage.sync="pageNumber" @current-change="loadData"
-                   style="text-align: right;margin-top:20px;">
-    </el-pagination>
-  </div>
 </template>
 <style scoped>
-  .buttons {
-    min-width: auto;
-    max-width: unset;
-    width: auto;
-  }
+    .buttons {
+        min-width: auto;
+        max-width: unset;
+        width: auto;
+    }
 
-  .buttons > * {
-    margin-right: 12px;
-  }
+    .buttons > * {
+        margin-right: 12px;
+    }
 
-  .buttons > *:last-child {
-    margin-right: 0;
-  }
+    .buttons > *:last-child {
+        margin-right: 0;
+    }
+
+    .last-row .link {
+        font-weight: bold;
+    }
 </style>
 <script type="text/ecmascript-6">
     export default {

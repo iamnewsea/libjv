@@ -312,13 +312,16 @@
                     return false;
                 }
             },
+            clear_value() {
+                this.$el.querySelector("input[type=file]").value = "";
+            },
             file_change(e) {
                 var files = e.target.files;
                 if (files.length + this.myValue.length > this.maxCount) {
                     jv.error("最多只能上传: " + this.maxCount + "个！");
+                    this.clear_value();
                     return;
                 }
-
 
                 if (this.fileType != "*") {
                     var errorFileType = Array.from(files).some((rawFile, index) => {
@@ -332,13 +335,15 @@
                     });
 
                     if (errorFileType) {
+                        this.clear_value();
                         return;
                     }
                 }
 
-                Promise.all(Array.from(files).map(file => this.uploadFile(file))).then(() => {
-                    e.target.value = "";
-                });
+                Promise.all(Array.from(files).map(file => this.uploadFile(file)))
+                    .finally(() => {
+                        this.clear_value();
+                    });
             },
             uploadFile(rawFile) {
                 if (!rawFile) {
@@ -411,26 +416,21 @@
                             }
                         });
                     });
-                }
-                else if( fileType.type == "video" && this.videoTime){
+                } else if (fileType.type == "video" && this.videoTime) {
                     var self = this;
-                    return jv.file2Base64Data(rawFile).then(base64Data => {
-                        var video = document.createElement("video")
-                        video.src = base64;
-                        video.onloadeddata = e => {
 
-                            var video = e.target;
-                            if (video.duration >  self.videoTime) {
-                                jv.error("视频时长超过 " + self.videoTime + "秒");
-                                self.myValue.removeItem(item);
-                                return ;
-                            }
+                    var audioElement = new Audio(URL.createObjectURL(rawFile));
+                    audioElement.addEventListener("loadedmetadata", e => {
+                        var video = e.target;
+                        if (video.duration > self.videoTime) {
+                            jv.error("视频时长超过 " + self.videoTime + "秒");
+                            self.myValue.removeItem(item);
+                            return;
+                        }
 
-                            this.doUpload(null, base64Data, fileName, item);
-                        };
+                        this.doUpload(null, base64Data, fileName, item);
                     });
-                }
-                else {
+                } else {
                     return this.doUpload(rawFile, null, fileName, item);
                 }
             },

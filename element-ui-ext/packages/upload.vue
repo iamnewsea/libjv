@@ -299,9 +299,11 @@
                 this.fileAttr = {multiple: "multiple"};
             },
             upload_Click() {
-                var input = this.$el.querySelector("input");
+                var input = this.$el.querySelector("input[type=file]");
                 if (input) {
                     input.click();
+                } else {
+                    jv.error("找不到input.file");
                 }
             },
             file_click(e) {

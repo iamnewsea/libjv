@@ -139,26 +139,7 @@
                     if (!v) {
                         return;
                     }
-                    var method = (this.urlMethod || "post").toLowerCase();
-
-                    if (this.cache) {
-                        var data = jv.cache["[selector]" + this.url];
-                        if (data) {
-                            return this.setData(data);
-                        }
-                    }
-
-                    var query = {};
-                    this.$emit("param", query);
-
-                    this.$http[method](v, query).then(res => {
-                        this.$emit("loaded", res);
-                        var data = res.data.data;
-                        if (this.cache) {
-                            jv.cache["[selector]" + this.url] = data;
-                        }
-                        this.setData(data);
-                    });
+                    this.ajaxUrl(v);
                 }
             },
             data: {
@@ -252,8 +233,6 @@
             };
         },
         created() {
-            // this.label2 = ""; // readOnly 显示时用。
-            this.init();
         },
         methods: {
             item_click(e) {
@@ -274,15 +253,28 @@
                 this.value1 = "";
                 this.changed();
             },
-            init() {
-                if (this.url) {
-                    var method = (this.urlMethod || "post").toLowerCase();
-                    this.$http[method](this.url).then(res => {
-                        this.setData(res.data.data);
-                    });
-                } else {
-                    this.setData();
+            ajaxUrl(url){
+                url = url || this.url;
+                var method = (this.urlMethod || "post").toLowerCase();
+
+                if (this.cache) {
+                    var data = jv.cache["[selector]" + url];
+                    if (data) {
+                        return this.setData(data);
+                    }
                 }
+
+                var query = {};
+                this.$emit("param", query);
+
+                this.$http[method](url, query).then(res => {
+                    this.$emit("loaded", res);
+                    var data = res.data.data;
+                    if (this.cache) {
+                        jv.cache["[selector]" + url] = data;
+                    }
+                    this.setData(data);
+                });
             },
             changed(set_v) {
                 var v = set_v;

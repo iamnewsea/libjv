@@ -1,13 +1,13 @@
 <template>
-  <el-cascader class="my-city" placeholder="请选择地区"
-               :props="props_data"
-               :multiple="multiple"
-               :emitPath="false"
-               @change="cityChange"
-               v-model="cityValue"
-               v-bind="$attrs"
-               >
-  </el-cascader>
+    <el-cascader class="my-city" placeholder="请选择地区"
+                 :props="props_data"
+                 :multiple="multiple"
+                 :emitPath="false"
+                 @change="cityChange"
+                 v-model="cityValue"
+                 v-bind="$attrs"
+    >
+    </el-cascader>
 </template>
 <script type="text/javascript">
     import jv from "./vue-city"
@@ -17,6 +17,10 @@
         props: {
             multiple: {
                 type: Boolean, default: () => false
+            },
+            //对直辖市来说，1=2
+            level: {
+                type: [String, Number], default: () => 3
             },
             value: {
                 type: [Object, Array]
@@ -30,13 +34,10 @@
                 cityValue: [],
                 props_data: {
                     lazy: true,
-                    lazyLoad(node, resolve) {
-                        jv.city.loadChildren(!node.level ? 0 : node.value, resolve);
-                    }
+                    lazyLoad: this.lazyLoad
                 }
             }
         },
-
         watch: {
             value: {
                 deep: true, immediate: true,
@@ -49,6 +50,9 @@
             }
         },
         methods: {
+            lazyLoad(node, resolve) {
+                jv.city.loadChildren(!node.level ? 0 : node.value, jv.asInt(this.level), resolve);
+            },
             cityChange(vals) {
                 var code = vals.last();
                 var city = jv.city.getByCode(code);
@@ -59,9 +63,9 @@
     }
 </script>
 <style scoped>
-  .my-city {
-    width: 100%;
-  }
+    .my-city {
+        width: 100%;
+    }
 
 
 </style>

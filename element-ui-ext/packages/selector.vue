@@ -306,25 +306,29 @@
                     }
 
 
-                    //保留空值不转换
-                    if (jv.isNull(v) || (v === "")) {
-                        v = "";
-                    } else if (this.valueIsBoolean) {
-                        v = jv.asBoolean(v)
-                    } else if (this.valueIsNumber) {
-                        v = jv.asInt(v);
+                    if( this.returnValueField) {
+                        //保留空值不转换
+                        if (jv.isNull(v) || (v === "")) {
+                            v = "";
+                        } else if (this.valueIsBoolean) {
+                            v = jv.asBoolean(v)
+                        } else if (this.valueIsNumber) {
+                            v = jv.asInt(v);
+                        }
                     }
-
                 } else {
                     if (jv.isNull(v)) {
                         v = this.value2;
                     }
 
                     v = v.filter(it => !jv.isNull(v));
-                    if (this.valueIsBoolean) {
-                        v = v.map(it => jv.asBoolean(it))
-                    } else if (this.valueIsNumber) {
-                        v = v.map(it => jv.asInt(it))
+
+                    if( this.returnValueField) {
+                        if (this.valueIsBoolean) {
+                            v = v.map(it => jv.asBoolean(it))
+                        } else if (this.valueIsNumber) {
+                            v = v.map(it => jv.asInt(it))
+                        }
                     }
                 }
                 this.$emit("input", v);

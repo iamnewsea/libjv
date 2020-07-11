@@ -1,52 +1,52 @@
 <template>
-  <div class="enum"  v-bind="$attrs">
-    <template v-if="!data2.length">
-      <label>{{nodata_display}}</label>
-    </template>
+    <div class="enum" v-bind="$attrs">
+        <template v-if="!data2.length">
+            <label>{{nodata_display}}</label>
+        </template>
 
-    <template v-if="readOnly">
-      <label v-for="item in value_displays" :key="item">{{item}}</label>
-    </template>
+        <template v-if="readOnly">
+            <label v-for="item in value_displays" :key="item">{{item}}</label>
+        </template>
 
-    <template v-else>
-      <template v-if="type == 'radio'">
-        <el-radio-group v-model="value1" v-if="data2.length <= enumCount"
-                        @change="changed" :class="clearable? 'ri4c':''">
-          <el-radio v-for="item in data2" :label="item[keyField]" @click.native.stop="item_click"
-                    :key="item[keyField]">{{item[labelField]}}
-          </el-radio>
-        </el-radio-group>
+        <template v-else>
+            <template v-if="type == 'radio'">
+                <el-radio-group v-model="value1" v-if="data2.length <= enumCount"
+                                @change="changed" :class="clearable? 'ri4c':''">
+                    <el-radio v-for="item in data2" :label="item[keyField]" @click.native.stop="item_click"
+                              :key="item[keyField]">{{item[labelField]}}
+                    </el-radio>
+                </el-radio-group>
 
-        <el-select v-model="value1" placeholder="请选择" v-else :clearable="clearable"
-                   @change="changed">
-          <el-option
-            v-for="item in data2"
-            :key="item[keyField]"
-            :label="item[labelField]"
-            :value="item[keyField]">
-          </el-option>
-        </el-select>
-      </template>
-      <template v-else>
-        <el-checkbox-group v-model="value2" v-if="data2.length <= enumCount"
-                           @change="changed(null)">
-          <el-checkbox v-for="item in data2" :label="item[keyField]"
-                       :key="item[keyField]">{{item[labelField]}}
-          </el-checkbox>
-        </el-checkbox-group>
-        <el-select v-model="value2" multiple placeholder="请选择" v-else :clearable="clearable"
-                   @change="changed">
-          <el-option
-            v-for=" item in data2"
-            :key="item[keyField]"
-            :label="item[labelField]"
-            :value="item[keyField]">
-          </el-option>
-        </el-select>
-      </template>
-    </template>
+                <el-select v-model="value1" placeholder="请选择" v-else :clearable="clearable"
+                           @change="changed">
+                    <el-option
+                            v-for="item in data2"
+                            :key="item[keyField]"
+                            :label="item[labelField]"
+                            :value="item[keyField]">
+                    </el-option>
+                </el-select>
+            </template>
+            <template v-else>
+                <el-checkbox-group v-model="value2" v-if="data2.length <= enumCount"
+                                   @change="changed(null)">
+                    <el-checkbox v-for="item in data2" :label="item[keyField]"
+                                 :key="item[keyField]">{{item[labelField]}}
+                    </el-checkbox>
+                </el-checkbox-group>
+                <el-select v-model="value2" multiple placeholder="请选择" v-else :clearable="clearable"
+                           @change="changed">
+                    <el-option
+                            v-for=" item in data2"
+                            :key="item[keyField]"
+                            :label="item[labelField]"
+                            :value="item[keyField]">
+                    </el-option>
+                </el-select>
+            </template>
+        </template>
 
-  </div>
+    </div>
 </template>
 <script>
     export default {
@@ -63,18 +63,12 @@
                     return "post"
                 }
             },
-            urlDataPath: {
-                type: String, default() {
-                    return "data"
-                }
-            },
             //如果是 url ，是否启用缓存，缓存对象 jv.cache
             cache: {
                 type: Boolean, default() {
                     return false
                 }
             },
-
             //数据在返回json的路径
             // data 如果是数组，对象深度只能是一级或零级： [{id,name } , ...]  ,["中学","小学",...]
             // 到 data2的时候，全部是一级对象。
@@ -154,8 +148,12 @@
                         }
                     }
 
-                    this.$http[method](v).then(res => {
-                        var data = jv.evalExpression(res.data, this.urlDataPath);
+                    var query = {};
+                    this.$emit("param", query);
+
+                    this.$http[method](v, query).then(res => {
+                        this.$emit("loaded", res);
+                        var data = res.data.data;
                         if (this.cache) {
                             jv.cache["[selector]" + this.url] = data;
                         }
@@ -593,11 +591,11 @@
 </script>
 <style scoped>
 
-  >>> .ri4c .el-radio__input.is-checked .el-radio__inner:hover {
-    border-radius: 0;
-  }
+    >>> .ri4c .el-radio__input.is-checked .el-radio__inner:hover {
+        border-radius: 0;
+    }
 
-  >>> .ri4c .el-radio__input.is-checked .el-radio__inner:hover:after {
-    border-radius: 0;
-  }
+    >>> .ri4c .el-radio__input.is-checked .el-radio__inner:hover:after {
+        border-radius: 0;
+    }
 </style>

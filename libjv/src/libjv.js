@@ -1035,6 +1035,25 @@ jv.evalExpression = (obj, path) => {
     }
 };
 
+jv.setEvalExpression = (obj, path, value) => {
+    if (path === 0) {
+        obj[path] = value;
+        return true;
+    }
+
+    if (!path) {
+        return false;
+    }
+
+    try {
+        eval("(obj,v)=>obj." + path +"=v")(obj,value);
+        return true;
+    } catch (e) {
+        jv.evalExpressionError = e;
+        return false;
+    }
+}
+
 /**
  * 从 container 向下，遍历 $children，根据 $el == dom 查找 dom所属的 vnode
  * @param container

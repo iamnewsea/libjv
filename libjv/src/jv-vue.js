@@ -32,6 +32,7 @@ jv.initVue = (setting) => {
         ajaxErrorMsg = true;
     }
 
+    // jv.initVue_setting = {ajaxJavaBooleanKey, ajaxResType, ajaxErrorMsg};
 
     Object.keys(process.env).forEach(key => {
         if (key.startsWith("VUE_APP_")) {
@@ -259,7 +260,9 @@ jv.initVue = (setting) => {
 
         return response;
     }, (error) => {
-
+        if (!error.config.errorMsg) {
+            return Promise.reject(error);
+        }
         //如果网络有返回
         var resp = error.response;
         if (resp) {

@@ -4,12 +4,13 @@ import jv from "./file-upload"
  * jv.initVue({vue:Vue,axios:axios,router:router});
  * @param setting
  * @returns {value|boolean|*}
- ajaxIgnoreJavaBooleanKey ：默认为false , 是否处理 Java Boolean的Key，如：接口返回 admin:true , 转化为： isAdmin: true
- ajaxIgnoreResType ： 默认为false , 系统默认对 boolean,date添加 _res 额外键，设置这个字段，会忽略指定的类型。该值是逗号分隔的字符串，有如下值：boolean,date
+ ajaxJavaBooleanKey ：默认为true , 是否处理 Java Boolean的Key，如：接口返回 admin:true , 转化为： isAdmin: true
+ ajaxResType ： 默认为true , 系统默认对 boolean,date添加 _res 额外键，设置这个字段，会忽略指定的类型。该值是逗号分隔的字符串，有如下值：boolean,date
+ ajaxErrorMsg: 默认为 true,系统默认认为 res.data.msg 是错误消息，弹窗提示
  */
 jv.initVue = (setting) => {
     window.jv = jv;
-    var {vue, axios, router, ajaxIgnoreJavaBooleanKey, ajaxIgnoreResType, ignoreMsg} = setting;
+    var {vue, axios, router, ajaxJavaBooleanKey, ajaxResType, ajaxErrorMsg} = setting;
     jv.Vue = vue;
     //关闭环境给出的提示.
     // vue.config.productionTip = false;
@@ -18,10 +19,20 @@ jv.initVue = (setting) => {
     vueProtype.Server_Host = window.Server_Host;
     vueProtype.$http = axios;
 
-    jv.initVue_setting = {ajaxIgnoreJavaBooleanKey, ajaxIgnoreResType};
-
 
     window.BASE_URL = process.env.BASE_URL;
+
+    if (jv.isNull(ajaxJavaBooleanKey)) {
+        ajaxJavaBooleanKey = true;
+    }
+    if (jv.isNull(ajaxResType)) {
+        ajaxResType = true;
+    }
+    if (jv.isNull(ajaxErrorMsg)) {
+        ajaxErrorMsg = true;
+    }
+
+
     Object.keys(process.env).forEach(key => {
         if (key.startsWith("VUE_APP_")) {
             var key2 = key.slice(8);
@@ -29,13 +40,6 @@ jv.initVue = (setting) => {
         }
     });
 
-    // vueProtype.Upload_Url = window.Server_Host + "/sys/upload";
-
-    // Object.defineProperty(vueProtype, "$resetData", {
-    //   value () {
-    //     return Object.assign(this.$data, this.$options.data());
-    //   }, enumerable: false
-    // });
 
     //创建简单的 store
     jv.store = vueProtype.$my_store = {
@@ -151,35 +155,6 @@ jv.initVue = (setting) => {
     //----------------------------------- axios
     //代理 post
 
-    // var ori_post = axios.post;
-    //
-    // axios.post = (url, data, config) => {
-    //     var need_ajax = false;
-    //     if (!config.cache) {
-    //         need_ajax = true;
-    //     } else {
-    //         var key = "post." + url + "." + jv.param(data);
-    //         if (config.cache === "storage") {
-    //             var json = jv.store.getJson(key);
-    //
-    //         } else if (config.cache === "page") {
-    //             var json = jv.cache_db[key] || {};
-    //         } else {
-    //             throw new Error("不识别的缓存类型:" + config.cache)
-    //         }
-    //
-    //         if (Object.keys(json).length) {
-    //             return Promise.resolve(json);
-    //         } else {
-    //             need_ajax = true;
-    //         }
-    //     }
-    //
-    //     if (need_ajax) {
-    //         return ori_post.call(this, url, data, config);
-    //     }
-    // };
-
     jv.Vue.mixin({
         updated: function () {
             if (jv.chk_must_dom_class && this.$el && this.$el.querySelectorAll) {
@@ -194,8 +169,9 @@ jv.initVue = (setting) => {
 
 
     jv.ajax = axios;
-    axios.defaults.ignoreJavaBooleanKey = ajaxIgnoreJavaBooleanKey;
-    axios.defaults.ignoreResType = ajaxIgnoreResType;
+    axios.defaults.javaBooleanKey = ajaxJavaBooleanKey;
+    axios.defaults.resType = ajaxResType;
+    axios.defaults.errorMsg = ajaxErrorMsg;
 
     axios.defaults.baseURL = window.Server_Host;
     axios.defaults.withCredentials = true;
@@ -224,7 +200,7 @@ jv.initVue = (setting) => {
         console.log((new Date()).valueOf().toDateString() + " [" + config.method + "] " + config.baseURL + config.url);
 
 
-        if (config.ignoreJavaBooleanKey) return config;
+        if (!config.javaBooleanKey) return config;
         if (!config.data) return config;
         var type = config.data.Type;
         if (!config.data.ObjectType && !["array", "set"].includes(type)) return config;
@@ -260,7 +236,7 @@ jv.initVue = (setting) => {
     axios.interceptors.response.use((response) => {
         // Do something with response data
         var json = response.body = response.data;
-        if (!ignoreMsg && json && json.msg) {
+        if (response.config.errorMsg && json && json.msg) {
             jv.error(json.msg);
             return Promise.reject({config: response.config, request: response.request, response, message: json.msg});
         }
@@ -277,7 +253,9 @@ jv.initVue = (setting) => {
         //     jv.fixJavaBoolField(json);
         // }
 
-        jv.fillRes(json, null, null, response.config.ignoreResType);
+        if (response.config.resType) {
+            jv.fillRes(json);
+        }
 
         return response;
     }, (error) => {

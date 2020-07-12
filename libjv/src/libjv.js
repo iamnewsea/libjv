@@ -553,18 +553,12 @@ jv.defEnum = (typeName, json, keyCallback) => {
  * @param obj
  * @param key
  * @param args
- * @param ignoreResTypes:  表示要忽略的Res类型：boolean,date ,是一个数组。
  */
-jv.fillRes = (obj, key, args, ignoreResTypes) => {
+jv.fillRes = (obj, key, args) => {
     if (!obj) {
         console.log("jv.fillRes 的 obj为空！");
         return;
     }
-
-    var ignoreBoolean = ignoreResTypes && ignoreResTypes.includes("boolean"),
-        ignoreDate = ignoreResTypes && ignoreResTypes.includes("date");
-
-    if (ignoreBoolean && ignoreDate) return;
 
     var res1 = (target, key1, args1, must) => {
         if (!target) {
@@ -592,7 +586,7 @@ jv.fillRes = (obj, key, args, ignoreResTypes) => {
 
         var type = value.Type;
 
-        if (!ignoreBoolean && (type == "boolean")) {
+        if (type == "boolean") {
             args1 = args1 || "";  //.replace(/，/g,",")
 
             Object.defineProperty(target, key1 + "_res", {
@@ -1046,7 +1040,7 @@ jv.setEvalExpression = (obj, path, value) => {
     }
 
     try {
-        eval("(obj,v)=>obj." + path +"=v")(obj,value);
+        eval("(obj,v)=>obj." + path + "=v")(obj, value);
         return true;
     } catch (e) {
         jv.evalExpressionError = e;

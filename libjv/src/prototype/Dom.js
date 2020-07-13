@@ -247,6 +247,35 @@
         }, enumerable: false
     });
 
+    /**
+     * 克隆Dom
+     */
+    Object.defineProperty(Element.prototype, "cloneDom", {
+        value(tagName,callback) {
+            if(!tagName){
+                tagName = this.tagName;
+            }
+
+            var item = this, p = item.parentNode;
+
+            var viewDom = document.createElement(tagName);
+            item.getAttributeNames().forEach(it => {
+                viewDom.setAttribute(it, item.getAttribute(it));
+            });
+            for (var key in item.dataset) {
+                viewDom.dataset[key] = item.dataset[key];
+            }
+
+            viewDom.innerHTML = item.value;
+
+            if( callback){
+                callback(viewDom);
+            }
+
+        }, enumerable: false
+    });
+
+
     //只读化.
     Object.defineProperty(Element.prototype, "nonEdit", {
         value() {
@@ -254,17 +283,9 @@
             tags = tags.concat(Array.from(this.querySelectorAll("textarea")));
 
             for (var i = 0, len = tags.length; i < len; i++) {
-                var item = tags[i], p = item.parentNode;
-                var itemIndex = item.indexOfParent;
-                var viewDom = document.createElement("span");
-                item.getAttributeNames().forEach(it => {
-                    viewDom.setAttribute(it, item.getAttribute(it));
-                });
-                for (var key in item.dataset) {
-                    viewDom.dataset[key] = item.dataset[key];
-                }
+                var item = tags[i] ;
 
-                viewDom.innerHTML = item.value;
+                var viewDom = item.cloneDom("span");
                 viewDom.classList.add("nonEdit");
                 viewDom.classList.add("nonEdit_" + window.getComputedStyle(item).display)
 
@@ -274,4 +295,5 @@
 
         }, enumerable: false
     });
+
 })();

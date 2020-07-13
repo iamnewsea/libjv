@@ -109,18 +109,23 @@ jv.initVue = (setting) => {
         }
     });
 
-    /*向下找 tag*/
-    Object.defineProperty(vueProtype, "$Find", {
-        value(ele) {
-            if (this.$vnode && this.$vnode.componentOptions.tag == ele) {
-                return this;
-            }
+    /**
+     * 向下找 tag
+     * callback 返回值：  0,false：停止遍历下级， -1:停止所有。
+     * */
+    Object.defineProperty(vueProtype, "$RecursionVNode", {
+        value(callback) {
+            callback = callback || jv.noop;
+            var ret = callback(this);
+            if ((ret === false) || (ret === 0) || (ret === -1)) return false;
+
             for (var i in this.$children) {
-                var ret = this.$children[i].$Find(ele);
-                if (ret) {
-                    return ret;
+                var ret = this.$children[i].$RecursionVNode(callback);
+                if (ret === -1) {
+                    return false;
                 }
             }
+            return true;
         }, enumerable: false
     });
 
@@ -153,6 +158,7 @@ jv.initVue = (setting) => {
             }
         }, enumerable: false
     });
+
     //----------------------------------- axios
     //代理 post
 

@@ -6,7 +6,6 @@
                 <slot name="button">
                     <el-button size="mini" @click="loadData(1)" type="primary">查询</el-button>
                 </slot>
-                <slot name="other"></slot>
             </div>
         </div>
 
@@ -68,6 +67,7 @@
             //列表数据
             value: {
                 type: Object, default: () => {
+                    return {};
                 }
             }
         },

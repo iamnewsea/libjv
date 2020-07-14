@@ -151,8 +151,10 @@
                     this.setData(v);
                 }
             },
-            enum(v) {
-                this.setData();
+            enum: {
+                immediate: true, handler(v) {
+                    this.setData();
+                }
             },
             fields: {
                 immediate: true, handler(v) {
@@ -253,7 +255,7 @@
                 this.value1 = "";
                 this.changed();
             },
-            ajaxUrl(url){
+            ajaxUrl(url) {
                 url = url || this.url;
                 var method = (this.urlMethod || "post").toLowerCase();
 
@@ -298,7 +300,7 @@
                     }
 
 
-                    if( this.returnValueField) {
+                    if (this.returnValueField) {
                         //保留空值不转换
                         if (jv.isNull(v) || (v === "")) {
                             v = "";
@@ -315,7 +317,7 @@
 
                     v = v.filter(it => !jv.isNull(v));
 
-                    if( this.returnValueField) {
+                    if (this.returnValueField) {
                         if (this.valueIsBoolean) {
                             v = v.map(it => jv.asBoolean(it))
                         } else if (this.valueIsNumber) {

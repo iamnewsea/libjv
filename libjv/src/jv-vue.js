@@ -241,6 +241,8 @@ jv.initVue = (setting) => {
 
 
     axios.interceptors.response.use((response) => {
+        if( !response) return;
+
         // Do something with response data
         var json = response.body = response.data;
         if (response.config.errorMsg && json && json.msg) {

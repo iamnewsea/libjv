@@ -7,7 +7,7 @@
 
           <el-tag @click.prevent.stop="popClick"
                   :closable="!readOnly" :close-transition="true"
-1                  @close.prevent.stop="removeTagClose(item.id,$event)" style="margin-right:18px;margin-bottom: 8px;">
+                  @close.prevent.stop="removeTagClose(item.id,$event)" style="margin-right:18px;margin-bottom: 8px;">
 <!--              {{item.name}}-->
             <slot name="display" v-bind:item="item">
               {{item.name}}

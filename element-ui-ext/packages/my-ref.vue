@@ -1,6 +1,6 @@
 <template>
-  <div style="display: inline-block">
-    <div @click="popClick">
+    <div style="display: inline-block">
+        <div @click="popClick">
       <span v-for="(item) in oriValue" :key="item.id" class="tag-product-name"
             :style="{minWidth: computeWidth(item.name && item.name.length)}">
 
@@ -14,40 +14,40 @@
             </slot>
           </el-tag>
         </span>
-      <slot name="button" v-if="!readOnly && !oriValue.length">
-        <el-button size="mini">选择{{name}}</el-button>
-      </slot>
+            <slot name="button" v-if="!readOnly && !oriValue.length">
+                <el-button size="mini">选择{{name}}</el-button>
+            </slot>
+        </div>
+
+        <el-dialog ref="dialog" :title="'选择 ' +name" :visible.sync="popOpen" :center="true" width="80%"
+                   style="padding:20px;">
+
+
+            <my-list ref="ref" :url="url" :query="query" :page-size="pageSize" @loaded="dataLoaded"
+                     @row-dblclick="dbl_click"
+                     @row-click="tableRowClick"
+                     v-bind="[attrs]"
+            >
+                <slot></slot>
+
+
+                <template #query="scope">
+                    <slot name="query" v-bind:query="scope.query"></slot>
+                </template>
+
+                <template #button>
+                    <el-dropdown split-button size="small" trigger="click"
+                                 @click="handleClick" v-if="multi" @command="removeTag">
+                        选择 {{dbRefValue.length}} 项
+                        <el-dropdown-menu slot="dropdown" title="选中对其删除" style="width:200px;">
+                            <el-dropdown-item v-for="item in dbRefValue" :key="item.id" :command="item.id">{{item.name}}
+                            </el-dropdown-item>
+                        </el-dropdown-menu>
+                    </el-dropdown>
+                </template>
+            </my-list>
+        </el-dialog>
     </div>
-
-    <el-dialog ref="dialog" :title="'选择 ' +name" :visible.sync="popOpen" :center="true" width="80%"
-               style="padding:20px;">
-
-
-      <my-list ref="ref" :url="url" :query="query" :page-size="pageSize" @loaded="dataLoaded"
-               @row-dblclick="dbl_click"
-               @row-click="tableRowClick"
-               v-bind="[attrs]"
-      >
-        <slot></slot>
-
-
-        <template #query="scope">
-          <slot name="query" v-bind:query="scope.query"></slot>
-        </template>
-
-        <template #other>
-          <el-dropdown split-button size="small" trigger="click"
-                       @click="handleClick" v-if="multi" @command="removeTag">
-            选择 {{dbRefValue.length}} 项
-            <el-dropdown-menu slot="dropdown" title="选中对其删除" style="width:200px;">
-              <el-dropdown-item v-for="item in dbRefValue" :key="item.id" :command="item.id">{{item.name}}
-              </el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-        </template>
-      </my-list>
-    </el-dialog>
-  </div>
 </template>
 <script>
     /**
@@ -70,26 +70,26 @@
         name: "my-ref",
         props: {
             readOnly: {
-                type: Boolean, default:()=>false
+                type: Boolean, default: () => false
             },
             open: {
-                type: Boolean, default:()=>false
+                type: Boolean, default: () => false
             },
             multi: {
-                type: Boolean, default:()=>false
+                type: Boolean, default: () => false
             }, //多选
             url: {
-                type: String, default:()=>""
+                type: String, default: () => ""
             },
             pageSize: {
-                type: Number, default:()=>10
+                type: Number, default: () => 10
             },
             // minNumber: {type: Number, default: 3},
             name: {
-                type: String, default:()=>""
+                type: String, default: () => ""
             }, //显示的主体名称
             id: {
-                type: [Object, String, Number], default:()=>""
+                type: [Object, String, Number], default: () => ""
             },    //标志数据，在change时传回。
             // query: {
             //     type: Object, default: function () {
@@ -97,7 +97,7 @@
             //     }
             // },
             value: {
-                type: [Object, Array], default:()=>[]
+                type: [Object, Array], default: () => []
             }
         },
         data() {
@@ -145,8 +145,8 @@
 
                 this.dbRefValue = Object.assign([], this.oriValue);
             },
-            doQuery() {
-                this.$refs["ref"].loadData(1);
+            loadData(pageNumber) {
+                this.$refs["ref"].loadData(pageNumber);
             },
             dataLoaded(res, option) {
                 var json = res.data.data;

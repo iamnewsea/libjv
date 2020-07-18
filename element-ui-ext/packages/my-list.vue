@@ -3,8 +3,11 @@
         <div class="query">
             <slot name="query" v-bind:query="query"></slot>
             <div class="buttons">
-                <slot name="button">
+                <slot name="query-button">
                     <el-button size="mini" @click="loadData(1)" type="primary">查询</el-button>
+                </slot>
+                <slot name="button">
+
                 </slot>
             </div>
         </div>

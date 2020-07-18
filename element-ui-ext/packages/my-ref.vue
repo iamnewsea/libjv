@@ -7,7 +7,7 @@
 
           <el-tag @click.prevent.stop="popClick"
                   :closable="!readOnly" :close-transition="true"
-                  @close.prevent.stop="removeTagClose(item.id,$event)" style="margin-right:18px;">
+1                  @close.prevent.stop="removeTagClose(item.id,$event)" style="margin-right:18px;margin-bottom: 8px;">
 <!--              {{item.name}}-->
             <slot name="display" v-bind:item="item">
               {{item.name}}
@@ -15,7 +15,7 @@
           </el-tag>
         </span>
             <slot name="button" v-if="!readOnly && !oriValue.length">
-                <el-button size="mini">选择{{name}}</el-button>
+                <el-button size="mini" icon="el-icon-folder-opened">选择{{name}}</el-button>
             </slot>
         </div>
 
@@ -36,7 +36,7 @@
                 </template>
 
                 <template #button>
-                    <el-dropdown split-button size="small" trigger="click"
+                    <el-dropdown split-button size="small" trigger="click" type="primary" icon="el-icon-goods"
                                  @click="handleClick" v-if="multi" @command="removeTag">
                         选择 {{dbRefValue.length}} 项
                         <el-dropdown-menu slot="dropdown" title="选中对其删除" style="width:200px;">
@@ -123,14 +123,6 @@
             }
         },
         mounted() {
-            // this.setValue(this.value);
-            this.attrs = Object.assign([], this.$attrs);
-
-            if (jv.isNull(this.attrs["row-class-name"])) {
-                this.attrs["row-class-name"] = ({row, rowIndex}) => {
-                    return this.dbRefValue.findIndex(it => it.id == row.id) >= 0 ? 'check-row' : ''
-                }
-            }
         },
         methods: {
             setValue(val) {
@@ -146,7 +138,9 @@
                 this.dbRefValue = Object.assign([], this.oriValue);
             },
             loadData(pageNumber) {
-                this.$refs["ref"].loadData(pageNumber);
+                this.$nextTick(()=>{
+                    this.$refs["ref"].loadData(pageNumber);
+                });
             },
             dataLoaded(res, option) {
                 var json = res.data.data;
@@ -198,9 +192,16 @@
                 this.dbRefValue = Object.assign([], this.oriValue);
                 this.popOpen = true;
 
-                this.$nextTick(it => {
-                    this.$refs["ref"].loadData(1);
-                });
+                // this.setValue(this.value);
+                this.attrs = Object.assign([], this.$attrs);
+
+                if (jv.isNull(this.attrs["row-class-name"])) {
+                    this.attrs["row-class-name"] = ({row, rowIndex}) => {
+                        return this.dbRefValue.findIndex(it => it.id == row.id) >= 0 ? 'check-row' : ''
+                    }
+                }
+
+                this.loadData(1);
             },
             handleClick() {
                 this.popOpen = false;

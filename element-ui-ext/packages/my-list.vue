@@ -4,7 +4,7 @@
             <slot name="query" v-bind:query="query"></slot>
             <div class="buttons">
                 <slot name="query-button">
-                    <el-button size="mini" @click="loadData(1)" type="primary">查询</el-button>
+                    <el-button size="mini" icon="el-icon-search" @click="loadData(1)" type="primary">查询</el-button>
                 </slot>
                 <slot name="button">
 
@@ -44,8 +44,21 @@
         margin-right: 0;
     }
 
+</style>
+<style>
+
     .last-row .link {
         font-weight: bold;
+    }
+
+    .el-cell-index .cell div {
+        text-align: center;
+    }
+
+    .check-row .el-cell-index .cell div {
+        color: white;
+        background-color: #df5000;
+        border-radius: 30px;
     }
 </style>
 <script type="text/ecmascript-6">
@@ -112,6 +125,8 @@
             value: {
                 deep: true, handler(v) {
                     if (!v) return;
+
+                    this.data_setted();
 
                     if (v.data) {
                         this.tableData = v.data;
@@ -220,6 +235,9 @@
                     take: this.pageSize
                 });
 
+
+                this.data_setted();
+
                 var para_ret;
                 /**
                  * 如果要阻止继续请求， param 事件需要调用第2个回调参数 ： @param="(param,callback)=> callback(false)"
@@ -249,8 +267,15 @@
 
                     this.$emit("input", this.tableData);
                     this.loading = false;
-                });
 
+                });
+            },
+            data_setted() {
+                if (jv.isNull(this.attrs["cell-class-name"])) {
+                    this.attrs["cell-class-name"] = ({row, column}) => {
+                        return column.type == 'index' ? 'el-cell-index' : '';
+                    }
+                }
             },
             dbClick(e) {
                 return this.$emit("row-dblclick", e)

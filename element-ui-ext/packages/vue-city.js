@@ -2,7 +2,7 @@ import jv from "libjv"
 
 (function () {
     jv.cityData = [{
-        c: 110100,
+        c: 110000,
         n: '北京',
         s: [{c: 110101, n: '东城'}, {c: 110102, n: '西城'}, {c: 110105, n: '朝阳'}, {c: 110106, n: '丰台'}, {
             c: 110107,
@@ -15,7 +15,7 @@ import jv from "libjv"
             n: '密云'
         }, {c: 110229, n: '延庆'}]
     }, {
-        c: 120100,
+        c: 120000,
         n: '天津',
         s: [{c: 120101, n: '和平'}, {c: 120102, n: '河东'}, {c: 120103, n: '河西'}, {c: 120104, n: '南开'}, {
             c: 120105,
@@ -31,7 +31,7 @@ import jv from "libjv"
         c: 220000,
         n: '吉林'
     }, {c: 230000, n: '黑龙江'}, {
-        c: 310100,
+        c: 310000,
         n: '上海',
         s: [{c: 310101, n: '黄浦'}, {c: 310104, n: '徐汇'}, {c: 310105, n: '长宁'}, {c: 310106, n: '静安'}, {
             c: 310107,
@@ -76,15 +76,11 @@ import jv from "libjv"
 
     jv.city = {};
 
-    jv.city.zhixiaData = [11, 12, 31, 50];
-
-    jv.city.isZhixia = function (code) {
-        return jv.city.zhixiaData.indexOf(parseInt(code / 10000)) >= 0;
-    };
-
     /**
      * 1级：河北，2级：沧州，3级：献县
      * 1级：北京，2级：北京市，3级：海淀区
+     *
+     * 直辖市的时候，2级编码不准，比如北京市:110100 , 延庆： 110229
      * @param code
      * @returns {number}
      */
@@ -95,12 +91,9 @@ import jv from "libjv"
         return 1;
     };
 
-
     jv.cityData.recursion(it => it.s || it.children, it => {
-
         var code = it.c;
         var codeLevel = jv.city.getLevel(code);
-
 
         if (codeLevel == 3) {
             it.leaf = true;
@@ -113,57 +106,68 @@ import jv from "libjv"
     /**
      * 根据 code,找数据项。
      * @param code
-     * @returns {null|T}
      */
     jv.city.getByCode = function (code) {
         if (!code) return;
         code = parseInt(code);
-        // 由于1级码可能是直辖市，所以.
-        // var level2Code = parseInt(code / 100) * 100;
 
-        var findSubOne = function (datas, code, level, maxLevel) {
-            if (level > 3) return null;
+
+        var findSubOne = function (datas, code, currentLevel) {
             if (!datas) return null;
-            if (level > maxLevel) return null;
+            var level = jv.city.getLevel(code);
+            if (level > 3) return null;
 
-            var chuShu = 1;
-            if (level == 1) chuShu = 10000;
-            else if (level == 2) chuShu = 100;
-
-            var levelCode = parseInt(code / chuShu) * chuShu;
+            currentLevel = currentLevel || 1;
+            var level1Code = parseInt(code / 10000) * 10000;
 
             for (var data of datas) {
                 if (data.value == code) {
                     return data;
                 }
-                if (data.value == levelCode) {
-                    return findSubOne(data.children, code, level + 1, maxLevel);
+
+                if (currentLevel == 1) {
+                    if (data.value == level1Code) {
+                        return findSubOne(data.children, code);
+                    }
+                } else {
+                    var ret = findSubOne(data.children, code);
+                    if (ret != null) {
+                        return ret;
+                    }
                 }
-                // if (level == 1 && data.c == level2Code) {
-                //   return findSubOne(datas, code, level + 1);
-                // }
             }
             return null;
         };
 
-        var level = jv.city.getLevel(code);
-
-        //如果选择了一级北京，返回2级北京市
-        var iszhi = jv.city.isZhixia(code);
-        if (level == 1 && iszhi) {
-            var min = parseInt(code / 10000), max = min + 9900;
-            return jv.cityData.filter(it => it.value.Between(min, max))[0];
-        }
-        return findSubOne(jv.cityData, code, iszhi ? 2 : 1, level);
+        return findSubOne(jv.cityData, code);
     }
 
     jv.child_citys_url = "/child-citys";
 
-    jv.city.loadChildren = function (code, maxLevel, resolve) {
+    jv.city.isZhixia = function (code) {
+        if (code % 10000 != 0) return false;
+        return [11, 12, 31].includes(code / 10000);
+    };
+    jv.city.isInZhixia = function (code) {
+        return [11, 12, 31].includes(parseInt(code / 10000));
+    };
 
-        var procLevel = function (data, currentLevel, maxLevel) {
+    /**
+     *
+     * @param code 加载哪个省/市的数据
+     * @param maxLevel 加载的最大级数
+     * @param resolve 回调
+     */
+    jv.city.loadChildren = function (code, maxLevel, resolve) {
+        maxLevel = maxLevel || 3;
+
+        var procLevel = function (data, leaf) {
             data.forEach(it => {
-                it.leaf = maxLevel <= (currentLevel+1);
+                it.leaf = leaf;
+                if (it.leaf) {
+                    delete it.c;
+                    delete it.children;
+                }
             })
             return data;
         }
@@ -172,30 +176,25 @@ import jv from "libjv"
         code = parseInt(code);
 
         if (!code) {
-            resolve(procLevel(jv.cityData, 0, maxLevel));
-            return;
-        }
-
-        if (code % 100) {
-            resolve();
+            resolve(procLevel(jv.cityData, maxLevel == 1));
             return;
         }
 
         var codeLevel = jv.city.getLevel(code);
 
-        //下一级是否是叶子
-        var subIsleaf = codeLevel == 2;
+        if (codeLevel == 3) {
+            resolve();
+            return;
+        }
+        var subIsleaf = codeLevel == (maxLevel - 1);
+
+        if (codeLevel == 1 && jv.city.isZhixia(code)) {
+            subIsleaf = true;
+        }
 
         var city = jv.city.getByCode(code);
         if (city && city.children && city.children.length) {
-            if (subIsleaf) {
-                city.children.forEach(it => {
-                    it.leaf = true;
-                })
-            }
-
-            resolve(procLevel(city.children, codeLevel, maxLevel));
-
+            resolve(procLevel(city.children, subIsleaf));
             return;
         }
 
@@ -203,23 +202,15 @@ import jv from "libjv"
         jv.ajax.post(jv.child_citys_url + "?pcode=" + code, {}, {cache: "page"})
             .then(res => {
                 var json = res.data.data;
-
-                if (subIsleaf) {
-                    json.forEach(it => {
-                        it.leaf = true;
-                    })
-                }
-
-
                 json.forEach(it => translateCityData(it));
                 city.children = json;
-                resolve(procLevel(city.children, codeLevel, maxLevel));
+                resolve(procLevel(city.children, subIsleaf));
 
             });
     };
 
-//在页面加载的时候,根据 code ,加载出层级数据.
-//如: code=101122 .加载出 第一级,10的第二级,及 11的第三级.
+    //在页面加载的时候,根据 code ,加载出层级数据.
+    //如: code=101122 .加载出 第一级,10的第二级,及 11的第三级.`
     jv.city.confirm = function (code, loaded) {
         if (!code) return;
         loaded = loaded || jv.noop;
@@ -248,19 +239,16 @@ import jv from "libjv"
         var chuShu = 1;
         for (var i = 1; i <= level; i++) {
             if (i == 1) {
-                if (jv.city.isZhixia(code)) {
-                    continue;
-                }
                 chuShu = 10000;
             } else if (i == 2) {
+                if (jv.city.isInZhixia(code)) {
+                    continue;
+                }
                 chuShu = 100;
             } else chuShu = 1;
 
             var city = jv.city.getByCode(parseInt(code / chuShu) * chuShu);
             if (!city) {
-                if (i == 1) {
-                    continue;
-                }
                 return ret;
             }
             ret.push({value: city.value, label: city.label});

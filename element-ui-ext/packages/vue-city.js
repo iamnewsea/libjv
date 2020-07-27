@@ -104,12 +104,11 @@ import jv from "libjv"
         code = parseInt(code);
 
 
-        var findSubOne = function (datas, code, currentLevel) {
+        var findSubOne = function (datas, code ) {
             if (!datas) return null;
             var level = jv.city.getLevel(code);
             if (level > 3) return null;
 
-            currentLevel = currentLevel || 1;
             var level1Code = parseInt(code / 10000) * 10000;
 
             for (var data of datas) {
@@ -117,7 +116,7 @@ import jv from "libjv"
                     return data;
                 }
 
-                if (currentLevel == 1) {
+                if (level == 1) {
                     if (data.value == level1Code) {
                         return findSubOne(data.children, code);
                     }
@@ -155,7 +154,9 @@ import jv from "libjv"
 
         var procLevel = function (data, leaf) {
             return data.map(it => {
-                return {label: it.label, value: it.value, leaf: leaf}
+                // return {label: it.label, value: it.value, leaf: leaf}
+                it.leaf = leaf;
+                return it;
             });
         };
 

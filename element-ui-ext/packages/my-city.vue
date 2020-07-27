@@ -51,11 +51,17 @@
         },
         methods: {
             lazyLoad(node, resolve) {
-                jv.city.loadChildren(!node.level ? 0 : node.value, jv.asInt(this.level), resolve);
+                jv.city.loadChildren(!node.level ? 0 : node.value, jv.asInt(this.level), it => {
+                    resolve(it);
+                });
             },
             cityChange(vals) {
                 var code = vals.last();
                 var city = jv.city.getByCode(code);
+
+                if (!city) {
+                    throw new Error("找不到城市:" + code);
+                }
                 //不传 name , 服务器自动设置name
                 this.$emit("input", {code: city.value});
             }

@@ -43,8 +43,14 @@
                 deep: true, immediate: true,
                 handler(value) {
                     var code = value && value.code || "";
-                    jv.city.confirm(code, it => {
+                    if (!code) {
+                        this.cityValue = [];
+                        return;
+                    }
+                    jv.city.confirm(code, this.level, it => {
                         this.cityValue = jv.city.getEachCitys(code).map(it => it.value);
+
+                        console.log(jv.cityData);
                     })
                 }
             }

@@ -104,7 +104,7 @@ import jv from "libjv"
         code = parseInt(code);
 
 
-        var findSubOne = function (datas, code ) {
+        var findSubOne = function (datas, code) {
             if (!datas) return null;
             var level = jv.city.getLevel(code);
             if (level > 3) return null;
@@ -131,7 +131,7 @@ import jv from "libjv"
         };
 
         return findSubOne(jv.cityData, code);
-    }
+    };
 
     jv.child_citys_url = "/child-citys";
 
@@ -154,7 +154,12 @@ import jv from "libjv"
 
         var procLevel = function (data, leaf) {
             return data.map(it => {
-                // return {label: it.label, value: it.value, leaf: leaf}
+                // var ret= {label: it.label, value: it.value, leaf: leaf};
+                // if(!leaf){
+                //     ret.children = [];
+                // }
+                // return ret;
+
                 it.leaf = leaf;
                 return it;
             });
@@ -182,7 +187,8 @@ import jv from "libjv"
 
         var city = jv.city.getByCode(code);
         if (city && city.children && city.children.length) {
-            resolve(procLevel(city.children, subIsleaf));
+            // resolve(procLevel(city.children, subIsleaf));
+            resolve([]);
             return;
         }
 
@@ -198,22 +204,38 @@ import jv from "libjv"
 
     //在页面加载的时候,根据 code ,加载出层级数据.
     //如: code=101122 .加载出 第一级,10的第二级,及 11的第三级.`
-    jv.city.confirm = function (code, loaded) {
-        if (!code) return;
+    jv.city.confirm = function (code, maxLevel, loaded) {
         loaded = loaded || jv.noop;
+        if (!code) {
+            return loaded();
+        }
         code = parseInt(code);
         var city = jv.city.getByCode(code);
         if (city) return loaded();
         var level = jv.city.getLevel(code);
         if (level >= 2) {
-            jv.city.loadChildren(parseInt(code / 10000) * 10000, it => {
+
+            var code1 = parseInt(code / 10000) * 10000;
+
+            return jv.city.loadChildren(code1, maxLevel, subNodes => {
+                //jv.city.getByCode(code1).children = subNodes;
+
+                if (jv.city.isInZhixia(code)) {
+                    return loaded();
+                }
                 if (level >= 3) {
-                    jv.city.loadChildren(parseInt(code / 100) * 100, loaded);
+                    var code2 = parseInt(code / 100) * 100;
+                    return jv.city.loadChildren(code2, maxLevel, subNodes => {
+                        //jv.city.getByCode(code2).children = subNodes;
+                        loaded();
+                    });
                 } else {
                     loaded();
                 }
             });
         }
+
+        return loaded();
     };
 
     jv.city.getEachCitys = function (code) {

@@ -241,7 +241,7 @@ jv.initVue = (setting) => {
 
 
     axios.interceptors.response.use((response) => {
-        if( !response) return;
+        if (!response) return;
 
         // Do something with response data
         var json = response.body = response.data;
@@ -317,31 +317,42 @@ jv.initVue = (setting) => {
      * 添加外部的 script 标签
      */
     jv.addScriptFile = (fileName, attributes) => {
-        if (!fileName) return;
+        if (!fileName) return Promise.reject();
 
         var id = jv.getIdFromUrl(fileName);
 
         var script = document.getElementById(id);
         if (script) {
-            return;
+            return Promise.resolve();
         }
 
-        script = document.createElement("script");
-        document.head.appendChild(script);
+        return new Promise((r, e) => {
+            script = document.createElement("script");
+            document.head.appendChild(script);
 
-        attributes = attributes || {};
+            attributes = attributes || {};
 
-        if (!attributes.type) {
-            attributes.type = "text/javascript";
-        }
+            if (!attributes.type) {
+                attributes.type = "text/javascript";
+            }
 
-        attributes.id = id;
+            attributes.id = id;
+
+            script.onload = script.onreadystatechange = function () {
+                if (!this.readyState     //这是FF的判断语句，因为ff下没有readyState这人值，IE的readyState肯定有值
+                    || this.readyState == 'loaded' || this.readyState == 'complete'   // 这是IE的判断语句
+                ) {
+                    r();
+                }
+            };
+
+            attributes.src = fileName;
+
+            Object.keys(attributes).forEach(it => {
+                script.setAttribute(it, attributes[it]);
+            });
 
 
-        attributes.src = fileName;
-
-        Object.keys(attributes).forEach(it => {
-            script.setAttribute(it, attributes[it]);
         });
     };
 

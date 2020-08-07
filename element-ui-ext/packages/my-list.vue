@@ -1,6 +1,7 @@
 <template>
     <div>
         <div class="query">
+            <!-- 通过 slot 传递 query 用法： <template #query="scope"> <input v-model="scope.query.name" /> </template> -->
             <slot name="query" v-bind:query="query"></slot>
             <div class="buttons">
                 <slot name="query-button">

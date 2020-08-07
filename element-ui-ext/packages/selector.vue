@@ -425,13 +425,15 @@
                         this.dataIsValueArray = !v0.ObjectType;
                     }
 
-                    var keys = data.map(it => it[this.keyField].toString());
-                    if (keys.filter(it => {
-                        return (it === "true") || (it === "false");
-                    }).length == 2) {
-                        this.valueIsBoolean = true;
-                    } else if (keys.every(it => it.IsNumberFormat())) {
-                        this.valueIsNumber = true;
+                    if (this.dataIsValueArray == false) {
+                        var keys = data.map(it => it[this.keyField].toString());
+                        if (keys.filter(it => {
+                            return (it === "true") || (it === "false");
+                        }).length == 2) {
+                            this.valueIsBoolean = true;
+                        } else if (keys.every(it => it.IsNumberFormat())) {
+                            this.valueIsNumber = true;
+                        }
                     }
                 }
 

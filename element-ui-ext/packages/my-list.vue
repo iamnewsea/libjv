@@ -2,7 +2,7 @@
     <div>
         <div class="query">
             <!-- 通过 slot 传递 query 用法： <template #query="scope"> <input v-model="scope.query.name" /> </template> -->
-            <slot name="query" v-bind:query="query"></slot>
+            <slot name="query" v-bind:query="query2"></slot>
             <div class="buttons">
                 <slot name="query-button">
                     <el-button size="mini" icon="el-icon-search" @click="loadData(1)" type="primary">查询</el-button>
@@ -76,11 +76,12 @@
             url: {
                 type: String, default: () => ""
             },
-            // query: {
-            //     type: Object, default() {
-            //         return {};
-            //     }
-            // },
+            //初始化query
+            query: {
+                type: Object, default() {
+                    return {};
+                }
+            },
             //列表数据
             value: {
                 type: Object, default: () => {
@@ -92,7 +93,7 @@
             return {
                 loading: false,
                 total: 0,
-                query: {}, // 嵌入的query
+                query2: {}, // 嵌入的query
                 pageNumber: 1,
                 lastRowId: "",
                 tableData: []
@@ -105,7 +106,7 @@
                 this.total = store.total || 0;
                 this.pageNumber = store.pageNumber || 1;
                 this.lastRowId = store.lastRowId || "";
-                this.query = Object.assign({}, this.query, store.query);
+                this.query2 = Object.assign({}, this.query2, store.query,this.query);
             }
         },
         computed: {
@@ -124,7 +125,7 @@
         },
         watch: {
             value: {
-                deep: true, handler(v) {
+                deep: true,immediate:true, handler(v) {
                     if (!v) return;
 
                     this.data_setted();
@@ -135,6 +136,11 @@
                     if (v.total) {
                         this.total = v.total;
                     }
+                }
+            },
+            query:{
+                deep:true,handler(v) {
+                    this.query2 = Object.assign({},this.query2,this.query);
                 }
             }
         },
@@ -230,7 +236,7 @@
                 }
 
 
-                let para = Object.assign({}, this.query, {
+                let para = Object.assign({}, this.query2, {
                     pageNumber: this.pageNumber,
                     skip: (this.pageNumber - 1) * this.pageSize,
                     take: this.pageSize
@@ -253,7 +259,7 @@
                     this.tableData = res.data.data;
                     //返回来的total只有第一次获取的时候才有值，第二次获取之后都是-1
 
-                    var storeData = {pageNumber: this.pageNumber, query: this.query};
+                    var storeData = {pageNumber: this.pageNumber, query: this.query2};
 
                     if (res.data.total >= 0) {
                         this.total = res.data.total;

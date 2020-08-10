@@ -11,7 +11,7 @@
         <template v-else>
             <template v-if="type == 'radio'">
                 <el-radio-group v-model="value1" v-if="data2.length <= enumCount"
-                                @change="changed" :class="clearable? 'ri4c':''">
+                                @change="changed" :class="clearable? 'ri4c':''" style="white-space: nowrap;">
                     <el-radio v-for="item in data2" :label="item[keyField]" @click.native.stop="item_click"
                               :key="item[keyField]">{{item[labelField]}}
                     </el-radio>

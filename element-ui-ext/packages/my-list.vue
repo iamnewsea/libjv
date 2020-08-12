@@ -143,6 +143,11 @@
                 deep: true, handler(v) {
                     this.query2 = Object.assign({}, this.query2, this.query);
                 }
+            },
+            url:{
+                immediate: true,handler(v){
+                    this.loadData();
+                }
             }
         },
         methods: {

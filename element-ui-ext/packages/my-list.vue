@@ -3,14 +3,15 @@
         <div class="query">
             <!-- 通过 slot 传递 query 用法： <template #query="scope"> <input v-model="scope.query.name" /> </template> -->
             <slot name="query" v-bind:query="query2"></slot>
-            <div class="buttons">
-                <slot name="query-button">
-                    <el-button size="mini" icon="el-icon-search" @click="loadData(1)" type="primary">查询</el-button>
-                </slot>
-                <slot name="button">
-
-                </slot>
-            </div>
+            <slot name="buttons">
+                <div class="buttons">
+                    <slot name="query-button">
+                        <el-button size="mini" icon="el-icon-search" @click="loadData(1)" type="primary">查询</el-button>
+                    </slot>
+                    <slot name="button">
+                    </slot>
+                </div>
+            </slot>
         </div>
 
         <slot name="head"></slot>
@@ -106,7 +107,7 @@
                 this.total = store.total || 0;
                 this.pageNumber = store.pageNumber || 1;
                 this.lastRowId = store.lastRowId || "";
-                this.query2 = Object.assign({}, this.query2, store.query,this.query);
+                this.query2 = Object.assign({}, this.query2, store.query, this.query);
             }
         },
         computed: {
@@ -125,7 +126,7 @@
         },
         watch: {
             value: {
-                deep: true,immediate:true, handler(v) {
+                deep: true, immediate: true, handler(v) {
                     if (!v) return;
 
                     this.data_setted();
@@ -138,9 +139,9 @@
                     }
                 }
             },
-            query:{
-                deep:true,handler(v) {
-                    this.query2 = Object.assign({},this.query2,this.query);
+            query: {
+                deep: true, handler(v) {
+                    this.query2 = Object.assign({}, this.query2, this.query);
                 }
             }
         },

@@ -16,7 +16,6 @@ jv.initVue = (setting) => {
     // vue.config.productionTip = false;
     var vueProtype = vue.prototype;
     vueProtype.jv = jv;
-    vueProtype.Server_Host = window.Server_Host;
     vueProtype.$http = axios;
 
 
@@ -42,6 +41,7 @@ jv.initVue = (setting) => {
     });
 
 
+    vueProtype.Server_Host = window.Server_Host;
     //创建简单的 store
     jv.store = vueProtype.$my_store = {
         setGlobalJson(data) {

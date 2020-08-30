@@ -310,7 +310,9 @@ jv.initVue = (setting) => {
         var msg = "";
 
         if (error.config) {
-            msg += "<div>" + error.config.baseURL + error.config.url + "</div>";
+            msg += "<div>"
+                + ((error.config.url.startsWith("http://") || error.config.url.startsWith("https://")) ? "" : error.config.baseURL)
+                + error.config.url + "</div>";
         }
         msg += (error.message || "网络连接失败,请检查网络再试。");
 

@@ -154,7 +154,6 @@
             //获取保存的查询条件
             getStoredQuery() {
                 var storeId = this.$vnode.data.ref || "list";
-
                 return this.$my_store.getJson(storeId).query;
             },
             setTotal(total) {
@@ -194,6 +193,11 @@
 
                 this.$emit("input", this.tableData);
             },
+            getQuery(){
+                let para = Object.assign({},this.query2);
+                this.$emit("param", para);
+                return para;
+            },
             //仅刷新数据,用于更新后，更新某一条。
             updateById(id, key) {
                 if (!id) return;
@@ -201,11 +205,11 @@
                 if (!row) return;
 
 
-                let para = {};
+                let para = Object.assign({},this.query2);
                 para[key || "id"] = id;
 
                 var para_ret;
-                this.$emit("param", para, v => para = v);
+                this.$emit("param", para, v => para_ret = v);
                 if (para_ret === false) {
                     return;
                 }

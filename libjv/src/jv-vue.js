@@ -42,6 +42,17 @@ jv.initVue = (setting) => {
 
 
     vueProtype.Server_Host = window.Server_Host;
+
+
+    //接受 postMessage,弹出错误消息。
+    window.addEventListener('message', (e) => {
+        //两个属性： event,arguments
+        if (e.data.event == "error") {
+            jv.error.apply(jv, e.data.arguments);
+        }
+    }, false);
+
+
     //创建简单的 store
     jv.store = vueProtype.$my_store = {
         setGlobalJson(data) {
@@ -299,7 +310,9 @@ jv.initVue = (setting) => {
         var msg = "";
 
         if (error.config) {
-            msg += "<div>" + error.config.baseURL + error.config.url + "</div>";
+            msg += "<div>"
+                + ((error.config.url.startsWith("http://") || error.config.url.startsWith("https://")) ? "" : error.config.baseURL)
+                + error.config.url + "</div>";
         }
         msg += (error.message || "网络连接失败,请检查网络再试。");
 

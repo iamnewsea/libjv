@@ -17,7 +17,7 @@
      */
     Object.defineProperty(String.prototype, 'trimPairs', {
         value() {
-            var ps = arguments;
+            var ps = Array.from(arguments);
 
             var value = this.trim();
             if (ps.length == 0) {
@@ -50,7 +50,7 @@
             }
 
             if (hit) {
-                return value.trimPairs(ps);
+                return value.trimPairs.apply(this,ps);
             } else return value;
         },
         enumerable: false

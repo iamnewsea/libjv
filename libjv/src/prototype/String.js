@@ -12,6 +12,74 @@
         }, enumerable: false
     });
 
+
+    Object.defineProperty(String.prototype, 'trimStartWith', {
+        value() {
+            var ps = Array.from(arguments);
+
+            var value = this.trim();
+            if (ps.length == 0) {
+                return value;
+            }
+
+
+            var hittedItem = ""
+
+            for (var i = 0, len = ps.length; i < len; i++) {
+                var item = ps[i];
+                if (value.startsWith(item)) {
+                    hittedItem = item;
+                    break;
+                }
+            }
+
+            if (hittedItem) {
+                value = value.slice(hittedItem.length);
+                return value.trimStartWith.apply(value,ps);
+            } else return value;
+        },
+        enumerable: false
+    });
+
+    /**
+     * 参数可以是多个字符串，如：
+     * "abc.txt.zip.log".trimEndWith(".txt",".zip",".log")
+     */
+    Object.defineProperty(String.prototype, 'trimEndWith', {
+        value() {
+            var ps = Array.from(arguments);
+
+            var value = this.trim();
+            if (ps.length == 0) {
+                return value;
+            }
+
+
+            var hittedItem = "";
+
+            for (var i = 0, len = ps.length; i < len; i++) {
+                var item = ps[i];
+                if (value.endsWith(item)) {
+                    hittedItem = item;
+                    break;
+                }
+            }
+
+            if (hittedItem) {
+                value = value.slice(0,0-hittedItem.length);
+                return value.trimEndWith.apply(value,ps);
+            } else return value;
+        },
+        enumerable: false
+    });
+
+    Object.defineProperty(String.prototype, 'trimPairs', {
+        value() {
+            var ret = this.trimStartWith.apply(this,arguments);
+            return ret.trimEndWith.apply(ret,arguments);
+        },
+        enumerable: false
+    });
     /**
      * "@$<li>ok</li>$@".trimPairs("<li>,</li>".split(",") , "<div>,</div>".split(",") ,"$" ,"@" )
      */
@@ -50,7 +118,7 @@
             }
 
             if (hit) {
-                return value.trimPairs.apply(this,ps);
+                return value.trimPairs.apply(value,ps);
             } else return value;
         },
         enumerable: false

@@ -73,7 +73,7 @@
         enumerable: false
     });
 
-    Object.defineProperty(String.prototype, 'trimPairs', {
+    Object.defineProperty(String.prototype, 'trimWith', {
         value() {
             var ret = this.trimStartWith.apply(this,arguments);
             return ret.trimEndWith.apply(ret,arguments);

@@ -134,6 +134,7 @@
         text-align: right;
         flex: 3;
         white-space: nowrap;
+        flex-wrap:nowrap;
     }
 
     .kv > .k:first-child:after {
@@ -144,6 +145,7 @@
     .kv > .v {
         flex: 7;
         justify-content: flex-start;
+        flex-wrap: wrap;
     }
 
 

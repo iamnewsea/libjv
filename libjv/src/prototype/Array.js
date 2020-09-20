@@ -14,30 +14,29 @@
         return ret;
     };
 
-    var findIndex = (ary,key,minOrMax)=>{
+    var findIndex = (ary, key, minOrMax) => {
         var index = -1;
         if (ary.length == 0) return index;
-        var getKeyValue = (item)=>{
+        var getKeyValue = (item) => {
             return item[key];
         };
 
         var findOne = null;
-        for(var i=0,len = ary.length;i<len;i++){
+        for (var i = 0, len = ary.length; i < len; i++) {
             var item = ary[i];
-            if( i== 0){
+            if (i == 0) {
                 findOne = getKeyValue(item);
                 index = 0;
                 continue;
             }
 
             var kv = getKeyValue(item);
-            if( minOrMax) {
+            if (minOrMax) {
                 if (kv < findOne) {
                     kv = findOne;
                     index = i;
                 }
-            }
-            else{
+            } else {
                 if (kv > findOne) {
                     kv = findOne;
                     index = i;
@@ -51,14 +50,14 @@
      */
     Object.defineProperty(Array.prototype, "findIndexByMinValue", {
         value(key) {
-            return findIndex(this,key,true);
+            return findIndex(this, key, true);
         }
         , enumerable: false
     });
 
     Object.defineProperty(Array.prototype, "findIndexByMaxValue", {
         value(key) {
-            return findIndex(this,key,false);
+            return findIndex(this, key, false);
         }
         , enumerable: false
     });
@@ -254,19 +253,69 @@
         }, enumerable: false
     });
 
+    /**
+     * 可以自定义比较,性能比 sort 好。
+     * @param compare : 比较器，返回第1个数是否大于第2个数， 可以用 1 或 true 表示。
+     */
     Object.defineProperty(Array.prototype, "max", {
-        value(emptyValue) {
-            if (!this.length) return emptyValue || 0;
-            return Math.max.apply(Math, this);
+        value(compare) {
+            compare = compare || function (a, b) {
+                return a > b;
+            };
+
+            var len = this.length;
+            if (!len) return null;
+            var max_item = this[0];
+            for (var i = 1; i < len; i++) {
+                var item = this[i];
+                var ret = compare(item, max_item);
+
+                if (ret === false) {
+                    continue;
+                }
+
+                if (ret === true) {
+                    max_item = item;
+                } else if (ret > 0) {
+                    max_item = item;
+                }
+            }
+            return max_item;
         }, enumerable: false
     });
 
+
+    /**
+     * 可以自定义比较,性能比 sort 好。
+     * @param compare : 比较器，返回第1个数是否大于第2个数， 可以用 1 或 true 表示。
+     */
     Object.defineProperty(Array.prototype, "min", {
-        value(emptyValue) {
-            if (!this.length) return emptyValue || 0;
-            return Math.min.apply(Math, this);
+        value(compare) {
+            compare = compare || function (a, b) {
+                return a > b;
+            };
+
+            var len = this.length;
+            if (!len) return null;
+            var max_item = this[0];
+            for (var i = 1; i < len; i++) {
+                var item = this[i];
+                var ret = compare(item, max_item);
+
+                if (ret === true) {
+                    continue;
+                }
+
+                if (ret === false) {
+                    max_item = item;
+                } else if (ret < 0) {
+                    max_item = item;
+                }
+            }
+            return max_item;
         }, enumerable: false
     });
+
     Object.defineProperty(Array.prototype, "sum", {
         value(emptyValue) {
             if (!this.length) return emptyValue || 0;

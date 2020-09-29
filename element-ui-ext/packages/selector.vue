@@ -411,6 +411,12 @@
                 if (["object", "map"].includes(type)) {
                     this.dataIsObject = true;
                     var keys = Object.keys(data);
+
+                    if(!keys.length){
+                      this.data2 = [];
+                      return;
+                    }
+
                     if (("true" in data) && ("false" in data) && keys.length < 4) {
                         this.valueIsBoolean = true;
                     } else if (keys.every(it => it.IsNumberFormat())) {
@@ -419,12 +425,17 @@
 
                     this.setFields();
                 } else if (["array", "set"].includes(type)) {
-                    this.setFields();
+                    if(!data.length){
+                      this.data2 = [];
+                      return;
+                    }
+
                     var v0 = data[0];
                     if (jv.isNull(v0) == false) {
                         this.dataIsValueArray = !v0.ObjectType;
                     }
 
+                  this.setFields();
                     if (this.dataIsValueArray == false) {
                         var keys = data.map(it => it[this.keyField].toString());
                         if (keys.filter(it => {

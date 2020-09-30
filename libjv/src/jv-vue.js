@@ -18,8 +18,8 @@ jv.initVue = (setting) => {
     vueProtype.jv = jv;
     vueProtype.$http = axios;
 
-
-    window.BASE_URL = process.env.BASE_URL;
+    var envs = process.env;
+    window.BASE_URL = envs.BASE_URL;
 
     if (jv.isNull(ajaxJavaBooleanKey)) {
         ajaxJavaBooleanKey = true;
@@ -33,10 +33,10 @@ jv.initVue = (setting) => {
 
     // jv.initVue_setting = {ajaxJavaBooleanKey, ajaxResType, ajaxErrorMsg};
 
-    Object.keys(process.env).forEach(key => {
+    Object.keys(envs).forEach(key => {
         if (key.startsWith("VUE_APP_")) {
             var key2 = key.slice(8);
-            window[key2] = process.env[key];
+            window[key2] = envs[key];
         }
     });
 

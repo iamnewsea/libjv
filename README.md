@@ -19,6 +19,7 @@ path 添加 python2
 
 > npm i -g node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
 > npm i -g @vue/cli --registry=https://registry.npm.taobao.org
+> npm config set puppeteer_download_host=https://npm.taobao.org/mirrors
 > npm i --registry=https://registry.npm.taobao.org
 > 指定版本： npm i -g @vue/cli@^4.1.1 --registry=https://registry.npm.taobao.org
 >作者 imnewsea

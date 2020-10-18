@@ -4,7 +4,7 @@
             <label>{{nodata_display}}</label>
         </template>
 
-        <template v-if="readOnly">
+        <template v-if="readOnlyStyle">
             <label v-for="item in value_displays" :key="item">{{item}}</label>
         </template>
 
@@ -166,6 +166,11 @@
                     this.setValue(v);
                 }
             },
+            readOnly:{
+                immediate: true,handler(v){
+                    this.readOnlyStyle = v;
+                }
+            }
         },
         computed: {
             nodata_display() {
@@ -185,7 +190,7 @@
             value_displays() {
                 var v2 = [];
                 if (this.type == "radio") {
-                    if (this.value1) {
+                    if (!jv.isNull(this.value1)) {
                         v2 = [this.value1];
                     }
                 } else {
@@ -209,8 +214,7 @@
                 if (this.data2.length) {
                     return this.data2.filter(it => v2.includes(getKey(it))).map(it => getValue(it));
                 }
-
-                return v2.map(it => getValue(it));
+                return v2;
             }
         },
         data() {
@@ -225,6 +229,7 @@
                 keyField: "",
                 //数据绑定的 labelField
                 labelField: "",
+                readOnlyStyle:false,
                 dataIsEnum: false,
                 dataIsValueArray: false,
                 dataIsObject: false,
@@ -330,7 +335,7 @@
                 return;
             },
             dblclick() {
-                if (this.readOnly) {
+                if (this.readOnlyStyle) {
                     return;
                 }
                 if (this.type == "radio") {

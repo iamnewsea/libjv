@@ -251,8 +251,8 @@
      * 克隆Dom
      */
     Object.defineProperty(Element.prototype, "cloneDom", {
-        value(tagName,callback) {
-            if(!tagName){
+        value(tagName, callback) {
+            if (!tagName) {
                 tagName = this.tagName;
             }
 
@@ -268,10 +268,11 @@
 
             viewDom.innerHTML = item.value;
 
-            if( callback){
+            if (callback) {
                 callback(viewDom);
             }
 
+            return viewDom;
         }, enumerable: false
     });
 
@@ -283,7 +284,7 @@
             tags = tags.concat(Array.from(this.querySelectorAll("textarea")));
 
             for (var i = 0, len = tags.length; i < len; i++) {
-                var item = tags[i] ;
+                var item = tags[i];
 
                 var viewDom = item.cloneDom("span");
                 viewDom.classList.add("nonEdit");
@@ -292,6 +293,10 @@
                 item.after(viewDom);
                 item.style.display = "none";
             }
+
+            Array.from(this.querySelectorAll("button")).forEach(it => {
+                it.classList.add("nonEdit");
+            })
 
         }, enumerable: false
     });

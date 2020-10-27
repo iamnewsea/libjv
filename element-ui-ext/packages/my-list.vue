@@ -109,6 +109,7 @@
                 this.lastRowId = store.lastRowId || "";
                 this.query2 = Object.assign({}, this.query2, store.query, this.query);
             }
+            this.loadData();
         },
         computed: {
             rowKey() {
@@ -145,7 +146,7 @@
                 }
             },
             url:{
-                immediate: true,handler(v){
+                immediate: false,handler(v){
                     this.loadData();
                 }
             }

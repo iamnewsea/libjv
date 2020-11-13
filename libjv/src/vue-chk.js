@@ -155,12 +155,9 @@ import jv from "./libjv"
     };
     //查找dom下第一个绑定 v-model 的值.返回 { vnode : v-model 对象, value : v-model 的值, data }
     var getVueData = function (component) {
-
-
         var vnode = component.$vnode, vdata = vnode.data, ret = {}, data = vnode.context._data;
         if (vdata && vdata.model && vdata.model.expression) {
             if ("value" in vdata.model) {
-
                 return {value: convertValue(vdata.model.value), data: data};
             }
 
@@ -194,12 +191,30 @@ import jv from "./libjv"
             return ret;
         }
 
-        return Object.assign(ret, chk_core(chk, value, data));
+        return Object.assign(ret, jv.chk(chk, value, data));
     }
 
+    /**
+     * 向上查找Vue Dom
+     * @param html_dom
+     */
+    var getParentVueDom = function (html_dom) {
+        if (!html_dom) {
+            return null;
+        }
+        if (html_dom.__vue__) {
+            return html_dom;
+        }
+        return getParentVueDom(html_dom.parentElement);
+    };
 
     var getHtmlData = function (html_dom) {
-        return {value: convertValue(html_dom.value), data: {}};
+        var pDom = getParentVueDom(html_dom);
+        var data = {};
+        if (pDom) {
+            data = pDom.$vnode.context._data;
+        }
+        return {value: convertValue(html_dom.value), data: data};
     };
     var chk_html_item = function (chk_dom) {
         var ret = {result: true};
@@ -215,10 +230,18 @@ import jv from "./libjv"
             return ret;
         }
 
-        return Object.assign(ret, chk_core(chk, value, data));
+        return Object.assign(ret, jv.chk(chk, value, data));
     }
 
-    var chk_core = function (chk, value, data) {
+    /**
+     * 核心校验函数，可以从脚本中递归执行。如：
+     * <input chk=": var r = jv.chk(int); if( r.result == false) return r.msg; "
+     * @param chk
+     * @param value
+     * @param data
+     * @returns {*|boolean}
+     */
+    jv.chk = function (chk, value, data) {
         var ret = {};
 
         var chk_type_index = getNextNonCharIndex(chk),
@@ -251,6 +274,7 @@ import jv from "./libjv"
         }
 
         if (chk_type == ":") {
+            //函数内部也可以调用 jv.chk("enum('a','b','c')",value,data);
             var r = eval("(value,data) => {" + chk_body + "}")(value, data);
             ret.result = !r;
             ret.msg = r;
@@ -370,6 +394,9 @@ import jv from "./libjv"
 
         for (var chk_dom of list) {
             chk_dom.$el.chk_vue_proced = true;
+            Array.from(chk_dom.$el.querySelectorAll("[chk]")).forEach(it => {
+                it.chk_vue_proced = true;
+            });
 
             var chk_result = chk_vue_item(chk_dom);
 
@@ -404,7 +431,6 @@ import jv from "./libjv"
                 chk_dom.$el.classList.remove("chk-error");
                 continue;
             }
-
 
 
             ret &= false;

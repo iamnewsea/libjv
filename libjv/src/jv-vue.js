@@ -346,7 +346,6 @@ jv.initVue = (setting) => {
 
         return new Promise((r, e) => {
             script = document.createElement("script");
-            document.head.appendChild(script);
 
             script.onload = script.onreadystatechange = function () {
                 if (!this.readyState     //这是FF的判断语句，因为ff下没有readyState这人值，IE的readyState肯定有值
@@ -360,7 +359,8 @@ jv.initVue = (setting) => {
                 script.setAttribute(it, attributes[it]);
             });
 
-            attributes.src = fileName;
+            script.src = fileName;
+            document.head.appendChild(script);
         });
     };
 
@@ -378,7 +378,6 @@ jv.initVue = (setting) => {
         }
 
         link = document.createElement("link");
-        document.head.appendChild(link);
 
         attributes = attributes || {};
 
@@ -394,7 +393,8 @@ jv.initVue = (setting) => {
             link.setAttribute(it, attributes[it]);
         });
 
-        attributes.href = fileName;
+        link.href = fileName;
+        document.head.appendChild(link);
     };
 
     //添加 style 标签

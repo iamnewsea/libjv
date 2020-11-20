@@ -338,18 +338,15 @@ jv.initVue = (setting) => {
         if (script) {
             return Promise.resolve();
         }
+        attributes = attributes || {};
+        if (!attributes.type) {
+            attributes.type = "text/javascript";
+        }
+        attributes.id = id;
 
         return new Promise((r, e) => {
             script = document.createElement("script");
             document.head.appendChild(script);
-
-            attributes = attributes || {};
-
-            if (!attributes.type) {
-                attributes.type = "text/javascript";
-            }
-
-            attributes.id = id;
 
             script.onload = script.onreadystatechange = function () {
                 if (!this.readyState     //这是FF的判断语句，因为ff下没有readyState这人值，IE的readyState肯定有值
@@ -359,13 +356,11 @@ jv.initVue = (setting) => {
                 }
             };
 
-            attributes.src = fileName;
-
             Object.keys(attributes).forEach(it => {
                 script.setAttribute(it, attributes[it]);
             });
 
-
+            attributes.src = fileName;
         });
     };
 
@@ -395,11 +390,11 @@ jv.initVue = (setting) => {
         }
         attributes.id = id;
 
-        attributes.href = fileName;
-
         Object.keys(attributes).forEach(it => {
             link.setAttribute(it, attributes[it]);
         });
+
+        attributes.href = fileName;
     };
 
     //添加 style 标签

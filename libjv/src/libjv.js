@@ -984,6 +984,53 @@ jv.param = (obj) => {
     }).join("&");
 };
 
+// class UrlCls {
+//     constructor(fullUrl){
+//
+//     }
+// }
+//
+// jv.url = (fullUrl) => {
+//     var parts = fullUrl.split("?"),
+//     path = parts[0],
+//     queryHash = parts[1] || "",
+//     queryHashParts = queryHash.split("#"),
+//     query = queryHashParts[0],
+//     hash = queryHashParts[1];
+//
+//     var getJson = (query)=>{
+//         var ret  = {};
+//         query.split("?").last().split("&").forEach((it) => {
+//             var sects = it.split("=");
+//             if (sects.length == 2) {
+//                 var key = sects[0];
+//                 var value = decodeURIComponent(sects[1]);
+//                 if (key in ret) {
+//                     var oriValue = ret[key];
+//                     if (oriValue.Type == "array") {
+//                         oriValue.push(value);
+//                     } else {
+//                         oriValue = [oriValue];
+//                         oriValue.push(value);
+//                     }
+//                     ret[key] = oriValue;
+//                 } else {
+//                     ret[key] = value;
+//                 }
+//             }
+//         });
+//         return ret;
+//     }
+//
+//     this
+//
+//     return {
+//         getPath :()=> path,
+//         getQueryJson:()=> getJson(query),
+//         getHashJson:()=> getJson(hash)
+//     }
+// }
+
 /**
  * 如果 query 里有 ？，则截断，取问号后面的部分。
  * @param query

@@ -54,7 +54,7 @@ jv.initVue = (setting) => {
 
 
     //创建简单的 store
-    jv.store = vueProtype.$my_store = {
+    jv.store = {
         setGlobalJson(data) {
             jv.store_db.setJson("global", Object.assign({}, this.getGlobal(), data));
         },
@@ -82,10 +82,26 @@ jv.initVue = (setting) => {
             }
             return ret;
         },
+        getString(key) {
+            return jv.store_db.getJson(jv.main.$route.fullPath)[key] || "";
+        },
         resetJson(data) {
             jv.store_db.setJson(jv.main.$route.fullPath, data);
         }
     };
+
+    Object.defineProperty(vueProtype, "$my_store", {
+        value() {
+            return jv.store;
+        }, enumerable: false
+    });
+
+    //重置数据
+    Object.defineProperty(vueProtype, "$resetData", {
+        value(data) {
+            return Object.assign(this.$data, this.$options.data(this), data)
+        }, enumerable: false
+    });
 
 
     Object.defineProperty(vueProtype, "chk", {
@@ -93,7 +109,6 @@ jv.initVue = (setting) => {
             return jv.chk_vue_dom(this, singleShow);
         }, enumerable: false
     });
-
 
     Object.defineProperty(HTMLElement.prototype, "chk", {
         value(singleShow) {

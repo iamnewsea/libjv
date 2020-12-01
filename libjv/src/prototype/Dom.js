@@ -138,7 +138,10 @@
 
 
     /**
-     * 触发元素事件. event=jv.createEvent
+     * 触发元素事件.
+     * event来源：
+     * jv.createEvent
+     * new MouseEvent("click", {view: window, bubbles: true, cancelable: true})
      */
     Object.defineProperty(Node.prototype, "trigger", {
         value(event) {

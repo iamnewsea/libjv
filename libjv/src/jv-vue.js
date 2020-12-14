@@ -91,7 +91,7 @@ jv.initVue = (setting) => {
     };
 
     Object.defineProperty(vueProtype, "$my_store", {
-        value() {
+        get() {
             return jv.store;
         }, enumerable: false
     });

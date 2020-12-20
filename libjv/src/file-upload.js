@@ -77,46 +77,6 @@ jv.file2Base64Data = (file) => {
 };
 
 
-jv.toByteUnit = (value) => {
-    if (!value) return 0;
-    value = value.toString().toUpperCase();
-
-    var unit = value.slice(-1), unitCode = unit.charCodeAt();
-
-    if (unitCode.Between(48, 57)) {
-        return parseInt(value);
-    }
-
-
-    if (unit == "B") {
-        value = value.slice(0, -1);
-        unit = value.slice(-1);
-    }
-
-    value = parseFloat(value.slice(0, -1));
-
-    if ("TGMK".indexOf(unit) < 0) {
-        return 0;
-    }
-
-    var j = 0;
-    if (unit == "K") {
-        j = 10;
-    }
-    if (unit == "M") {
-        j = 20;
-    }
-    if (unit == "G") {
-        j = 30;
-    }
-    if (unit == "T") {
-        j = 40;
-    }
-
-    return parseInt(value * Math.pow(2, j));
-}
-
-
 jv.compressImage = (op) => {
     var imgDataBase64 = op.imageData,
         maxWidth = op.maxWidth,

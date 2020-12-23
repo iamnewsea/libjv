@@ -27,3 +27,11 @@ path 添加 python2
 
 ![](https://gitee.com/uploads/74/1227074_imnewsea.png)
 
+## 发布到nexus
+>https://www.e-learn.cn/topic/2624958
+
+```
+npm config set registry  http://saas-dev.nancal.com:31016/repository/npm/
+npm login
+npm publish
+```

@@ -647,6 +647,70 @@ jv.fillRes = (obj, key, args) => {
     });
 };
 
+
+/**
+ * 转换为人类可读的形式
+ * @param value,数值,或带单位的字符串
+ * @param precision, 精度，小数点位数。
+ * @returns {number}
+ */
+jv.toHumanSize = (value, precision) => {
+    if (!value) {
+        return "";
+    }
+    if (value.Type == "string") {
+        var unit = value.slice(-1), unitCode = unit.charCodeAt();
+        //如果不是数字
+        if (!unitCode.Between(48, 57)) {
+            value = jv.fromHumanSize(value);
+        }
+    }
+
+    if (jv.isNull(precision)) {
+        precision = 2;
+    }
+    var scale = 1024;
+
+    if (value < scale) {
+        return value + "B"
+    }
+
+    for (var i = 0; i < 4; i++) {
+        value = value / scale;
+        if (value < scale || i == 3) {
+            return value.ToRound(precision) + "KMGT"[i] + "B";
+        }
+    }
+};
+
+jv.fromHumanSize = (value) => {
+    if (!value) return 0;
+    value = value.toString().toUpperCase();
+
+    var unit = value.slice(-1), unitCode = unit.charCodeAt();
+
+    //如果是数字
+    if (unitCode.Between(48, 57)) {
+        return parseInt(value);
+    }
+
+
+    if (unit == "B") {
+        value = value.slice(0, -1);
+        unit = value.slice(-1);
+    }
+
+    value = parseFloat(value.slice(0, -1));
+
+    if ("TGMK".indexOf(unit) < 0) {
+        return value;
+    }
+
+    var j = ("KMGT".indexOf(unit) + 1) * 10;
+
+    return parseInt(value * Math.pow(2, j));
+}
+
 /**
  * 代理对象，避免 toJSON 递归调用。
  * @param json

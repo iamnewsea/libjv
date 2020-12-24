@@ -17,14 +17,17 @@ path 添加 python2
 
 ---- 使用以下方法下载编译后版本，比较快。
 
-> npm i -g node-sass --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
+> npm i -g node-sass@4.14.1 --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
 > npm i -g @vue/cli --registry=https://registry.npm.taobao.org
 > npm config set puppeteer_download_host=https://npm.taobao.org/mirrors
 > npm i --registry=https://registry.npm.taobao.org
 > 指定版本： npm i -g @vue/cli@^4.1.1 --registry=https://registry.npm.taobao.org
 >作者 imnewsea
 
-
+---
+> yarn global add node-sass@4.14.1 --sass_binary_site=https://npm.taobao.org/mirrors/node-sass/
+> yarn global add @vue/cli --registry=https://registry.npm.taobao.org
+> yarn --registry=https://registry.npm.taobao.org
 ![](https://gitee.com/uploads/74/1227074_imnewsea.png)
 
 ## 发布到nexus

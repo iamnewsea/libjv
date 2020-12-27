@@ -2,8 +2,15 @@ import jv from "libjv"
 
 (function () {
 
+  jv.last_msgs = {};
+  jv.showLastInfo = function () {
+    if (!jv.last_msgs.info) return;
+    jv.info.apply(null, jv.last_msgs.info);
+  };
 
   jv.info = function (msg, title, opt) {
+    jv.last_msgs.info = [msg, title, opt];
+
     return jv.main.$notify(Object.assign({
       title: title || '消息',
       message: msg,
@@ -13,6 +20,7 @@ import jv from "libjv"
   };
 
   jv.warn = function (msg, title, opt) {
+    jv.last_msgs.warn = [msg, title, opt];
     return jv.main.$notify(Object.assign({
       title: title || '提示',
       message: msg,
@@ -21,24 +29,19 @@ import jv from "libjv"
     }, opt));
   };
 
-  jv.last_error_msg = "";
-  jv.last_error_title = "";
   jv.showLastError = function () {
-    if (!jv.last_error_msg) return;
-    return jv.error(jv.last_error_msg, jv.last_error_title);
+    if (!jv.last_msgs.error) return;
+    jv.error.apply(null, jv.last_msgs.error);
   };
 
   jv.error = function (msg, title, opt) {
+    jv.last_msgs.error = [msg,title,opt];
+
     var msg2 = msg;
     if (title) {
       msg2 = "[" + title + "] " + msg2;
     }
-
-
     console.error(msg2);
-
-    jv.last_error_msg = msg;
-    jv.last_error_title = title;
 
     var ret = jv.main.$notify(Object.assign({
       title: title || '错误',

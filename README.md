@@ -33,8 +33,18 @@ path 添加 python2
 ## 发布到nexus
 >https://www.e-learn.cn/topic/2624958
 
+安装包使用：
+> npm config set registry  http://saas-dev.nancal.com:31016/repository/npm-proxy/
+
+发版使用：
 ```
 npm config set registry  http://saas-dev.nancal.com:31016/repository/npm/
 npm login
 npm publish
+```
+
+如果npm login出现异常，查看配置文件 C:\Users\[your user name]\.npmrc,只保留以下内容：
+```
+puppeteer_download_host=https://npm.taobao.org/mirrors
+registry=http://saas-dev.nancal.com:31016/repository/npm/
 ```

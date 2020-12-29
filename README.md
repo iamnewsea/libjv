@@ -38,7 +38,7 @@ path 添加 python2
 
 发版使用：
 ```
-npm config set registry  http://saas-dev.nancal.com:31016/repository/npm/
+npm config set registry http://saas-dev.nancal.com:31016/repository/npm-hosted/
 npm login
 npm publish
 ```

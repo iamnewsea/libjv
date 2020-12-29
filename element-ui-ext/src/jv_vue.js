@@ -8,6 +8,20 @@ import jv from "libjv"
     jv.info.apply(null, jv.last_msgs.info);
   };
 
+  jv.alert = function (msg, title, opt) {
+    jv.last_msgs.alert = [msg, title, opt];
+
+    this.$alert('这是一段内容', '标题名称', {
+      confirmButtonText: '确定',
+      callback: action => {
+        this.$message({
+          type: 'info',
+          message: `action: ${ action }`
+        });
+      }
+    });
+  };
+
   jv.info = function (msg, title, opt) {
     jv.last_msgs.info = [msg, title, opt];
 

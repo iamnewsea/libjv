@@ -11,15 +11,10 @@ import jv from "libjv"
   jv.alert = function (msg, title, opt) {
     jv.last_msgs.alert = [msg, title, opt];
 
-    this.$alert('这是一段内容', '标题名称', {
-      confirmButtonText: '确定',
-      callback: action => {
-        this.$message({
-          type: 'info',
-          message: `action: ${ action }`
-        });
-      }
-    });
+    this.$alert(msg, title || "提示", Object.assign({
+      type: "info",
+      dangerouslyUseHTMLString: true
+    }, opt));
   };
 
   jv.info = function (msg, title, opt) {
@@ -49,7 +44,7 @@ import jv from "libjv"
   };
 
   jv.error = function (msg, title, opt) {
-    jv.last_msgs.error = [msg,title,opt];
+    jv.last_msgs.error = [msg, title, opt];
 
     var msg2 = msg;
     if (title) {

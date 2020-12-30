@@ -11,7 +11,7 @@ import jv from "libjv"
   jv.alert = function (msg, title, opt) {
     jv.last_msgs.alert = [msg, title, opt];
 
-    this.$alert(msg, title || "提示", Object.assign({
+    jv.main.$alert(msg, title || "提示", Object.assign({
       type: "info",
       dangerouslyUseHTMLString: true
     }, opt));

@@ -30,17 +30,25 @@ path 添加 python2
 > yarn --registry=https://registry.npm.taobao.org
 ![](https://gitee.com/uploads/74/1227074_imnewsea.png)
 
+
+## 默认
+> yarn config set registry https://registry.npm.taobao.org
+> 
 ## 发布到nexus
 >https://www.e-learn.cn/topic/2624958
+本地 .yarnrc 变量内容会覆盖系统目录的 .yarnrc 变量内容。
 
 安装包使用：
-> yarn config set registry http://saas-dev.nancal.com:31016/repository/npm-group/
-> yarn config list
+
+> 运行 yarn config list
+> 检查项目文件 .yarnrc registry 配置，设置到淘宝或注释。
 > yarn
 
 发版使用：
 ```
-yarn config set registry http://saas-dev.nancal.com:31016/repository/npm-hosted/
+运行 yarn config list
+检查项目文件 .yarnrc registry 配置，设置到私服 npm-hosted
+yarn
 yarn login
 yarn publish
 ```

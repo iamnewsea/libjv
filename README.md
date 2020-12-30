@@ -31,9 +31,16 @@ path 添加 python2
 ![](https://gitee.com/uploads/74/1227074_imnewsea.png)
 
 
-## 默认
+## 系统设置
+
+系统 .yarnrc 两个文件地址：
+
+> /root/.yarnrc
+> /usr/local/share/.yarnrc
+
+运行：
 > yarn config set registry https://registry.npm.taobao.org
-> 
+
 ## 发布到nexus
 >https://www.e-learn.cn/topic/2624958
 本地 .yarnrc 变量内容会覆盖系统目录的 .yarnrc 变量内容。

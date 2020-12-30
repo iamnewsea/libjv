@@ -60,6 +60,12 @@ yarn login
 yarn publish
 ```
 
+如果使用npm发版：
+```
+npm config set registry http://saas-dev.nancal.com:31016/repository/npm-hosted/
+npm login
+npm publish
+```
 如果yarn login出现异常，查看配置文件:
 
 > C:\Users\[your user name]\.npmrc

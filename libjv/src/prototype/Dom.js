@@ -139,12 +139,16 @@
 
     /**
      * 触发元素事件.
-     * event来源：
-     * jv.createEvent
-     * new MouseEvent("click", {view: window, bubbles: true, cancelable: true})
+     * event:
+     * 1. 四个鼠标事件： "click", "dblclick", "mouseup", "mousedown"
+     * 2. 自定义事件 jv.createEvent
+     * 3. 系统事件 new MouseEvent("click", {view: window, bubbles: true, cancelable: true})
      */
     Object.defineProperty(Node.prototype, "trigger", {
         value(event) {
+            if (["click", "dblclick", "mouseup", "mousedown"].includes(event)) {
+                event = new MouseEvent(event, {view: window, bubbles: true, cancelable: true})
+            }
             if (Node.prototype.dispatchEvent) {
                 this.dispatchEvent(event);
                 return event;

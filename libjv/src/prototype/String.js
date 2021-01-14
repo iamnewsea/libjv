@@ -12,6 +12,29 @@
         }, enumerable: false
     });
 
+    Object.defineProperty(String.prototype, 'getBigCamelCase', {
+        value(sep) {
+            if (!this) return "";
+            return this.split(/[\W_]+/).map(it => it[0].toUpperCase() + it.slice(1)).join("");
+        }, enumerable: false
+    });
+    Object.defineProperty(String.prototype, 'getSmallCamelCase', {
+        value(sep) {
+            var v = this.getBigCamelCase()
+            if (!v) return v;
+            return v[0].toLowerCase() + v.slice(1);
+        }, enumerable: false
+    });
+    /**
+     * 获取短横线格式
+     */
+    Object.defineProperty(String.prototype, 'getKebabCase', {
+        value(sep) {
+            var v = this.getSmallCamelCase();
+            if (!v) return v;
+            return v.replace(/[A-Z]/g, (it, index) => "-" + it.toLowerCase());
+        }, enumerable: false
+    });
 
     Object.defineProperty(String.prototype, 'trimStartWith', {
         value() {
@@ -35,7 +58,7 @@
 
             if (hittedItem) {
                 value = value.slice(hittedItem.length);
-                return value.trimStartWith.apply(value,ps);
+                return value.trimStartWith.apply(value, ps);
             } else return value;
         },
         enumerable: false
@@ -66,8 +89,8 @@
             }
 
             if (hittedItem) {
-                value = value.slice(0,0-hittedItem.length);
-                return value.trimEndWith.apply(value,ps);
+                value = value.slice(0, 0 - hittedItem.length);
+                return value.trimEndWith.apply(value, ps);
             } else return value;
         },
         enumerable: false
@@ -75,8 +98,8 @@
 
     Object.defineProperty(String.prototype, 'trimWith', {
         value() {
-            var ret = this.trimStartWith.apply(this,arguments);
-            return ret.trimEndWith.apply(ret,arguments);
+            var ret = this.trimStartWith.apply(this, arguments);
+            return ret.trimEndWith.apply(ret, arguments);
         },
         enumerable: false
     });
@@ -118,7 +141,7 @@
             }
 
             if (hit) {
-                return value.trimPairs.apply(value,ps);
+                return value.trimPairs.apply(value, ps);
             } else return value;
         },
         enumerable: false

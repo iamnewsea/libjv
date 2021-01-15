@@ -135,6 +135,8 @@
         flex: 3;
         white-space: nowrap;
         flex-wrap:nowrap;
+        display: flex;
+        align-items: center;
     }
 
     .kv > .k:first-child:after {

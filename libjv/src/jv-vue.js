@@ -103,37 +103,30 @@ jv.initVue = (setting) => {
         }, enumerable: false
     });
 
+    Object.defineProperty(vueProtype, "chk_item", {
+        value(chk, chk_msg) {
+            return jv.chk_vue_item(this, chk, chk_msg)
+        }, enumerable: false
+    });
+
+    Object.defineProperty(HTMLElement.prototype, "chk_item", {
+        value(chk, chk_msg) {
+            return jv.chk_html_item(this, chk, chk_msg)
+        }
+    });
 
     Object.defineProperty(vueProtype, "chk", {
-        value(singleShow) {
-            return jv.chk_vue_dom(this, singleShow);
+        value(setting) {
+            return jv.chk_vue(this, setting);
         }, enumerable: false
     });
 
     Object.defineProperty(HTMLElement.prototype, "chk", {
-        value(singleShow) {
-            //遍历所有的Vue元素。
-            var recusion_vue_dom = (dom, singleShow) => {
-                if (dom.__vue__) {
-                    return dom.__vue__.chk(singleShow);
-                }
-
-                var ret = true;
-
-                for (var i = 0, children = dom.children, len = children.length; i < len; i++) {
-                    var item = children[i];
-                    ret &= recusion_vue_dom(item, singleShow);
-                    if ((ret === false) && singleShow) {
-                        return ret;
-                    }
-                }
-
-                return ret;
-            };
-
-            return recusion_vue_dom(this, singleShow)
+        value(setting) {
+            return jv.chk_html(this, setting)
         }
     });
+
 
     /**
      * 向下找 tag

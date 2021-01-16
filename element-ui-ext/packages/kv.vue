@@ -148,6 +148,8 @@
         flex: 7;
         justify-content: flex-start;
         flex-wrap: wrap;
+        display: flex;
+        align-items: center;
     }
 
 

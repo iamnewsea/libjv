@@ -10,7 +10,7 @@
 
         <template v-else>
             <template v-if="type == 'radio'">
-                <el-radio-group v-model="value1" v-if="data2.length <= enumCount"
+                <el-radio-group :size="size" v-model="value1" v-if="data2.length <= enumCount"
                                 @change="changed" :class="clearable? 'ri4c':''" style="white-space: nowrap;">
                     <component :is="buttonStyle? 'el-radio-button': 'el-radio'" v-for="item in data2"
                                :label="item[keyField]" @click.native.stop="item_click"
@@ -18,7 +18,7 @@
                     </component>
                 </el-radio-group>
 
-                <el-select v-model="value1" placeholder="请选择" v-else :clearable="clearable"
+                <el-select :size="size" v-model="value1" placeholder="请选择" v-else :clearable="clearable"
                            @change="changed">
                     <el-option
                         v-for="item in data2"
@@ -29,14 +29,14 @@
                 </el-select>
             </template>
             <template v-else>
-                <el-checkbox-group v-model="value2" v-if="data2.length <= enumCount"
+                <el-checkbox-group :size="size" v-model="value2" v-if="data2.length <= enumCount"
                                    @change="changed(null)">
                     <component :is="buttonStyle? 'el-checkbox-button' :'el-checkbox'" v-for="item in data2"
                                :label="item[keyField]"
                                :key="item[keyField]">{{ item[labelField] }}
                     </component>
                 </el-checkbox-group>
-                <el-select v-model="value2" multiple placeholder="请选择" v-else :clearable="clearable"
+                <el-select :size="size" v-model="value2" multiple placeholder="请选择" v-else :clearable="clearable"
                            @change="changed">
                     <el-option
                         v-for=" item in data2"
@@ -74,6 +74,11 @@ export default {
         buttonStyle: {
             type: Boolean, default() {
                 return false;
+            }
+        },
+        size: {
+            type: String, default() {
+                return "small"
             }
         },
         //数据在返回json的路径

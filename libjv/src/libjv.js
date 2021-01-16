@@ -336,7 +336,7 @@ jv.JvEnum = function JvEnum(typeName, json, keyCallback) {
 
 
 /**
- * 在枚举的基础上，定义一个多重状态设置
+ * 判断所有枚举项是否完全被设置过。
  */
 jv.enumAllSet = function (enumType, enumValue) {
     if (!enumValue) {

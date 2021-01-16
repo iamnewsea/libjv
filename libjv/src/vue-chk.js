@@ -265,9 +265,9 @@ import jv from "./libjv"
 
 
         var {value, data} = getHtmlData(chk_dom);
-        if (!data) {
-            throw new Error("找不到vue数据!")
-        }
+        // if (!data) {
+        //     throw new Error("找不到vue数据!")
+        // }
 
         var chk_result = Object.assign(
             {msg: chk_msg || chk_dom.getAttribute("chkmsg")},

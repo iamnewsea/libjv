@@ -274,6 +274,12 @@ export default {
         },
         ajaxUrl(url) {
             url = url || this.url;
+
+            if (!url) {
+                this.setData([]);
+                return;
+            }
+
             var method = (this.urlMethod || "post").toLowerCase();
 
             if (this.cache) {

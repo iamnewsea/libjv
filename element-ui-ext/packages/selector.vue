@@ -194,7 +194,7 @@ export default {
                 }
             }
             if (this.labelField) {
-                return this.value2 && this.value2.length && this.value2.map(it => it[labelField]).join(",")
+                return this.value2 && this.value2.length && this.value2.map(it => it[this.labelField]).join(",")
             } else {
                 return this.value2 && this.value2.length && this.value2.join(",")
             }

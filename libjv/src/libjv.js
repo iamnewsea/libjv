@@ -949,7 +949,7 @@ let param_jmap = (obj) => {
     //   return obj;
     // }
 
-    var ret = {};
+    var ret = {}, ary = [];
     Object.keys(obj).forEach(key => {
         if (!key) return;
         if (key.endsWith("_res")) {
@@ -962,6 +962,8 @@ let param_jmap = (obj) => {
         if (value === undefined) return;
         if (value === null) return;
 
+        //如果是 Array[Map]，生成 ret[items['id']]=1
+        //如果是 Array[Object]，生成 ret[items.id]=1
         var isMap = (mapObject, objType) => {
             var isMapValue = objType == "map";
             if (!isMapValue) {
@@ -978,8 +980,7 @@ let param_jmap = (obj) => {
         };
 
         if (Array.isArray(value)) {
-
-            value = value.filter(it => it != undefined && it != null);
+            value = value.filter(it => !jv.isNull(it));
 
             if (value.length == 0) {
                 ret[key] = "";
@@ -988,14 +989,11 @@ let param_jmap = (obj) => {
 
             var firstType = typeof (value[0]);
             if (firstType == "string" || firstType == "number") {
-                ret[key] = value.join(",");
-            }
-
-            for (var i in value) {
-                var item = value[i];
-                if (!item) continue;
-                var objType = item.ObjectType;
-                if (objType) {
+                ary.pushAll(value.map(it => encodeURIComponent(key) + "=" + encodeURIComponent(it)));
+            } else {
+                for (var i in value) {
+                    var item = value[i];
+                    if (!item) continue;
                     var m = param_jmap(item);
                     var keys = Object.keys(m);
 
@@ -1013,7 +1011,7 @@ let param_jmap = (obj) => {
         } else {
             var objType = value.ObjectType;
             if (objType) {
-                var m = param_jmap(value);
+                var m = param_jmap(value).json;
                 var keys = Object.keys(m);
 
                 if (isMap(value, objType)) {
@@ -1033,7 +1031,7 @@ let param_jmap = (obj) => {
         }
     });
 
-    return ret;
+    return {json: ret, ary: ary};
 };
 
 /**
@@ -1043,9 +1041,12 @@ let param_jmap = (obj) => {
  */
 jv.param = (obj) => {
     var ret = param_jmap(obj);
-    return Object.keys(ret).map(it => {
-        return encodeURIComponent(it) + "=" + encodeURIComponent(ret[it])
-    }).join("&");
+    var ary = [];
+    ary.pushAll(Object.keys(ret.json).map(it => {
+        return encodeURIComponent(it) + "=" + encodeURIComponent(ret.json[it])
+    }));
+    ary.pushAll(ret.ary)
+    return ary.join("&")
 };
 
 // class UrlCls {

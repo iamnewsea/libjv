@@ -1,14 +1,14 @@
 <template>
     <div class="enum" v-bind="$attrs">
         <template v-if="!data2.length">
-            <label>{{ nodata_display }}</label>
+            <slot name="empty"><label>{{ nodata_display }}</label></slot>
         </template>
 
-        <template v-if="readOnlyStyle">
+        <template v-else-if="readOnlyStyle">
             <label v-for="item in value_displays" :key="item">{{ item }}</label>
         </template>
 
-        <template v-else>
+        <template v-else-if="keyField && labelField">
             <template v-if="type == 'radio'">
                 <el-radio-group :size="size" v-model="value1" v-if="data2.length <= enumCount"
                                 @change="changed" :class="clearable? 'ri4c':''" style="white-space: nowrap;">
@@ -19,7 +19,7 @@
                 </el-radio-group>
 
                 <el-select :size="size" v-model="value1" placeholder="请选择" v-else :clearable="clearable"
-                           @change="changed">
+                           @change="changed" style="width:100%">
                     <el-option
                         v-for="item in data2"
                         :key="item[keyField]"
@@ -37,7 +37,7 @@
                     </component>
                 </el-checkbox-group>
                 <el-select :size="size" v-model="value2" multiple placeholder="请选择" v-else :clearable="clearable"
-                           @change="changed">
+                           @change="changed" style="width:100%">
                     <el-option
                         v-for=" item in data2"
                         :key="item[keyField]"
@@ -47,7 +47,6 @@
                 </el-select>
             </template>
         </template>
-
     </div>
 </template>
 <script>
@@ -119,11 +118,12 @@ export default {
                 return false
             }
         },
+        //使用 enum方式的个数
         enumCount: {
             type: Number, default() {
                 return 3
             }
-        }, //使用 enum方式的个数
+        },
         //radio,checkbox
         type: {
             type: String, default() {
@@ -131,16 +131,17 @@ export default {
             }
         },
         //如果是多选，是数组， 如果是单选是对象或值。
+        //value 必须是 keyField 的内容。
         value: {
-            type: [String, Array, Boolean, Number, Object], default() {
+            type: [Array, Object], default() {
                 return "";
             }
+        },
+        emptyText: {
+            type: String, default() {
+                return "(空)"
+            }
         }
-        // valueIsBoolean: {
-        //     type: Boolean, default() {
-        //         return false
-        //     }
-        // },
         //默认:如果是json，返回 key.如果是 valueArray ["a","b"] ，会返回值。 枚举会返回name,其它情况返回整条数据。
         //该字段仅对返回整条数据的情况有效,指定返回该条数据的哪个值
         // valueField: {type: String, default: ""}
@@ -155,17 +156,41 @@ export default {
             }
         },
         data: {
-            deep: true, immediate: true, handler(v) {
-                if (jv.dataEquals(v, this.data2)) {
-                    return;
+            deep: true, immediate: true, handler(data) {
+                if (!data) return;
+
+                var type = data.Type;
+
+                if (["object", "map"].includes(type)) {
+                    var keys = Object.keys(data);
+                    if (!keys.length) {
+                        this.setData([]);
+                        return;
+                    }
+                    if (("true" in data) && ("false" in data) && keys.length < 4) {
+                        this.valueIsBoolean = true;
+                    } else if (keys.every(it => it.IsNumberFormat())) {
+                        this.valueIsNumber = true;
+                    }
+
+                    this.keyField = "name"
+                    this.labelField = "remark"
+                    data = keys.map(it => {
+                        return {name: it, remark: data[it]};
+                    });
                 }
 
-                this.setData(v);
+                this.setData(data);
             }
         },
         enum: {
             immediate: true, handler(v) {
-                this.setData();
+                if (!v) return;
+                this.keyField = "name";
+                this.labelField = "remark";
+                var data = jv.enum[v];
+
+                this.setData(data && data.getData() || []);
             }
         },
         fields: {
@@ -188,15 +213,15 @@ export default {
         nodata_display() {
             if (this.type == "radio") {
                 if (this.labelField) {
-                    return this.value1 && this.value1[this.labelField];
+                    return this.value1 && this.value1[this.labelField] || this.emptyText;
                 } else {
-                    return this.value1;
+                    return this.value1 || this.emptyText;
                 }
             }
             if (this.labelField) {
-                return this.value2 && this.value2.length && this.value2.map(it => it[this.labelField]).join(",")
+                return this.value2 && this.value2.map(it => it[this.labelField]).join(",") || this.emptyText
             } else {
-                return this.value2 && this.value2.length && this.value2.join(",")
+                return this.value2 && this.value2.join(",") || this.emptyText
             }
         },
         value_displays() {
@@ -242,12 +267,10 @@ export default {
             //数据绑定的 labelField
             labelField: "",
             readOnlyStyle: false,
-            dataIsEnum: false,
             dataIsValueArray: false,
-            dataIsObject: false,
             valueIsBoolean: false,    //如果 data 包含 true,false 或 value值为boolean
             valueIsNumber: false,    //如果 data 只包含 数字Key！
-            returnValueField: "",     //获取 fields 中[]包裹项
+
             value1_click_v1: "", //click下会有两次点击，记录第一次点击时的值
         };
     },
@@ -308,45 +331,30 @@ export default {
                     v = this.value1;
                 }
 
-                if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
 
-                } else {
-                    if (this.keyField == this.returnValueField) {
-
-                    } else {
-                        v = this.data2.find(it => it[this.keyField] == v)
-
-                        if (this.returnValueField) {
-                            v = jv.evalExpression(v, this.returnValueField);
-                        }
-                    }
+                //保留空值不转换
+                if (jv.isNull(v) || (v === "")) {
+                    v = "";
+                } else if (this.valueIsBoolean) {
+                    v = jv.asBoolean(v)
+                } else if (this.valueIsNumber) {
+                    v = jv.asInt(v);
                 }
 
-
-                if (this.returnValueField) {
-                    //保留空值不转换
-                    if (jv.isNull(v) || (v === "")) {
-                        v = "";
-                    } else if (this.valueIsBoolean) {
-                        v = jv.asBoolean(v)
-                    } else if (this.valueIsNumber) {
-                        v = jv.asInt(v);
-                    }
-                }
             } else {
                 if (jv.isNull(v)) {
                     v = this.value2;
                 }
 
-                v = v.filter(it => !jv.isNull(v));
+                v = v.filter(it => !jv.isNull(it));
 
-                if (this.returnValueField) {
-                    if (this.valueIsBoolean) {
-                        v = v.map(it => jv.asBoolean(it))
-                    } else if (this.valueIsNumber) {
-                        v = v.map(it => jv.asInt(it))
-                    }
+
+                if (this.valueIsBoolean) {
+                    v = v.map(it => jv.asBoolean(it))
+                } else if (this.valueIsNumber) {
+                    v = v.map(it => jv.asInt(it))
                 }
+
             }
             this.$emit("input", v);
             this.$emit("change", v);
@@ -374,92 +382,63 @@ export default {
             this.setValue_2(v);
         },
         setFields() {
-            var fields = (this.fields || "").split(",");
-            var keyField = "";
-            var valueField = "";
-            var returnValueField = "";
-            if (this.dataIsEnum) {
-                keyField = fields[0] || "name";
-                valueField = fields[1] || "remark";
-                returnValueField = keyField;
-
-            } else if (this.dataIsValueArray || this.dataIsObject) {
-                keyField = fields[0] || "value";
-                valueField = fields[1] || "label";
-                returnValueField = keyField;
-            } else {
-                keyField = fields[0] || "id";
-                valueField = fields[1] || "name";
+            if (!this.fields) {
+                return;
             }
+            var fields = (this.fields || "").split(",");
+            var keyField = fields[0] || "";
+            var labelField = fields[1] || "";
 
             keyField = keyField.trim();
-            valueField = valueField.trim();
-            if (returnValueField) {
-                returnValueField = returnValueField.trim();
-            }
+            labelField = labelField.trim();
 
-            if (keyField.startsWith("#")) {
-                keyField = keyField.slice(1);
-                returnValueField = keyField;
-            }
-
-            if (valueField.startsWith("#")) {
-                valueField = valueField.slice(1);
-                returnValueField = valueField;
-            }
-
-            this.returnValueField = returnValueField;
             this.keyField = keyField;
-            this.labelField = valueField;
+            this.labelField = labelField;
         },
         setData(data) {
-            if (this.enum) {
-                var data2 = jv.enum[this.enum];
-                if (data2) {
-                    this.dataIsEnum = true;
-                    data = data2.getData();
-                    type = data.Type;
-                }
-            } else {
-                data = data || this.data;
-            }
-
-            if (jv.isNull(data)) {
-                this.data2 = [];
+            if (jv.dataEquals(data, this.data2)) {
                 return;
             }
 
+            if (jv.isNull(data)) {
+                data = [];
+            }
+
             var type = data.Type;
-
-            if (["object", "map"].includes(type)) {
-                this.dataIsObject = true;
-                var keys = Object.keys(data);
-
-                if (!keys.length) {
-                    this.data2 = [];
-                    return;
-                }
-
-                if (("true" in data) && ("false" in data) && keys.length < 4) {
-                    this.valueIsBoolean = true;
-                } else if (keys.every(it => it.IsNumberFormat())) {
-                    this.valueIsNumber = true;
-                }
-
-                this.setFields();
-            } else if (["array", "set"].includes(type)) {
-                if (!data.length) {
-                    this.data2 = [];
-                    return;
-                }
+            if (["array", "set"].includes(type) && data.length) {
 
                 var v0 = data[0];
                 if (jv.isNull(v0) == false) {
                     this.dataIsValueArray = !v0.ObjectType;
                 }
 
-                this.setFields();
-                if (this.dataIsValueArray == false) {
+                if (this.dataIsValueArray) {
+                    this.keyField = "name"
+                    this.labelField = "remark"
+
+                    data = data.map(it => {
+                        return {name: it, remark: it}
+                    });
+                } else {
+                    //如果只有有两个，其中一个为 remark, 或 name.
+                    var fields = Object.keys(v0);
+                    if (fields.length == 2) {
+                        var remark_index = fields.indexOf("remark");
+                        var name_index = fields.indexOf("name");
+                        var id_index = fields.indexOf("id");
+
+                        if (id_index >= 0) {
+                            this.keyField = "id"
+                            this.labelField = fields[id_index ? 0 : 1]
+                        } else if (remark_index >= 0) {
+                            this.keyField = fields[remark_index ? 0 : 1]
+                            this.labelField = "remark"
+                        } else if (name_index >= 0) {
+                            this.keyField = fields[name_index ? 0 : 1]
+                            this.labelField = "name"
+                        }
+                    }
+                    //需要提前定义 fields
                     var keys = data.map(it => it[this.keyField].toString());
                     if (keys.filter(it => {
                         return (it === "true") || (it === "false");
@@ -473,40 +452,15 @@ export default {
 
             this.setValue();
 
-            var d2 = [];
-            if (this.dataIsObject) {
-                var keys = Object.keys(data)
-                for (var key of keys) {
-                    var value = data[key];
-
-                    var item = {};
-                    if (this.valueIsBoolean) {
-                        item[this.keyField] = jv.asBoolean(key);
-                    } else if (this.valueIsNumber) {
-                        item[this.keyField] = jv.asInt(key);
-                    } else {
-                        item[this.keyField] = key;
-                    }
-                    item[this.labelField] = value;
-                    d2.push(item);
-                }
-            } else if (this.dataIsValueArray) {
-                d2 = data.map(it => {
-                    return {value: it, label: it}
-                });
-            } else {
-                d2 = data;
-            }
-
-            if (jv.dataEquals(this.data2, d2)) {
+            if (jv.dataEquals(this.data2, data)) {
                 return;
             }
 
-            this.data2 = d2;
+            this.data2 = data.map(it => it)
 
             //如果是单选，并且只有一个，自动选择。
-            if (this.type == "radio" && d2.length == 1) {
-                this.value1 = d2[0][this.keyField];
+            if (this.type == "radio" && data.length == 1) {
+                this.value1 = data[0][this.keyField];
                 this.changed();
             }
         },
@@ -574,43 +528,10 @@ export default {
             }
 
             //如果 v 是对象，先转成值
-            if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray) {
-            } else {
-                v = v.map(it => it[this.keyField]);
-            }
-
-            // var type = v.Type;
-            // if (["array", "set"].includes(type)) {
-            //
+            // if (this.dataIsValueArray) {
+            // } else {
+            //     v = v.map(it => it[this.keyField]);
             // }
-
-            // if (jv.dataEquals(v, this.value2)) {
-            //     return;
-            // }
-            // if (jv.isNull(v)) {
-            //     this.value2 = [];
-            //     return;
-            // }
-
-
-            //解决 boolean类型问题
-            // if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray || (this.returnValueField == this.keyField)) {
-            //     if (this.valueIsBoolean) {
-            //         this.value2 = v.map(it => jv.asBoolean(it));
-            //     } else {
-            //         this.value2 = v;
-            //     }
-            //     return;
-            // }
-            //
-            // this.value2 = v.map(it => {
-            //     var rv = it[this.keyField];
-            //     if (this.valueIsBoolean) {
-            //         return jv.asBoolean(rv);
-            //     }
-            //     return rv;
-            // });
-
 
             if (this.valueIsBoolean) {
                 v.map(it => jv.asBoolean(it))

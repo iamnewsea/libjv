@@ -1,6 +1,6 @@
 {
   "name": "element-ui-ext",
-  "version": "0.10.25",
+  "version": "0.10.26",
   "description": "基于element-ui的vue扩展",
   "author": "于新海 <13466396863@163.com>",
   "scripts": {
@@ -8,7 +8,7 @@
     "build_only": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "build": "vue-cli-service build --target lib --name element-ui-ext --dest lib src/index.js",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "yarn build"
   },
   "dependencies": {},
   "peerDependencies": {

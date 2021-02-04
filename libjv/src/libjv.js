@@ -154,11 +154,14 @@ jv.store_db = {
     getExpireKey(key) {
         return "jv.store_exp." + key;
     },
-    getJson(key) {
+    getJson(key, defaultValue) {
         if (!key) return null;
 
         var v = this.getString(key);
-        if (!v) return {};
+        if (!v) {
+            if (typeof (defaultValue) == "undefined") return {};
+            return defaultValue;
+        }
         return JSON.parse(v);
     },
     setJson(key, value, cacheSeconds) {

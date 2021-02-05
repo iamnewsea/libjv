@@ -13,54 +13,24 @@
         }
         return ret;
     };
+    // /**
+    //  * 根据 key 或 lambda 找出最小的项。
+    //  */
+    // Object.defineProperty(Array.prototype, "findIndex", {
+    //     value(eqCallback) {
+    //         var eqIsFunction = eqCallback.Type == "function";
+    //         for (var i = 0, len = this.length; i < len; i++) {
+    //             if (eqIsFunction) {
+    //                 if (eqCallback(this[i])) return i;
+    //             } else {
+    //                 if (this[i] === eqCallback) return i;
+    //             }
+    //         }
+    //         return -1;
+    //     }
+    //     , enumerable: false
+    // });
 
-    var findIndex = (ary, key, minOrMax) => {
-        var index = -1;
-        if (ary.length == 0) return index;
-        var getKeyValue = (item) => {
-            return item[key];
-        };
-
-        var findOne = null;
-        for (var i = 0, len = ary.length; i < len; i++) {
-            var item = ary[i];
-            if (i == 0) {
-                findOne = getKeyValue(item);
-                index = 0;
-                continue;
-            }
-
-            var kv = getKeyValue(item);
-            if (minOrMax) {
-                if (kv < findOne) {
-                    kv = findOne;
-                    index = i;
-                }
-            } else {
-                if (kv > findOne) {
-                    kv = findOne;
-                    index = i;
-                }
-            }
-        }
-        return index;
-    }
-    /**
-     * 根据 key 或 lambda 找出最小的项。
-     */
-    Object.defineProperty(Array.prototype, "findIndexByMinValue", {
-        value(key) {
-            return findIndex(this, key, true);
-        }
-        , enumerable: false
-    });
-
-    Object.defineProperty(Array.prototype, "findIndexByMaxValue", {
-        value(key) {
-            return findIndex(this, key, false);
-        }
-        , enumerable: false
-    });
     //返回时间的字符串格式.
     Object.defineProperty(Array.prototype, "spliceDate", {
         value() {

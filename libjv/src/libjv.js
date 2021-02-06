@@ -302,11 +302,18 @@ jv.JvEnum = function JvEnum(typeName, json, keyCallback) {
     });
 
     this.getData = (key) => {
-        if (!jv.isNull(key)) {
-            return this.list.filter(it => it.name == keyCallback(key))[0] || {};
+        if (jv.isNull(key)) {
+            return this.list;
         }
-        return this.list;
+
+        if (["array", "set"].includes(key.Type)) {
+            return this.list.filter(it => key.map(k2 => keyCallback(k2)).includes(it.name))
+        }
+
+
+        return this.list.filter(it => it.name == keyCallback(key))[0] || {};
     };
+
     this.fillRes = (obj, key) => {
         if (key in obj == false) {
             return;
@@ -325,11 +332,15 @@ jv.JvEnum = function JvEnum(typeName, json, keyCallback) {
                 }
 
                 var v = self.getData(value);
-                if (!v || !v.name) {
+                if (!v) {
+                    return "";
+                } else if (v.length) {
+                    return v.map(it => it.remark || it.name).join(",")
+                } else if (!v.name) {
                     return "";
                 }
 
-                return v.remark || "";
+                return v.remark || v.name || "";
             },
             enumerable: false,
             configurable: true
@@ -539,6 +550,16 @@ jv.recursionJson = (json, eachJsonItemCallback, deepth) => {
 使用 对象.Enumer(键,jv.枚举)  对对象的key进行枚举化。
  */
 jv.defEnum = (typeName, json, keyCallback) => {
+    if (!json) return;
+    var type = json.Type;
+    if (["array", "set"].includes(type)) {
+        var json2 = {};
+        json.forEach(it => {
+            json2[it] = it;
+        });
+
+        json = json2;
+    }
     jv.enum[typeName] = new jv.JvEnum(typeName, json, keyCallback);
 };
 

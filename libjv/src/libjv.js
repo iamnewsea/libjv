@@ -1063,14 +1063,19 @@ let param_jmap = (obj) => {
  * @param obj
  * @returns {string}
  */
-jv.param = (obj) => {
+jv.param = (obj, withHost) => {
+    var host = withHost && obj.getUrlPart && obj.getUrlPart() || "";
+    if (host) {
+        host += "?"
+    }
     var ret = param_jmap(obj);
     var ary = [];
     ary.pushAll(Object.keys(ret.json).map(it => {
         return encodeURIComponent(it) + "=" + encodeURIComponent(ret.json[it])
     }));
     ary.pushAll(ret.ary)
-    return ary.join("&")
+
+    return host + ary.join("&")
 };
 
 // class UrlCls {
@@ -1128,7 +1133,13 @@ jv.param = (obj) => {
 jv.query2Json = (query) => {
     let ret = {};
     if (!query) return ret;
-    query.split("?").last().split("&").forEach((it) => {
+    var url_sects = query.split("?");
+    Object.defineProperty(ret, "getUrlPart", {
+        value() {
+            return url_sects[0];
+        }, enumerable: false
+    });
+    url_sects.last().split("&").forEach((it) => {
         var sects = it.split("=");
         if (sects.length == 2) {
             var key = sects[0];

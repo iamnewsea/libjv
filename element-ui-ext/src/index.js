@@ -5,6 +5,7 @@ import e from '../packages/e.vue';
 import kv from '../packages/kv.vue';
 import selector from '../packages/selector.vue';
 import my_list from '../packages/my-list.vue';
+import input_list from '../packages/input-list.vue';
 import my_ref from '../packages/my-ref.vue';
 
 // import Upload1 from '../packages/upload1.vue';
@@ -19,15 +20,18 @@ import image_edit from '../packages/image-edit.vue';
 import "./jv_vue"
 
 const components = [
-  c, e,
-  kv,
-  selector,
-  my_list, my_ref,
-  // Upload1,
-  upload,
-  my_city,
-  number_input, number_range,
-  image_edit
+    c, e,
+    kv,
+    selector,
+    my_list,
+    input_list,
+    my_ref,
+    // Upload1,
+    upload,
+    my_city,
+    number_input,
+    number_range,
+    image_edit
 ];
 
 // var components_export = {};
@@ -35,17 +39,17 @@ const components = [
 import menu from "./right-menu"
 
 const install = function (Vue, opts = {}) {
-  components.map(component => {
-    // components_export[component.name] = component;
-    Vue.component(component.name, component);
-  });
+    components.map(component => {
+        // components_export[component.name] = component;
+        Vue.component(component.name, component);
+    });
 
-  menu.install(Vue);
+    menu.install(Vue);
 };
 
 /* istanbul ignore if */
 if (typeof window !== 'undefined' && window.Vue) {
-  install(window.Vue);
+    install(window.Vue);
 }
 
 // components_export["jv"] = jv;

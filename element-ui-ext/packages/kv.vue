@@ -138,6 +138,7 @@ tinymce显示错乱
     flex-wrap: nowrap;
     display: flex;
     align-items: center;
+    margin: 6px auto;
 }
 
 .kv > .k:first-child:after {
@@ -216,8 +217,6 @@ legend {
     padding: 2px 10px;
     margin-left: 10px;
 }
-
-
 
 
 @keyframes fade_in {

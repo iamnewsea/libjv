@@ -143,107 +143,22 @@ jv.getUrlHost = (url) => {
 
 //---------------------------------------------
 
-/**
- * 提供 基于 localStorage 的缓存数据，增加过期时间机制。额外多保存一个 key ，默认有效期是4个小时。
- * Vue 中使用原型方法
- */
-jv.store_db = {
-    getStoreKey(key) {
-        return "jv.store_db." + key;
-    },
-    getExpireKey(key) {
-        return "jv.store_exp." + key;
-    },
-    getJson(key, defaultValue) {
-        if (!key) return null;
+Object.defineProperty(Storage.prototype, "getJson", {
+    value(key) {
+        var value = this.getItem(key);
+        if (!value) return null;
+        return JSON.parse(value);
+    }, enumerable: false
+})
 
-        var v = this.getString(key);
-        if (!v) {
-            if (typeof (defaultValue) == "undefined") return {};
-            return defaultValue;
+Object.defineProperty(Storage.prototype, "setJson", {
+    value(key, json) {
+        if (jv.isNull(json)) {
+            return this.removeItem(key);
         }
-        return JSON.parse(v);
-    },
-    setJson(key, value, cacheSeconds) {
-        if (!value) return false;
-        this.setString(key, JSON.stringify(value), cacheSeconds);
-        return true;
-    },
-    getString(key) {
-        if (!key) return null;
-        this.check_key(key);
-
-        var storeKey = this.getStoreKey(key);
-
-        return localStorage.getItem(storeKey);
-    },
-    setString(key, value, cacheSeconds) {
-        if (!key) return;
-        if (value === null) {
-            this.remove(key);
-            return;
-        }
-
-        var storeKey = this.getStoreKey(key);
-
-        localStorage.setItem(storeKey, value);
-
-        cacheSeconds = cacheSeconds || 14400; //默认4小时。
-
-        if (cacheSeconds < 0) return;
-
-        var expireAt_key = this.getExpireKey(key);
-        localStorage.setItem(expireAt_key, Date.now() + cacheSeconds * 1000);
-    },
-    check_key(key) {
-        var expireAt_key = this.getExpireKey(key);
-        var expireAt = localStorage.getItem(expireAt_key);
-        if (!expireAt) {
-            return;
-        }
-        if (parseInt(expireAt) < Date.now()) {
-            this.remove(key);
-            return null;
-        }
-    },
-    check() {
-        for (var i = localStorage.length - 1; i >= 0; i--) {
-            var key = localStorage.key(i);
-
-            if (key.startsWith("jv.store_exp.") == false) {
-                continue;
-            }
-
-            var cacheKey = key.slice(13);
-
-            this.check_key(cacheKey);
-        }
-    },
-    remove(key) {
-        if (!key) return;
-        var storeKey = this.getStoreKey(key);
-        var expireAt_key = this.getExpireKey(key);
-        localStorage.removeItem(storeKey);
-        localStorage.removeItem(expireAt_key);
-    },
-    /**
-     *
-     * @param key
-     * @param cacheSeconds 设置为小于等于0,马上过期。
-     */
-    setExpire(key, cacheSeconds) {
-        if (!key) return;
-        cacheSeconds = cacheSeconds || 14400;
-        if (cacheSeconds <= 0) {
-            this.remove(key);
-            return;
-        }
-
-        var expireAt_key = this.getExpireKey(key);
-        localStorage.setItem(expireAt_key, Date.now() + cacheSeconds * 1000);
-    }
-};
-
+        this.setItem(key, JSON.stringify(json))
+    }, enumerable: false
+})
 
 //缓存在内存的数据
 jv.cache = {};

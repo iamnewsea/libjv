@@ -54,45 +54,44 @@ jv.initVue = (setting) => {
 
 
     //创建简单的 store
-    jv.store = {
-        setGlobalJson(data) {
-            jv.store_db.setJson("global", Object.assign({}, this.getGlobal(), data));
-        },
-        getGlobalJson() {
-            return jv.store_db.getJson("global");
-        },
-        resetGlobalJson(data) {
-            jv.store_db.setJson("global", data);
-        },
-        setJson(key, v) {
-            var data = {};
-            if (key && v && (key.Type == "string")) {
-                var obj = {};
-                obj[key] = v;
-                data = obj;
-            } else {
-                data = key;
-            }
-            jv.store_db.setJson(jv.main.$route.fullPath, Object.assign({}, this.getJson(), data));
-        },
-        getJson(key) {
-            var ret = jv.store_db.getJson(jv.main.$route.fullPath);
-            if (key) {
-                return ret[key] || {};
-            }
-            return ret;
-        },
-        getString(key) {
-            return jv.store_db.getJson(jv.main.$route.fullPath)[key] || "";
-        },
-        resetJson(data) {
-            jv.store_db.setJson(jv.main.$route.fullPath, data);
-        }
-    };
+
 
     Object.defineProperty(vueProtype, "$my_store", {
         get() {
-            return jv.store;
+            var my_store = localStorage.getItem("my_store")
+            if (!my_store) {
+                localStorage.setItem("my_store", "{}");
+            }
+
+            return {
+                setJson(key, value) {
+                    var data = this.getJson();
+                    if (jv.isNull(value)) {
+                        delete data[key]
+                    } else {
+                        data[key] = value;
+                    }
+                    this.resetJson(data);
+                },
+                getJson(key) {
+                    var my_store = localStorage.getJson("my_store");
+                    var my_store_page_json = my_store[jv.main.$route.fullPath];
+                    if (!my_store_page_json) {
+                        return {};
+                    }
+                    return my_store_page_json[key] || {};
+                },
+                resetJson(data) {
+                    var my_store = localStorage.getJson("my_store");
+                    var key = jv.main.$route.fullPath;
+                    if (jv.isNull(data)) {
+                        delete my_store[key]
+                    } else {
+                        my_store[key] = data;
+                    }
+                    localStorage.setJson("my_store", my_store);
+                }
+            };
         }, enumerable: false
     });
 

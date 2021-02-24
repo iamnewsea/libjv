@@ -13,18 +13,16 @@ jv.getFileMd5 = (file) => {
         var blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
             chunkSize = 2097152, // read in chunks of 2MB
             chunks = Math.ceil(file.size / chunkSize),
-            currentChunk = 0;
-        var spark = new SparkMD5.ArrayBuffer();
+            currentChunk = 0,
+            spark = new SparkMD5.ArrayBuffer(),
+            frOnload, frOnerror, loadNext;
 
-
-        var frOnload, frOnerror, loadNext;
         frOnload = (e) => {
             spark.append(e.target.result); // append array buffer
             currentChunk++;
             if (currentChunk < chunks)
                 loadNext();
             else {
-                var d = "";
                 resolve(spark.end());
             }
         };
@@ -34,11 +32,11 @@ jv.getFileMd5 = (file) => {
         };
 
         loadNext = () => {
-            var fileReader = new FileReader();
+            var fileReader = new FileReader(),
+                start = currentChunk * chunkSize,
+                end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
             fileReader.onload = frOnload;
             fileReader.onerror = frOnerror;
-            var start = currentChunk * chunkSize,
-                end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
             fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
         };
 
@@ -55,8 +53,12 @@ jv.getFileMd5 = (file) => {
  * @returns {Blob}
  */
 jv.base64Data2File = (base64Data, fileName) => {
-    var arr = base64Data.split(','), mime = arr[0].match(/:(.*?);/)[1],
-        bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+    var arr = base64Data.split(','),
+        mime = arr[0].match(/:(.*?);/)[1],
+        bstr = atob(arr[1]),
+        n = bstr.length,
+        u8arr = new Uint8Array(n);
+
     while (n--) {
         u8arr[n] = bstr.charCodeAt(n);
     }
@@ -82,12 +84,11 @@ jv.compressImage = (op) => {
         maxWidth = op.maxWidth,
         fileName = op.fileName || "",
         filter = op.filter || (() => true), //是否压缩的回调
-        quality = op.quality || 0.8;
+        quality = op.quality || 0.8,
 
-
-    var getImageContextTypeByExtName = (fileNameExt) => {
-        return 'image/' + ((fileNameExt.match(/png|jpeg|bmp|gif/ig) || []) [0] || "jpeg");
-    };
+        getImageContextTypeByExtName = (fileNameExt) => {
+            return 'image/' + ((fileNameExt.match(/png|jpeg|bmp|gif/ig) || []) [0] || "jpeg");
+        };
 
     return new Promise((resolve, reject) => {
         // if (fileType != "img") {

@@ -449,7 +449,7 @@
                     processCallback: p => item.percentage = p
                 }).then(res => {
                     if (!res) {
-                        console.log("上传文件错误");
+                        console.error("上传文件错误");
                         item.percentage = 0;
                         return res;
                     }

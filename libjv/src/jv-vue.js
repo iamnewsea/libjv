@@ -52,46 +52,17 @@ jv.initVue = (setting) => {
         }
     }, false);
 
-
-    //创建简单的 store
-
-
+    //创建简单的 local store
     Object.defineProperty(vueProtype, "$my_store", {
         get() {
-            var my_store = localStorage.getItem("my_store")
-            if (!my_store) {
-                localStorage.setItem("my_store", "{}");
-            }
+            return localStorage.my_store;
+        }, enumerable: false
+    });
 
-            return {
-                setJson(key, value) {
-                    var data = this.getJson();
-                    if (jv.isNull(value)) {
-                        delete data[key]
-                    } else {
-                        data[key] = value;
-                    }
-                    this.resetJson(data);
-                },
-                getJson(key) {
-                    var my_store = localStorage.getJson("my_store");
-                    var my_store_page_json = my_store[jv.main.$route.fullPath];
-                    if (!my_store_page_json) {
-                        return {};
-                    }
-                    return my_store_page_json[key] || {};
-                },
-                resetJson(data) {
-                    var my_store = localStorage.getJson("my_store");
-                    var key = jv.main.$route.fullPath;
-                    if (jv.isNull(data)) {
-                        delete my_store[key]
-                    } else {
-                        my_store[key] = data;
-                    }
-                    localStorage.setJson("my_store", my_store);
-                }
-            };
+    //创建简单的 session store
+    Object.defineProperty(vueProtype, "$my_session_store", {
+        get() {
+            return sessionStorage.my_store;
         }, enumerable: false
     });
 
@@ -222,7 +193,7 @@ jv.initVue = (setting) => {
             config.baseURL = "";
         }
 
-        console.log((new Date()).valueOf().toDateString() + " [" + config.method + "] " + config.baseURL + config.url);
+        console.log("ajax:" + (new Date()).valueOf().toDateString() + " [" + config.method + "] " + config.baseURL + config.url);
 
 
         if (!config.javaBooleanKey) return config;

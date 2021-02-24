@@ -9,7 +9,6 @@ class JvObject {
     }
 }
 
-console.log("jv init!");
 var jv = new JvObject();
 jv.prototype = JvObject.prototype;
 jv.inBrowser = typeof window !== 'undefined';
@@ -66,9 +65,8 @@ jv.getFileType = function (fileName) {
     var dotIndex = fileName.lastIndexOf('.');
     if (dotIndex < 0) return {};
 
-    var ext = fileName.slice(dotIndex + 1).toLowerCase();
-
-    var findKey = Object.keys(jv.fileTypes).last(key => jv.fileTypes[key].exts.includes(ext));
+    var ext = fileName.slice(dotIndex + 1).toLowerCase(),
+        findKey = Object.keys(jv.fileTypes).last(key => jv.fileTypes[key].exts.includes(ext));
     if (findKey) {
         return Object.assign({ext: ext}, jv.fileTypes[findKey]);
     }
@@ -159,6 +157,46 @@ Object.defineProperty(Storage.prototype, "setJson", {
         this.setItem(key, JSON.stringify(json))
     }, enumerable: false
 })
+
+Object.defineProperty(Storage.prototype, "my_store", {
+    get() {
+        var ls = this, my_store = ls.getItem("my_store")
+        if (!my_store) {
+            ls.setItem("my_store", "{}");
+        }
+
+        return {
+            setJson(key, value) {
+                var data = this.getJson();
+                if (jv.isNull(value)) {
+                    delete data[key]
+                } else {
+                    data[key] = value;
+                }
+                this.resetJson(data);
+            },
+            getJson(key) {
+                var my_store = ls.getJson("my_store"),
+                    my_store_page_json = my_store[jv.main.$route.fullPath];
+                if (!my_store_page_json) {
+                    return {};
+                }
+                return my_store_page_json[key] || {};
+            },
+            resetJson(data) {
+                var my_store = ls.getJson("my_store"),
+                    key = jv.main.$route.fullPath;
+                if (jv.isNull(data)) {
+                    delete my_store[key]
+                } else {
+                    my_store[key] = data;
+                }
+                ls.setJson("my_store", my_store);
+            }
+        }
+    }, enumerable: false
+})
+
 
 //缓存在内存的数据
 jv.cache = {};
@@ -276,8 +314,9 @@ jv.enumAllSet = function (enumType, enumValue) {
         throw new Error("找不到枚举： jv.enum." + enumType)
         return;
     }
-    var key = "_" + enumType + "_";
-    var set = jv.cache[key];
+    var key = "_" + enumType + "_",
+        set = jv.cache[key];
+
     if (!set) {
         set = new Set();
         jv.cache[key] = set;
@@ -495,7 +534,7 @@ jv.defEnum = (typeName, json, keyCallback) => {
  */
 jv.fillRes = (obj, key, args) => {
     if (!obj) {
-        console.log("jv.fillRes 的 obj为空！");
+        console.log("jv.fillRes 参数不能为空！");
         return;
     }
 

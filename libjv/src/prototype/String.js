@@ -277,7 +277,7 @@
                     try {
                         value = eval("(function(){ return  this['" + key + "']; })").call(json)
                     } catch (e) {
-                        console.log("String.format 执行出错, " + e.message);
+                        console.error("String.format 执行出错, " + e.message);
                         throw e;
                     }
 

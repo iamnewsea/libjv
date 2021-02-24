@@ -9,8 +9,8 @@ export default {
     install(Vue) {
         Vue.directive('menu', {
             inserted(el, binding, vnode) {
-                var ref = binding.arg || binding.expression;
-                var menu = vnode.context.$refs[ref];
+                var ref = binding.arg || binding.expression,
+                    menu = vnode.context.$refs[ref];
                 if (menu) {
                     menu.classList.add("context-menu-hide");
                 }

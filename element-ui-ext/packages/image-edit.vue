@@ -192,7 +192,7 @@ export default {
                 json["iniframe"] = "true";
             }
             url = jv.param(json, true);
-            console.log(url);
+            console.log("jv.downloadFile:" + url);
             var div = this.$refs["download_div"];
             div.innerHTML = "";
             div.innerHTML = "<iframe src=\"" + url + "\" />";
@@ -331,9 +331,8 @@ export default {
             // }
 
 
-            var cropperImage = this.$refs.cropper;
-
-            var canvas = document.createElement("canvas"),
+            var cropperImage = this.$refs.cropper,
+                canvas = document.createElement("canvas"),
                 ctx = canvas.getContext('2d'),
                 // corpBox = cropperImage.getCropBoxData(),
                 data = cropperImage.getData();

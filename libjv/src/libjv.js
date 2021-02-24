@@ -1099,6 +1099,7 @@ jv.query2Json = (query) => {
     });
 
     query_parts[0].split("&").forEach((it) => {
+        if (!it) return;
         var sects = it.split("=");
         if (sects.length != 2) {
             console.warn("jv.query2Json 不识别的URL:" + it);

@@ -100,13 +100,14 @@ export default {
         },
         /**
          * 当data是Array的时候，需要指定 field的两个值,第一个是 key , 第2个是 value
-         *
-         * 返回值是选择对象的哪个属性。
+         * v-model 永远表示 keyField
          * 如果是 枚举, valueIsBoolean ,valueArray ,valueIsObject 那么 $emit的值是 item.value。
          * 如果想返回值是某个值， fields的值部分，使用 #开头。一般第一项是返回的keyField。
          *
-         * 如果在卡片上： <selector  v-model="info.park" url="url" fields="code,name" />
-         * 如果是查询条件： <selector  v-model="info.park" url="url" fields="#code,name"/>
+         * 如果想返回对象， v-model == {code,name} ：
+         *  <selector v-model="info.park.code" url="url" fields="code,name" @change="(v,m)=>info.park.name = m.name"/>
+         *  或
+         *  <selector v-model="info.park.code" url="url" fields="code,name" @change="(v,m)=>info.park = m"/>
          */
         fields: {
             type: String, default() {
@@ -325,12 +326,11 @@ export default {
             });
         },
         changed(set_v) {
-            var v = set_v;
+            var v = set_v, fullModel;
             if (this.type == "radio") {
                 if (jv.isNull(v)) {
                     v = this.value1;
                 }
-
 
                 //保留空值不转换
                 if (jv.isNull(v) || (v === "")) {
@@ -341,6 +341,7 @@ export default {
                     v = jv.asInt(v);
                 }
 
+                fullModel = this.data2.filter(it => it[this.keyField] == v)[0];
             } else {
                 if (jv.isNull(v)) {
                     v = this.value2;
@@ -348,16 +349,16 @@ export default {
 
                 v = v.filter(it => !jv.isNull(it));
 
-
                 if (this.valueIsBoolean) {
                     v = v.map(it => jv.asBoolean(it))
                 } else if (this.valueIsNumber) {
                     v = v.map(it => jv.asInt(it))
                 }
 
+                fullModel = this.data2.filter(it => it[this.keyField] == v);
             }
             this.$emit("input", v);
-            this.$emit("change", v);
+            this.$emit("change", v, fullModel);
             return;
         },
         dblclick() {
@@ -392,6 +393,17 @@ export default {
             keyField = keyField.trim();
             labelField = labelField.trim();
 
+            // if (keyField.startsWith("#")) {
+            //     keyField = keyField.slice(1);
+            //     this.vmodelFiled = keyField;
+            // } else if (labelField.startsWith("#")) {
+            //     labelField = labelField.slice(1);
+            //     this.vmodelFiled = labelField
+            // }
+            // else{
+            //     this.vmodelFiled = keyField;
+            // }
+
             this.keyField = keyField;
             this.labelField = labelField;
         },
@@ -404,9 +416,10 @@ export default {
                 data = [];
             }
 
+            this.$emit("proc", data);
+
             var type = data.Type;
             if (["array", "set"].includes(type) && data.length) {
-
                 var v0 = data[0];
                 if (jv.isNull(v0) == false) {
                     this.dataIsValueArray = !v0.ObjectType;

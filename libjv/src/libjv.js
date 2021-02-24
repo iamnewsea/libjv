@@ -417,6 +417,11 @@ jv.isNull = (value) => {
     return value === null;
 };
 
+/**
+ * 返回四态： true,false,"",null
+ * @param value
+ * @returns {string|null|boolean|*}
+ */
 jv.asBoolean = (value) => {
     if (jv.isNull(value)) return null;
     var type = value.Type;
@@ -424,21 +429,16 @@ jv.asBoolean = (value) => {
     if (value === Infinity) return false;
     if (value === -Infinity) return false;
 
-    if (value === "null" ||
-        value === "undefined") return null;
-
     //选择数据源，可能是空。
     if (value === "") return "";
 
-    if (value === false ||
-        value === "false" ||
-        value === 0) return false;
+    if (value === "null" ||
+        value === "undefined") return null;
 
-    if (value === true ||
-        value === "true" ||
-        value === 1) return true;
+    if (value === "false" ||
+        value === "0") return false;
 
-    return value;
+    return !!value;
 };
 
 jv.asString = (value, format) => {

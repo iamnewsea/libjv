@@ -934,8 +934,6 @@ let param_jmap = (obj) => {
             return;
         }
 
-        if (key[0] == "_") return;
-
         var value = obj[key];
         if (value === undefined) return;
         if (value === null) return;
@@ -1080,7 +1078,7 @@ jv.param = (obj, withHost) => {
 // }
 
 /**
- * 如果 query 里有 ？，则截断，取问号后面的部分。
+ * query 必须包含? 截取问号后面的部分。
  * @param query
  * @returns {{}}
  */
@@ -1093,23 +1091,33 @@ jv.query2Json = (query) => {
             return url_sects[0];
         }, enumerable: false
     });
-    url_sects.last().split("&").forEach((it) => {
+    var query_parts = (url_sects[1] || "").split("#");
+    Object.defineProperty(ret, "getHashPart", {
+        value() {
+            return query_parts[1] || "";
+        }, enumerable: false
+    });
+
+    query_parts[0].split("&").forEach((it) => {
         var sects = it.split("=");
-        if (sects.length == 2) {
-            var key = sects[0];
-            var value = decodeURIComponent(sects[1]);
-            if (key in ret) {
-                var oriValue = ret[key];
-                if (oriValue.Type == "array") {
-                    oriValue.push(value);
-                } else {
-                    oriValue = [oriValue];
-                    oriValue.push(value);
-                }
-                ret[key] = oriValue;
+        if (sects.length != 2) {
+            console.warn("jv.query2Json 不识别的URL:" + it);
+            return;
+        }
+
+        var key = sects[0];
+        var value = decodeURIComponent(sects[1]);
+        if (key in ret) {
+            var oriValue = ret[key];
+            if (oriValue.Type == "array") {
+                oriValue.push(value);
             } else {
-                ret[key] = value;
+                oriValue = [oriValue];
+                oriValue.push(value);
             }
+            ret[key] = oriValue;
+        } else {
+            ret[key] = value;
         }
     });
     return ret;

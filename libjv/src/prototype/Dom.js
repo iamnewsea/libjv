@@ -85,7 +85,7 @@
 
     Object.defineProperty(Location.prototype, "json", {
         get() {
-            return jv.query2Json(location.search.slice(1));
+            return jv.query2Json(location.search);
         }, enumerable: false
     });
 
@@ -94,7 +94,7 @@
             var hash = location.hash
             var hash_search_index = hash.indexOf("?");
             if (hash_search_index >= 0) {
-                return jv.query2Json(hash.slice(hash_search_index + 1));
+                return jv.query2Json(hash.slice(hash_search_index));
             }
             return {};
         }, enumerable: false

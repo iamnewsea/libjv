@@ -15,7 +15,10 @@
     Object.defineProperty(String.prototype, 'getBigCamelCase', {
         value(sep) {
             if (!this) return "";
-            return this.split(/[\W_]+/).map(it => it[0].toUpperCase() + it.slice(1)).join("");
+            return this.split(/[\W_]+/)
+                .filter(it => it)
+                .map(it => it[0].toUpperCase() + it.slice(1))
+                .join("");
         }, enumerable: false
     });
     Object.defineProperty(String.prototype, 'getSmallCamelCase', {
@@ -41,7 +44,7 @@
             var ps = Array.from(arguments);
 
             var value = this.trim();
-            if (ps.length == 0) {
+            if (!ps.length) {
                 return value;
             }
 
@@ -73,7 +76,7 @@
             var ps = Array.from(arguments);
 
             var value = this.trim();
-            if (ps.length == 0) {
+            if (!ps.length) {
                 return value;
             }
 
@@ -111,7 +114,7 @@
             var ps = Array.from(arguments);
 
             var value = this.trim();
-            if (ps.length == 0) {
+            if (!ps.length) {
                 return value;
             }
 
@@ -314,11 +317,11 @@
             }, enumerable: false
         });
     }
-//兼容IE
+    //兼容IE
     if (!String.prototype.startsWith) {
         Object.defineProperty(String.prototype, "startsWith", {
             value(find) {
-                return this.indexOf(find) == 0;
+                return !this.indexOf(find)
             }, enumerable: false
         });
     }

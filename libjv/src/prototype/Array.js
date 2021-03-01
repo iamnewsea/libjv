@@ -34,7 +34,7 @@
     //返回时间的字符串格式.
     Object.defineProperty(Array.prototype, "spliceDate", {
         value() {
-            if (this.length == 0) return [];
+            if (!this.length) return [];
             return this.map(it => {
                 if (!it) return it;
                 return it.valueOf().toDateString(null, "local");

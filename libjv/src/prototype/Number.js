@@ -79,7 +79,7 @@
         value() {
             //"000.00" 只接收 0 和一个点。
             var ps = arguments;
-            if (ps.length == 0) {
+            if (!ps.length) {
                 return value;
             }
             // if (ps.length == 1 && (typeof(ps[0]) != "string") && ps[0].length) {
@@ -94,7 +94,7 @@
             var zero1Index = formatValue.indexOf("0");
             if (zero1Index < 0) {
                 return this.toString();
-            } else if (zero1Index == 0) {
+            } else if (!zero1Index) {
                 dotIndex = formatValue.indexOf(".");
 
             } else if (formatValue[0] == ".") {

@@ -34,10 +34,12 @@ export default {
         let style = {};
 
         if (this.gutter && this.$parent) {
-            var index = this.$parent.$children.indexOf(this);
-            if (index > 0) {
-                style.marginLeft = this.gutter + "px";
-            }
+            // var index = this.$parent.$children.indexOf(this);
+            // if (index > 0) {
+            //     style.marginLeft = this.gutter + "px";
+            // }
+            style.marginLeft = this.gutter/2 + "px";
+            style.marginRight = this.gutter/2 + "px";
         }
 
         ['span', 'offset', 'pull', 'push'].forEach(prop => {

@@ -958,7 +958,7 @@ let param_jmap = (obj) => {
         if (Array.isArray(value)) {
             value = value.filter(it => !jv.isNull(it));
 
-            if (value.length == 0) {
+            if (!value.length) {
                 ret[key] = "";
                 return;
             }

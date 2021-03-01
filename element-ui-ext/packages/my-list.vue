@@ -85,7 +85,7 @@ export default {
         },
         //列表数据
         value: {
-            type: Object, default: () => {
+            type: Object, default() {
                 return {};
             }
         }

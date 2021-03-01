@@ -24,6 +24,7 @@
         props: {
             map: {
                 type: Object, default: () => {
+                    return {};
                 }
             },
             readOnly: {

@@ -19,6 +19,18 @@ import image_edit from '../packages/image-edit.vue';
 //引入即可
 import "./jv_vue"
 
+import Col from "../packages/col"
+import Row from "../packages/row"
+
+const js_components = [
+    Col,Row
+]
+js_components.forEach(component=>{
+    component.install = function (Vue) {
+        Vue.component(component.name, component);
+    };
+})
+
 const components = [
     c, e,
     kv,
@@ -31,7 +43,8 @@ const components = [
     my_city,
     number_input,
     number_range,
-    image_edit
+    image_edit,
+    ...js_components
 ];
 
 // var components_export = {};

@@ -103,6 +103,7 @@ export default {
     props: {
         option: {
             type: Object, default: () => {
+                return {};
             }
         },
 //      image_url: "",

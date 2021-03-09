@@ -315,10 +315,21 @@ export default {
 
             var query = {};
             this.$emit("param", query);
-
+            //请求的是标准的列表接口，也可以直接返回 list
             this.$http[method](url, query).then(res => {
                 this.$emit("loaded", res);
-                var data = res.data.data;
+                var data = res.data;
+                if (!data) {
+                    this.setData([]);
+                    return;
+                }
+
+                if (data.Type == "object") {
+                    //是标准的列表接口
+                    data = data.data;
+                }
+                // else data.Type == "array"
+
                 if (this.cache) {
                     jv.cache["[selector]" + url] = data;
                 }

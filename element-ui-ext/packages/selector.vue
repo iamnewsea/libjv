@@ -11,7 +11,7 @@
         <template v-else-if="keyField && labelField">
             <template v-if="type == 'radio'">
                 <el-radio-group :size="size" v-model="value1" v-if="data2.length <= enumCount"
-                                @change="changed" :class="clearable? 'ri4c':''" style="white-space: nowrap;">
+                                @change="changed" :class="clearable? 'ri4c':''">
                     <component :is="buttonStyle? 'el-radio-button': 'el-radio'" v-for="item in data2"
                                :label="item[keyField]" @click.native.stop="item_click"
                                :key="item[keyField]">{{ item[labelField] }}
@@ -369,7 +369,7 @@ export default {
                 fullModel = this.data2.filter(it => it[this.keyField] == v);
             }
             this.$emit("input", v);
-            this.$emit("change", v, fullModel);
+            this.$emit("change", v, fullModel || {});
             return;
         },
         dblclick() {
@@ -483,13 +483,14 @@ export default {
             this.data2 = data.map(it => it)
 
             //如果是单选，并且只有一个，自动选择。
-            if (this.type == "radio" && data.length == 1) {
-                this.value1 = data[0][this.keyField];
+            if (this.type == "radio") {
+                if (data.length == 1) {
+                    this.value1 = data[0][this.keyField];
+                }
+
                 this.changed();
             }
         },
-
-
         //设置单选值
         setValue_1(v) {
             if (jv.isNull(v)) {
@@ -568,7 +569,10 @@ export default {
     }
 }
 </script>
-<style scoped>
+<style>
+>>>.el-radio {
+    margin-bottom: 6px;
+}
 
 >>> .ri4c .el-radio__input.is-checked .el-radio__inner:hover {
     border-radius: 0;

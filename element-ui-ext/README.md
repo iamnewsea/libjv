@@ -10,7 +10,7 @@ vue element ui extend
 ## 安装依赖包
 > npm i --registry=https://registry.npm.taobao.org
 
-## 发版
+## 发版到中央仓库
 > npm publish
 
 > cnpm sync libjv

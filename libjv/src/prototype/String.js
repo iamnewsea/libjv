@@ -317,14 +317,23 @@
             }, enumerable: false
         });
     }
-    //兼容IE
-    if (!String.prototype.startsWith) {
-        Object.defineProperty(String.prototype, "startsWith", {
-            value(find) {
-                return !this.indexOf(find)
-            }, enumerable: false
-        });
-    }
+
+    // if (!String.prototype.includes) {
+    //     Object.defineProperty(String.prototype, "includes", {
+    //         value(find) {
+    //             return this.indexOf(find) >= 0;
+    //         }, enumerable: false
+    //     });
+    // }
+    //
+    // //兼容IE
+    // if (!String.prototype.startsWith) {
+    //     Object.defineProperty(String.prototype, "startsWith", {
+    //         value(find) {
+    //             return !this.indexOf(find)
+    //         }, enumerable: false
+    //     });
+    // }
 
 
     Object.defineProperty(String.prototype, 'ToRound', {

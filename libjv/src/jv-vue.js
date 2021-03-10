@@ -94,7 +94,7 @@ jv.initVue = (setting) => {
     Object.defineProperty(HTMLElement.prototype, "chk", {
         value(setting) {
             return jv.chk_html(this, setting)
-        }
+        }, enumerable: false
     });
 
 

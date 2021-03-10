@@ -446,7 +446,7 @@ export default {
                 } else {
                     //如果只有有两个，其中一个为 remark, 或 name.
                     var fields = Object.keys(v0);
-                    if (fields.length == 2) {
+                    if (fields.length >= 2) {
                         var remark_index = fields.indexOf("remark");
                         var name_index = fields.indexOf("name");
                         var id_index = fields.indexOf("id");
@@ -462,6 +462,11 @@ export default {
                             this.labelField = "name"
                         }
                     }
+
+                    if (!this.keyField) {
+                        throw new Error("selector keyField不能为空！")
+                    }
+
                     //需要提前定义 fields
                     var keys = data.map(it => it[this.keyField].toString());
                     if (keys.filter(it => {
@@ -570,7 +575,7 @@ export default {
 }
 </script>
 <style>
->>>.el-radio {
+>>> .el-radio {
     margin-bottom: 6px;
 }
 

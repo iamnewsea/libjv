@@ -146,6 +146,14 @@
         }
     });
 
+    if (!Array.prototype.includes) {
+        Object.defineProperty(Array.prototype, "includes", {
+            value(find) {
+                return this.indexOf(find) >= 0;
+            }, enumerable: false
+        });
+    }
+
 
     /** 递归一个数组:
      * @param subCallback, 每一项包含子项的回调.

@@ -444,22 +444,24 @@ export default {
                         return {name: it, remark: it}
                     });
                 } else {
-                    //如果只有有两个，其中一个为 remark, 或 name.
-                    var fields = Object.keys(v0);
-                    if (fields.length >= 2) {
-                        var remark_index = fields.indexOf("remark");
-                        var name_index = fields.indexOf("name");
-                        var id_index = fields.indexOf("id");
+                    if (!this.keyField) {
+                        //如果只有有两个，其中一个为 remark, 或 name.
+                        var fields = Object.keys(v0);
+                        if (fields.length >= 2) {
+                            var remark_index = fields.indexOf("remark");
+                            var name_index = fields.indexOf("name");
+                            var id_index = fields.indexOf("id");
 
-                        if (id_index >= 0) {
-                            this.keyField = "id"
-                            this.labelField = fields[id_index ? 0 : 1]
-                        } else if (remark_index >= 0) {
-                            this.keyField = fields[remark_index ? 0 : 1]
-                            this.labelField = "remark"
-                        } else if (name_index >= 0) {
-                            this.keyField = fields[name_index ? 0 : 1]
-                            this.labelField = "name"
+                            if (id_index >= 0) {
+                                this.keyField = "id"
+                                this.labelField = fields[id_index ? 0 : 1]
+                            } else if (remark_index >= 0) {
+                                this.keyField = fields[remark_index ? 0 : 1]
+                                this.labelField = "remark"
+                            } else if (name_index >= 0) {
+                                this.keyField = fields[name_index ? 0 : 1]
+                                this.labelField = "name"
+                            }
                         }
                     }
 
@@ -574,16 +576,16 @@ export default {
     }
 }
 </script>
-<style>
->>> .el-radio {
+<style lang="scss">
+.el-radio {
     margin-bottom: 6px;
 }
 
->>> .ri4c .el-radio__input.is-checked .el-radio__inner:hover {
+.ri4c .el-radio__input.is-checked .el-radio__inner:hover {
     border-radius: 0;
 }
 
->>> .ri4c .el-radio__input.is-checked .el-radio__inner:hover:after {
+.ri4c .el-radio__input.is-checked .el-radio__inner:hover:after {
     border-radius: 0;
 }
 </style>

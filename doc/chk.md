@@ -6,7 +6,7 @@ vue 示例:
 
 <div ref="query">
     <kv label="数据库">
-        <selector :button-style="true" :data="['mongo','mysql']" v-model="query.db" chk="*"></selector>
+        <selector :button-style="true" :data="['mongo','mysql']" v-model="query.db" chk="*" chkmsg="必填项!"></selector>
     </kv>
 </div>
 ```
@@ -20,7 +20,8 @@ if (this.$refs.query.chk() == false) {
 ```
 
 ## 定义 
-在指定 dom 上添加 chk,chk-msg 属性，对每一个chk属性,验证里面的 v-model 绑定表达式值 或 input,textarea 元素的值. 优先使用 v-model值。chk用法：
+在指定 dom 上添加 chk 属性，对每一个chk属性,验证里面的 v-model 绑定表达式值 或 input,textarea 元素的值. 优先使用 v-model值。chk用法：
+可以自定义 chkmsg 属性用于校验失败后显示的消息。 如果不定义会有默认消息提示。
 
 1. 冒号开头，表示回调函数，参数：当前值,vue定义的data ,这是最灵活的方式. 函数返回的是错误消息，没有消息表示通过。
 
@@ -55,23 +56,23 @@ enum(红,黄,蓝)
 4. 正则表达式写法
 
 ```
-reg{值}:正则表达式
+chk="reg{值}:正则表达式"
 
 如:
-reg{value.code}:/^\d{9,11}$/   表示value.code 必须是9到11位数字.
+chk="reg{value.code}:/^\d{9,11}$/"   表示value.code 必须是9到11位数字.
 ```
 
 5. 扩展类型 如果需要重复使用某一个通用的类型,可以扩展,如下:
 
 ```
- jv.chk_types["mobile"] = function(chk_body, value, inputDom){
+ jv.chk_types["mobile"] = function(value, inputDom){
     //对value进行验证
     //通过返回 true
     //失败返回 false
  }
  
 写法:
-mobile{value[0]}[1]  //手机号格式,第一位必须是1
+chk="mobile{value.length[0]}(1,3]"  //手机号格式,第一位必须是1
 ```
 
 ## 执行
@@ -79,7 +80,7 @@ mobile{value[0]}[1]  //手机号格式,第一位必须是1
 全部执行:
 
 ```
-if( this.$refs.card.chk() == false){
+if(this.$refs.card.chk() == false){
     return;
 }
 ```

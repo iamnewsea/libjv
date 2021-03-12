@@ -68,30 +68,30 @@ import jv from "./libjv"
     };
 
     jv.chk_types = {
-        "float": function (chk_body, value) {
+        "float": function (value,chk_body) {
             return (/^[+-]?[0-9]+.?[0-9]*$/).test(value);
         },
-        "int": function (chk_body, value) {
+        "int": function (value,chk_body) {
             return (/^[+-]?[0-9]+$/).test(value);
         },
-        "date": function (chk_body, value) {
+        "date": function (value,chk_body) {
             return (/^\d{4}[-/]([01]?\d|2[0-4])[-/]([0-2]?\d|3[0-1])$/).test(value);
         },
-        "date-time": function (chk_body, value) {
+        "date-time": function (value,chk_body) {
             return (/^\d{4}[-/]([01]?\d|2[0-4])[-/]([0-2]?\d|3[0-1]) ([01]?\d|2[0-3]):[0-5]?\d:[0-5]?\d$/).test(value);
         },
-        "time": function (chk_body, value) {
+        "time": function (value,chk_body) {
             return (/^([01]?\d|2[0-3]):[0-5]?\d:[0-5]?\d$/).test(value);
         },
-        "email": function (chk_body, value) {
+        "email": function (value,chk_body) {
             return (/^([\w-])+@([\w-])+(\.[\w-]{1,})$/).test(value);
         },
         //名称
-        "name": function (chk_body, value) {
+        "name": function (value,chk_body) {
             return (/^[\w\d]+$/).test(value);
         },
         //*号必填
-        "*": function (chk_body, value) {
+        "*": function (value,chk_body) {
             if (value === 0) return true;
             if (value === false) return true;
             return jv.hasValue(value);
@@ -375,7 +375,7 @@ import jv from "./libjv"
                 return ret;
             }
 
-            var r2 = jv.chk_types[chk_type](chk_body, value);
+            var r2 = jv.chk_types[chk_type](value,chk_body);
 
             if (!r2) {
                 ret.result = false;

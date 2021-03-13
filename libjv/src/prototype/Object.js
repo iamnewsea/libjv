@@ -7,7 +7,7 @@
         return;
     }
 
-    JSON.clone = (value)=>{
+    JSON.clone = (value) => {
         return JSON.parse(JSON.stringify(value));
     };
 
@@ -82,12 +82,15 @@
         }, enumerable: false
     });
 
-    //移除Json的指定Keys，返回新对象。
-    Object.defineProperty(Object.prototype, "RemoveKeys", {
+    //移除Json的指定Keys。返回删除对象的 keys
+    Object.defineProperty(Object.prototype, "deleteJsonKeys", {
         value() {
-            var ret = Object.assign({}, this);
+            var ret = [];
             Array.from(arguments).forEach(it => {
-                delete ret[it];
+                if( it in this) {
+                    ret.push(it);
+                    delete this[it];
+                }
             });
             return ret;
         }, enumerable: false

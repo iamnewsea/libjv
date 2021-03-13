@@ -486,7 +486,7 @@
             //     this.$el.querySelector("input").value = "";
             //     this.myValue.splice(0, this.myValue.length, json);
             //
-            //     var value = Object.assign({id: "", url: ""}, json).RemoveKeys("percentage", "fullUrl", "fileType","logoSize","showName");
+            //     var value = Object.assign({id: "", url: ""}, json).deleteJsonKeys("percentage", "fullUrl", "fileType","logoSize","showName");
             //
             //
             //     if (this.db && this.uid) {
@@ -526,7 +526,7 @@
                     var value = Object.assign({
                         id: "",
                         url: ""
-                    }, json).RemoveKeys("percentage", "fileType", "logoSize", "showName");
+                    }, json).deleteJosnKeys("percentage", "fileType", "logoSize", "showName");
 
 
                     if (this.db && this.uid) {

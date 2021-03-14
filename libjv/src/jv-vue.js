@@ -15,7 +15,7 @@ jv.initVue = (setting) => {
     //关闭环境给出的提示.
     // vue.config.productionTip = false;
     var vueProtype = vue.prototype;
-    vueProtype.jv = jv;
+    //vueProtype.jv = jv;
     vueProtype.$http = axios;
 
     var envs = process.env;
@@ -433,6 +433,15 @@ jv.initVue = (setting) => {
             }, 200)
         });
     };
+
+
+    jv.Vue.mixin({
+        data() {
+            return {
+                jv: jv
+            }
+        }
+    });
 
 
     // jv.Vue.mixin({

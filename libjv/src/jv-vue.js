@@ -15,7 +15,7 @@ jv.initVue = (setting) => {
     //关闭环境给出的提示.
     // vue.config.productionTip = false;
     var vueProtype = vue.prototype;
-    //vueProtype.jv = jv;
+    vueProtype.jv = jv;
     vueProtype.$http = axios;
 
     var envs = process.env;
@@ -152,6 +152,12 @@ jv.initVue = (setting) => {
     //代理 post
 
     jv.Vue.mixin({
+        // data() {
+        //     return {
+        //         //轻量化，控制 vue_jv.an_version (data 里属性不能以 $,_ 开头。)
+        //         vue_jv: {}
+        //     }
+        // },
         updated: function () {
             if (jv.chk_must_dom_class && this.$el && this.$el.querySelectorAll) {
                 Array.from(this.$el.querySelectorAll(jv.chk_must_dom_class)).forEach(it => {
@@ -433,16 +439,6 @@ jv.initVue = (setting) => {
             }, 200)
         });
     };
-
-
-    jv.Vue.mixin({
-        data() {
-            return {
-                jv: jv
-            }
-        }
-    });
-
 
     // jv.Vue.mixin({
     //     updated() {

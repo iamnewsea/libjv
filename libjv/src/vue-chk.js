@@ -7,9 +7,9 @@ import jv from "./libjv"
     //vue 验证在 sect 组件中处理 msg
     jv.chk_msg_vue_tag = "sect";
     //初始化chk时，对 .kv 添加 must 样式。
-    jv.chk_must_dom_class = ".kv";
+    jv.chk_must_dom_class = "kv";
     //html 验证在 .sect 元素中处理 msg
-    jv.chk_msg_html_class = ".sect";
+    jv.chk_msg_html_class = "sect";
 
 
     //如果返回字符串，则为验证消息， 另外返回布尔值，表示是否通过验证。
@@ -68,30 +68,30 @@ import jv from "./libjv"
     };
 
     jv.chk_types = {
-        "float": function (value,chk_body) {
+        "float": function (value, chk_body) {
             return (/^[+-]?[0-9]+.?[0-9]*$/).test(value);
         },
-        "int": function (value,chk_body) {
+        "int": function (value, chk_body) {
             return (/^[+-]?[0-9]+$/).test(value);
         },
-        "date": function (value,chk_body) {
+        "date": function (value, chk_body) {
             return (/^\d{4}[-/]([01]?\d|2[0-4])[-/]([0-2]?\d|3[0-1])$/).test(value);
         },
-        "date-time": function (value,chk_body) {
+        "date-time": function (value, chk_body) {
             return (/^\d{4}[-/]([01]?\d|2[0-4])[-/]([0-2]?\d|3[0-1]) ([01]?\d|2[0-3]):[0-5]?\d:[0-5]?\d$/).test(value);
         },
-        "time": function (value,chk_body) {
+        "time": function (value, chk_body) {
             return (/^([01]?\d|2[0-3]):[0-5]?\d:[0-5]?\d$/).test(value);
         },
-        "email": function (value,chk_body) {
+        "email": function (value, chk_body) {
             return (/^([\w-])+@([\w-])+(\.[\w-]{1,})$/).test(value);
         },
         //名称
-        "name": function (value,chk_body) {
+        "name": function (value, chk_body) {
             return (/^[\w\d]+$/).test(value);
         },
         //*号必填
-        "*": function (value,chk_body) {
+        "*": function (value, chk_body) {
             if (value === 0) return true;
             if (value === false) return true;
             return jv.hasValue(value);
@@ -211,7 +211,16 @@ import jv from "./libjv"
         }
 
         if (!up_finded && jv.chk_msg_html_class) {
-            var sect = chk_dom.$el.closest(jv.chk_msg_html_class);
+            var sect = chk_dom.$el.closest("." + jv.chk_msg_html_class);
+            if (!sect) {
+                var div = document.createElement("div")
+                div.classList.add(jv.chk_msg_html_class)
+                chk_dom.$el.parentElement.appendChild(div);
+                div.appendChild(chk_dom.$el)
+
+                sect = chk_dom.$el.closest("." + jv.chk_msg_html_class);
+            }
+
             if (sect) {
                 chked_dom_msg(sect, chkEvent);
                 sect.trigger(chkEvent);
@@ -285,7 +294,7 @@ import jv from "./libjv"
 
         //用 html 的 class 元素显示消息。
         if (jv.chk_msg_html_class) {
-            var sect = chk_dom.closest(jv.chk_msg_html_class);
+            var sect = chk_dom.closest("." + jv.chk_msg_html_class);
             if (sect) {
                 chked_dom_msg(sect, chkEvent);
                 sect.trigger(chkEvent);
@@ -375,7 +384,7 @@ import jv from "./libjv"
                 return ret;
             }
 
-            var r2 = jv.chk_types[chk_type](value,chk_body);
+            var r2 = jv.chk_types[chk_type](value, chk_body);
 
             if (!r2) {
                 ret.result = false;

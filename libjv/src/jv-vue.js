@@ -159,8 +159,9 @@ jv.initVue = (setting) => {
         //     }
         // },
         updated: function () {
+            //对所有 .kv [chk] 添加 must 样式。
             if (jv.chk_must_dom_class && this.$el && this.$el.querySelectorAll) {
-                Array.from(this.$el.querySelectorAll(jv.chk_must_dom_class)).forEach(it => {
+                Array.from(this.$el.querySelectorAll("." + jv.chk_must_dom_class)).forEach(it => {
                     if (it.querySelector("[chk]")) {
                         it.classList.add("must");
                     }

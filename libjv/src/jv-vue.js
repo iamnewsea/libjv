@@ -103,7 +103,41 @@ jv.initVue = (setting) => {
         }, enumerable: false
     });
 
+    /**
+     * 查找dom下第一个绑定 v-model 的值.返回 { vnode : v-model 对象, value : v-model 的值, data }
+     */
+    Object.defineProperty(vueProtype, "$getVModelData", {
+        value() {
+            var vnode = this.$vnode, vdata = vnode.data, data = vnode.context._data;
+            if (vdata && vdata.model && vdata.model.expression) {
+                if ("value" in vdata.model) {
+                    return {value: convertValue(vdata.model.value), data: data};
+                }
 
+                //对于 el-input 它的值在 component._data.currentValue,对于其它 v-model 它的值在  vdata.model.value
+                var ret = jv.evalExpression(data, vdata.model.expression);
+                if (jv.evalExpressionError) {
+                    return {};
+                }
+                return {value: convertValue(ret), data: data};
+            }
+
+            return {};
+
+        }, enumerable: false
+    });
+
+    /**
+     *
+     * @param vdom ,  htmlDom.__vue__ 是也
+     * @returns {string|*}
+     */
+    Object.defineProperty(vueProtype, "$getBindExpression", {
+        value() {
+            var model = this.$vnode.data.model;
+            return model && model.expression || "";
+        }, enumerable: false
+    });
     /**
      * 通过表过式，查询绑定指定Expression的Dom,性能差
      * @param findExp
@@ -132,7 +166,7 @@ jv.initVue = (setting) => {
 
             var recusion_vue = function (container, findExp) {
                 if (!container) return null;
-                var exp = jv.getVueExpression(container);
+                var exp = container.$getBindExpression();
                 if (exp == findExp) {
                     return container;
                 }

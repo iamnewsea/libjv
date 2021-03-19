@@ -116,6 +116,7 @@ import jv from "./libjv"
     };
 
     var isValidateChar = function (code) {
+        // - , _
         if (code == 45 || code == 95) return true;
         if (code >= 65 && code <= 90) return true;
         if (code >= 97 && code <= 122) return true;
@@ -153,24 +154,6 @@ import jv from "./libjv"
         // }
         return v;
     };
-    //查找dom下第一个绑定 v-model 的值.返回 { vnode : v-model 对象, value : v-model 的值, data }
-    var getVueData = function (component) {
-        var vnode = component.$vnode, vdata = vnode.data, ret = {}, data = vnode.context._data;
-        if (vdata && vdata.model && vdata.model.expression) {
-            if ("value" in vdata.model) {
-                return {value: convertValue(vdata.model.value), data: data};
-            }
-
-            //对于 el-input 它的值在 component._data.currentValue,对于其它 v-model 它的值在  vdata.model.value
-            var ret = jv.evalExpression(data, vdata.model.expression);
-            if (jv.evalExpressionError) {
-                return {};
-            }
-            return {value: convertValue(ret), data: data};
-        }
-
-        return {};
-    };
 
 
     // vueModel = { vnode , value }
@@ -181,7 +164,7 @@ import jv from "./libjv"
         chk = chk.trim();
         if (!chk) return true;
 
-        var {value, data} = getVueData(chk_dom);
+        var {value, data} = chk_dom.$getVModelData();
         if (!data) {
             throw new Error("找不到vue数据!")
         }
@@ -539,15 +522,6 @@ import jv from "./libjv"
         return ret;
     }
 
-    /**
-     *
-     * @param vdom ,  htmlDom.__vue__ 是也
-     * @returns {string|*}
-     */
-    jv.getVueExpression = function (vdom) {
-        var model = vdom && vdom.$vnode.data.model;
-        return model && model.expression || "";
-    }
 
     //校验器
     /**
@@ -587,7 +561,7 @@ import jv from "./libjv"
             });
 
             if (excludes && (excludes.includes(chk_dom) ||
-                excludes_exps.includes(jv.getVueExpression(chk_dom)) ||
+                excludes_exps.includes(chk_dom.$getBindExpression()) ||
                 (chk_dom.id && excludes_exp.includes("#" + chk_dom.id)))) {
                 continue
             }

@@ -496,56 +496,6 @@ import jv from "./libjv"
         return recusion_vue_dom(container, setting)
     }
 
-    /**
-     * 通过表过式，查询VDom,性能差
-     * @param findExp
-     */
-    jv.getVDomFromExpression = function (container, findExp) {
-        if (!container) return null;
-
-        var recusion_html = function (container, findExp) {
-            var container_vue = container.__vue__;
-            if (container_vue) {
-                return recusion_vue(container_vue, findExp)
-            }
-            if (container.$vnode) {
-                return recusion_vue(container, findExp)
-            }
-
-
-            for (var i = 0, children = container.children, len = (children && children.length || 0); i < len; i++) {
-                var item = children[i];
-                var ret = recusion_html(item, findExp)
-                if (ret) {
-                    return ret;
-                }
-            }
-            return null;
-        }
-
-        var recusion_vue = function (container, findExp) {
-            if (!container) return null;
-            var exp = jv.getVueExpression(container);
-            if (exp == findExp) {
-                return container;
-            }
-            for (var i = 0, children = container.$children, len = children.length; i < len; i++) {
-                var item = children[i];
-                var ret = recusion_vue(item, findExp);
-                if (ret) {
-                    return ret;
-                }
-            }
-            return null;
-        }
-
-        if (container.$vnode) {
-            return recusion_vue(container, findExp);
-        } else if (container.__vue__) {
-            return recusion_vue(container.__vue__, findExp);
-        }
-        return recusion_html(container, findExp)
-    }
 
     /**
      * 遍历html,但依然可以处理 vue chk

@@ -73,6 +73,9 @@ jv.initVue = (setting) => {
         }, enumerable: false
     });
 
+    /**
+     * 保持和 HTMLElement 一致的方法名
+     */
     Object.defineProperty(vueProtype, "chk_item", {
         value(chk, chk_msg) {
             return jv.chk_vue_item(this, chk, chk_msg)
@@ -85,6 +88,9 @@ jv.initVue = (setting) => {
         }
     });
 
+    /**
+     * 保持和 HTMLElement 一致的方法名
+     */
     Object.defineProperty(vueProtype, "chk", {
         value(setting) {
             return jv.chk_vue(this, setting);
@@ -97,6 +103,57 @@ jv.initVue = (setting) => {
         }, enumerable: false
     });
 
+
+    /**
+     * 通过表过式，查询绑定指定Expression的Dom,性能差
+     * @param findExp
+     * @return 返回值，可能是 html dom , 可能是 vue vdom
+     */
+    Object.defineProperty(vueProtype, "$findByBindExpression", {
+        value(findExp) {
+            var recusion_html = function (container, findExp) {
+                var container_vue = container.__vue__;
+                if (container_vue) {
+                    return recusion_vue(container_vue, findExp)
+                }
+                if (container.$vnode) {
+                    return recusion_vue(container, findExp)
+                }
+
+                for (var i = 0, children = container.children, len = (children && children.length || 0); i < len; i++) {
+                    var item = children[i];
+                    var ret = recusion_html(item, findExp)
+                    if (ret) {
+                        return ret;
+                    }
+                }
+                return null;
+            }
+
+            var recusion_vue = function (container, findExp) {
+                if (!container) return null;
+                var exp = jv.getVueExpression(container);
+                if (exp == findExp) {
+                    return container;
+                }
+                for (var i = 0, children = container.$children, len = children.length; i < len; i++) {
+                    var item = children[i];
+                    var ret = recusion_vue(item, findExp);
+                    if (ret) {
+                        return ret;
+                    }
+                }
+                return null;
+            }
+
+            if (this.$vnode) {
+                return recusion_vue(this, findExp);
+            } else if (this.__vue__) {
+                return recusion_vue(this.__vue__, findExp);
+            }
+            return recusion_html(this, findExp);
+        }, enumerable: false
+    });
 
     /**
      * 向下找 tag
@@ -118,7 +175,7 @@ jv.initVue = (setting) => {
         }, enumerable: false
     });
 
-    //向上找元素.
+    //向上查找Vue元素.
     Object.defineProperty(vueProtype, "$Closest", {
         value(vueTagName) {
             let cur = this;

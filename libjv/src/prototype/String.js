@@ -39,6 +39,12 @@
         }, enumerable: false
     });
 
+    Object.defineProperty(String.prototype, 'replaceAll', {
+        value(find, replace) {
+            return this.split(find).join(replace);
+        }, enumerable: false
+    });
+
     Object.defineProperty(String.prototype, 'trimStartWith', {
         value() {
             var ps = Array.from(arguments);

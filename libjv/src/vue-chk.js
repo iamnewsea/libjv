@@ -142,19 +142,6 @@ import jv from "./libjv"
         return ret;
     };
 
-    var convertValue = function (value) {
-        var v = value;
-        if (jv.isNull(v)) {
-            v = "";
-        }
-        // if (v.Type == "date") {
-        //     v = v.toDateString();
-        // } else {
-        //     v = v.toString();
-        // }
-        return v;
-    };
-
 
     // vueModel = { vnode , value }
     jv.chk_vue_item = function (chk_dom, chk, chk_msg) {
@@ -239,6 +226,11 @@ import jv from "./libjv"
         if (pDom) {
             data = pDom.$vnode.context._data;
         }
+
+        var convertValue = function (value) {
+            return jv.isNull(value) ? "" : value
+        }
+
         return {value: convertValue(html_dom.value), data: data};
     };
 

@@ -108,6 +108,10 @@ jv.initVue = (setting) => {
      */
     Object.defineProperty(vueProtype, "$getVModelData", {
         value() {
+            var convertValue = function (value) {
+                return jv.isNull(value) ? "" : value
+            }
+
             var vnode = this.$vnode, vdata = vnode.data, data = vnode.context._data;
             if (vdata && vdata.model && vdata.model.expression) {
                 if ("value" in vdata.model) {

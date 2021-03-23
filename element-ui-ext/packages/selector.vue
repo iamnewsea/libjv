@@ -170,7 +170,7 @@ export default {
                     }
                     if (("true" in data) && ("false" in data) && keys.length < 4) {
                         this.valueIsBoolean = true;
-                    } else if (keys.every(it => it.IsNumberFormat())) {
+                    } else if (keys.every(it => it.isNumberFormat())) {
                         this.valueIsNumber = true;
                     }
 
@@ -475,7 +475,7 @@ export default {
                         return (it === "true") || (it === "false");
                     }).length == 2) {
                         this.valueIsBoolean = true;
-                    } else if (keys.every(it => it.IsNumberFormat())) {
+                    } else if (keys.every(it => it.isNumberFormat())) {
                         this.valueIsNumber = true;
                     }
                 }

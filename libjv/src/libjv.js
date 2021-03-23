@@ -450,7 +450,7 @@ jv.asString = (value, format) => {
 //如果是数字形式，返回 Int，否则返回 0.
 jv.asInt = (value) => {
     if (jv.isNull(value)) return 0;
-    if (value.toString().IsNumberFormat(value)) {
+    if (value.toString().isNumberFormat(value)) {
         return parseInt(value);
     }
     return 0;
@@ -598,10 +598,10 @@ jv.fillRes = (obj, key, args) => {
             return true;
         }
         // else if (!ignoreDate && (type == "string")) {
-        //     if (value.IsDateFormat()) {
+        //     if (value.isDateFormat()) {
         //         target[key1 + "_res"] = value;
         //         return true;
-        //     } else if (value.IsDateTimeFormat()) {
+        //     } else if (value.isDateTimeFormat()) {
         //         target[key1 + "_res"] = Date.from(value).toDateString(args1, "local");
         //         return true;
         //     }

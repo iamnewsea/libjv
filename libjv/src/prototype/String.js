@@ -1,5 +1,5 @@
 (function () {
-    if (String.prototype.IsNumberFormat) {
+    if (String.prototype.isNumberFormat) {
         return;
     }
 
@@ -171,30 +171,25 @@
 // });
 
 
-    Object.defineProperty(String.prototype, 'IsTimeFormat', {
+    Object.defineProperty(String.prototype, 'isTimeFormat', {
         value() {
             return /^[0-2]?\d:[0-5]?\d:[0-5]?\d$/.test(this)
         }, enumerable: false
     });
-    Object.defineProperty(String.prototype, 'IsDateFormat', {
+    Object.defineProperty(String.prototype, 'isDateFormat', {
         value() {
             return /^\d{4}[-/][0-1]?\d[-/][0-3]?\d?$/.test(this)
         }, enumerable: false
     });
 
-    Object.defineProperty(String.prototype, 'IsDateTimeFormat', {
+    Object.defineProperty(String.prototype, 'isDateTimeFormat', {
         value() {
             return /^\d{4}[-/][0-1]?\d[-/][0-3]?\d[ T]?[0-2]?\d:[0-5]?\d:[0-5]?\dZ?$/.test(this)
         }, enumerable: false
     });
 
-    Object.defineProperty(String.prototype, 'IsDateOrDateTimeFormat', {
-        value() {
-            return /^\d{4}[-/][0-1]?\d[-/][0-3]?\d([ T]?[0-2]?\d:[0-5]?\d:[0-5]?\d)?Z?$/.test(this)
-        }, enumerable: false
-    });
 
-    Object.defineProperty(String.prototype, 'IsNumberFormat', {
+    Object.defineProperty(String.prototype, 'isNumberFormat', {
         value() {
             return /^[-+]?((\d+\.*\d*)|(\.\d+))$/.test(this)
         }, enumerable: false
@@ -212,7 +207,7 @@
     /**
      * 是否是大写字母
      */
-    Object.defineProperty(String.prototype, 'IsUpperLetter', {
+    Object.defineProperty(String.prototype, 'isUpperLetter', {
         value() {
             return this.toCharArray().every(it => it >= 65 && it <= 90);
         }, enumerable: false
@@ -221,7 +216,7 @@
     /**
      * 是否是小写字母
      */
-    Object.defineProperty(String.prototype, 'IsLowerLetter', {
+    Object.defineProperty(String.prototype, 'isLowerLetter', {
         value() {
             return this.toCharArray().every(it => it >= 97 && it <= 122);
         }, enumerable: false
@@ -230,7 +225,7 @@
     /**
      * 是否是数字，0-9
      */
-    Object.defineProperty(String.prototype, 'IsDigit', {
+    Object.defineProperty(String.prototype, 'isDigit', {
         value() {
             return this.toCharArray().every(it => it >= 48 && it <= 57);
         }, enumerable: false

@@ -45,10 +45,6 @@
                 v-model="p.remark">
             </el-input>
         </el-dialog>
-
-
-        <div style="display:none" ref="download_div"></div>
-        <a style="display: none" target="_self" ref="link_a"></a>
     </div>
 </template>
 <!--<style>-->
@@ -177,40 +173,6 @@ export default {
                     scale: p.scale || p.scales[0]
                 });
         };
-
-        //通过 iframe 打开
-        jv.downloadFile = url => {
-            if (!url) return;
-            if (!url.includes("?")) {
-                url += "?"
-            }
-            var json = jv.query2Json(url);
-            if (!("_" in json)) {
-                json["_"] = jv.random()
-            }
-
-            if (!("iniframe" in json)) {
-                json["iniframe"] = "true";
-            }
-            url = jv.param(json, true);
-            console.log("jv.downloadFile:" + url);
-            var div = this.$refs["download_div"];
-            div.innerHTML = "";
-            div.innerHTML = "<iframe src=\"" + url + "\" />";
-        }
-
-        //通过 a 打开。
-        jv.open = (url, target) => {
-            if (!url) {
-                return;
-            }
-            var link = this.$refs["link_a"];
-            if (target) {
-                link.setAttribute("target", target);
-            }
-            link.setAttribute("href", url);
-            link.trigger(new MouseEvent("click", {view: window, bubbles: true, cancelable: true}));
-        }
     },
     watch: {
         option: {

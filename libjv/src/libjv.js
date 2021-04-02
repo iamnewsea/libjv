@@ -1030,6 +1030,59 @@ jv.param = (obj, withHost) => {
     return host + ary.join("&")
 };
 
+jv.getOrPutDiv = (divId, attributes, styles) => {
+    var ret = document.getElementById(divId);
+    if (ret) return ret;
+    ret = document.createElement("div")
+    ret.id = divId;
+    if (attributes) {
+        Object.keys(attributes).forEach(key => {
+            ret.setAttribute(key, attributes[key]);
+        })
+    }
+    if (styles) {
+        Object.keys(styles).forEach(key => {
+            ret.style[key] = styles[key]
+        })
+    }
+    document.body.appendChild(ret)
+    return ret;
+}
+
+//通过 iframe 打开
+jv.downloadFile = url => {
+    if (!url) return;
+    if (!url.includes("?")) {
+        url += "?"
+    }
+    var json = jv.query2Json(url);
+    if (!("_" in json)) {
+        json["_"] = jv.random()
+    }
+
+    if (!("iniframe" in json)) {
+        json["iniframe"] = "true";
+    }
+    url = jv.param(json, true);
+    console.log("jv.downloadFile:" + url);
+    var div = jv.getOrPutDiv("download_div", {}, {display: "none"})
+    div.innerHTML = "";
+    div.innerHTML = "<iframe src=\"" + url + "\" />";
+}
+
+//通过 a 打开。
+jv.open = (url, target) => {
+    if (!url) {
+        return;
+    }
+    var link = jv.getOrPutDiv("open_a", {}, {display: "none"})
+    if (target) {
+        link.setAttribute("target", target);
+    }
+    link.setAttribute("href", url);
+    link.trigger(new MouseEvent("click", {view: window, bubbles: true, cancelable: true}));
+}
+
 // class UrlCls {
 //     constructor(fullUrl){
 //

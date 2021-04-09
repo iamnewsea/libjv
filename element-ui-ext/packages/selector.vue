@@ -174,11 +174,18 @@ export default {
                         this.valueIsNumber = true;
                     }
 
+                    if (this.valueIsBoolean) {
+                        data = keys.map(it => {
+                            return {name: it ? jv.asBoolean(it) : it, remark: data[it]};
+                        });
+                    } else {
+                        data = keys.map(it => {
+                            return {name: it, remark: data[it]};
+                        });
+                    }
+
                     this.keyField = "name"
                     this.labelField = "remark"
-                    data = keys.map(it => {
-                        return {name: it, remark: data[it]};
-                    });
                 }
 
                 this.setData(data);
@@ -343,16 +350,21 @@ export default {
                     v = this.value1;
                 }
 
+                var nv = v;
                 //保留空值不转换
                 if (jv.isNull(v) || (v === "")) {
                     v = "";
+                    nv = "";
                 } else if (this.valueIsBoolean) {
-                    v = jv.asBoolean(v)
+                    nv = jv.asBoolean(v)
                 } else if (this.valueIsNumber) {
-                    v = jv.asInt(v);
+                    nv = jv.asInt(v);
                 }
 
+                //先使用字符串格式值对 data2进行查找。
                 fullModel = this.data2.filter(it => it[this.keyField] == v)[0];
+
+                v = nv;
             } else {
                 if (jv.isNull(v)) {
                     v = this.value2;
@@ -360,13 +372,17 @@ export default {
 
                 v = v.filter(it => !jv.isNull(it));
 
+                var nv = v;
                 if (this.valueIsBoolean) {
-                    v = v.map(it => jv.asBoolean(it))
+                    nv = v.map(it => jv.asBoolean(it))
                 } else if (this.valueIsNumber) {
-                    v = v.map(it => jv.asInt(it))
+                    nv = v.map(it => jv.asInt(it))
                 }
 
+                //先使用字符串格式值对 data2进行查找。
                 fullModel = this.data2.filter(it => it[this.keyField] == v);
+
+                v = nv;
             }
             this.$emit("input", v);
             this.$emit("change", v, fullModel || {});

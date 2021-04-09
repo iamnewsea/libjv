@@ -43,12 +43,11 @@
         , enumerable: false
     });
 
-    Array.prototype._IndexOf_ = Array.prototype.indexOf
-    Object.defineProperty(Array.prototype, "indexOf", {
+    Object.defineProperty(Array.prototype, "IndexOf", {
         value(filter) {
             if (!this.length) return -1;
             if (!filter || filter.Type != "function") {
-                return this._lastIndexOf_(filter);
+                return this.indexOf(filter);
             }
 
             for (var i = 0, len = this.length; i < len; i++) {
@@ -59,12 +58,11 @@
         }, enumerable: false
     });
 
-    Array.prototype._lastIndexOf_ = Array.prototype.lastIndexOf
-    Object.defineProperty(Array.prototype, "lastIndexOf", {
+    Object.defineProperty(Array.prototype, "LastIndexOf", {
         value(filter) {
             if (!this.length) return -1;
             if (!filter || filter.Type != "function") {
-                return this._lastIndexOf_(filter);
+                return this.lastIndexOf(filter);
             }
 
             for (var i = this.length - 1; i > -1; i--) {

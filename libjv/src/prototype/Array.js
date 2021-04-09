@@ -43,6 +43,38 @@
         , enumerable: false
     });
 
+    Array.prototype._IndexOf_ = Array.prototype.indexOf
+    Object.defineProperty(Array.prototype, "indexOf", {
+        value(filter) {
+            if (!this.length) return -1;
+            if (!filter || filter.Type != "function") {
+                return this._lastIndexOf_(filter);
+            }
+
+            for (var i = 0, len = this.length; i < len; i++) {
+                var item = this[i];
+                if (filter(item, i)) return i;
+            }
+            return -1;
+        }, enumerable: false
+    });
+
+    Array.prototype._lastIndexOf_ = Array.prototype.lastIndexOf
+    Object.defineProperty(Array.prototype, "lastIndexOf", {
+        value(filter) {
+            if (!this.length) return -1;
+            if (!filter || filter.Type != "function") {
+                return this._lastIndexOf_(filter);
+            }
+
+            for (var i = this.length - 1; i > -1; i--) {
+                var item = this[i];
+                if (filter(item, i)) return i;
+            }
+            return -1;
+        }, enumerable: false
+    });
+
     Object.defineProperty(Array.prototype, "last", {
         value(filter) {
             if (!this.length) return null;
@@ -58,9 +90,9 @@
         }, enumerable: false
     });
 
-//增强型ForEach，函数返回 false 退出循环。
-// filter第二个参数是 index
-//没有值返回 null , 如果全部执行完，返回true, 否则返回 filter 返回的值false。
+    //增强型ForEach，函数返回 false 退出循环。
+    // filter第二个参数是 index
+    //没有值返回 null , 如果全部执行完，返回true, 否则返回 filter 返回的值false。
     Object.defineProperty(Array.prototype, "ForEach", {
         value(filter, trueAction, falseAction) {
             return this.forEachIndexed(filter, trueAction, falseAction)
@@ -146,6 +178,8 @@
         }
     });
 
+
+    //兼容性
     if (!Array.prototype.includes) {
         Object.defineProperty(Array.prototype, "includes", {
             value(find) {

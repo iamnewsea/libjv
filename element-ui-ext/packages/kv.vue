@@ -1,13 +1,7 @@
 <template>
     <div class="kv" v-bind="$attrs" v-on="$listeners">
-        <template v-if="label">
-            <div class="k"> {{ label }}</div>
-        </template>
-        <template v-else>
-            <slot name="k"></slot>
-        </template>
-
-
+        <div class="k" v-if="label"> {{ label }}</div>
+        <slot name="k" v-else></slot>
         <sect class="v sect">
             <slot></slot>
         </sect>

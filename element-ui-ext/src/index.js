@@ -52,7 +52,7 @@ const components = [
 import menu from "./right-menu"
 
 const install = function (Vue, opts = {}) {
-    components.map(component => {
+    components.forEach(component => {
         // components_export[component.name] = component;
         Vue.component(component.name, component);
     });

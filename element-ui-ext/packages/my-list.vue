@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div class="query">
+        <div class="query" v-if="!noQueryPart">
             <!-- 通过 slot 传递 query 用法： <template #query="scope"> <input v-model="scope.query.name" /> </template> -->
             <slot name="query" v-bind:query="query2"></slot>
             <slot name="buttons">
@@ -68,6 +68,9 @@ export default {
     name: "my-list",
     inheritAttrs: false,
     props: {
+        noQueryPart: {
+            type: Boolean, default: () => false
+        },
         store: {
             type: Boolean, default: () => true
         }, //是否存储 页码，总页数,lastRowId

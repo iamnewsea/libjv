@@ -6,6 +6,7 @@ import kv from '../packages/kv.vue';
 import selector from '../packages/selector.vue';
 import my_list from '../packages/my-list.vue';
 import input_list from '../packages/input-list.vue';
+import input_table from '../packages/input-table.vue';
 import my_ref from '../packages/my-ref.vue';
 
 // import Upload1 from '../packages/upload1.vue';
@@ -37,6 +38,7 @@ const components = [
     selector,
     my_list,
     input_list,
+    input_table,
     my_ref,
     // Upload1,
     upload,

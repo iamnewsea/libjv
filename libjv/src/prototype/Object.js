@@ -82,17 +82,15 @@
         }, enumerable: false
     });
 
-    //移除Json的指定Keys。返回删除对象的 keys
+    //移除Json的指定Keys。返回对象
     Object.defineProperty(Object.prototype, "deleteJsonKeys", {
         value() {
-            var ret = [];
             Array.from(arguments).forEach(it => {
-                if( it in this) {
-                    ret.push(it);
+                if (it in this) {
                     delete this[it];
                 }
             });
-            return ret;
+            return this;
         }, enumerable: false
     });
 

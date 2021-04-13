@@ -4,9 +4,9 @@
                v-if="!readOnly">
 
         <div class="el-upload" :class="'el-upload-' + index" v-for="(item,index) in myValue">
-            <div class="el-upload-preview" v-if="item.id && item.url" onmouseleave="this.classList.remove('deleting')">
+            <div class="el-upload-preview" v-if="item.id && item.fullUrl" onmouseleave="this.classList.remove('deleting')">
                 <div v-bind="img_attrs" class="avatar-uploader-icon preview--img" @click="img_click(index)"
-                     :style="{backgroundImage: 'url(' + item.url + ')'}"
+                     :style="{backgroundImage: 'url(' + item.fullUrl + ')'}"
                      v-if="item.fileType=='img'"/>
 
                 <template v-else-if="item.fileType=='video'">
@@ -16,7 +16,7 @@
                          :style="{backgroundImage: 'url(' + (item.logo || poster) + ')'}"/>
 
                     <video v-bind="video_attrs" v-else
-                           :src="item.url"
+                           :src="item.fullUrl"
                            :poster="item.logo || poster"
                            class="avatar-uploader-icon"></video>
                 </template>
@@ -526,7 +526,7 @@
                     var value = Object.assign({
                         id: "",
                         url: ""
-                    }, json).deleteJosnKeys("percentage", "fileType", "logoSize", "showName");
+                    }, json).deleteJsonKeys("percentage", "fileType", "logoSize", "showName");
 
 
                     if (this.db && this.uid) {
@@ -588,10 +588,10 @@
             }
             ,
             file_preview(index) {
-                jv.openPreview({type: this.myValue[index].fileType, h5: this.h5, url: this.myValue[index].url});
+                jv.openPreview({type: this.myValue[index].fileType, h5: this.h5, url: this.myValue[index].fullUrl});
             },
             file_download(index) {
-                jv.downloadFile(this.myValue[index].url)
+                jv.downloadFile(this.myValue[index].fullUrl)
             }
         }
     }

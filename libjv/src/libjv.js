@@ -166,6 +166,17 @@ Object.defineProperty(Storage.prototype, "my_store", {
         }
 
         return {
+            getItem(url, key) {
+                var page = ls[url];
+                if (!page) return null;
+                return page[key]
+            },
+            setItem(url, key, value) {
+                var page = ls[url];
+                if (!page) return false;
+                page[key] = value;
+                return true;
+            },
             setJson(key, value) {
                 var data = this.getJson();
                 if (jv.isNull(value)) {

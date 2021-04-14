@@ -2,14 +2,22 @@
     <my-list v-model="tableData" :noQueryPart="true">
         <el-table-column type="index" clign="center" width="50"></el-table-column>
 
-        <el-table-column v-for="(item,index) in tableFields" :key="item.field" :label="item.title" align="center">
+        <el-table-column v-for="(item,index) in tableFields" :key="item.field" :label="item.title" align="center"
+                         :width="item.width">
             <template slot-scope="scope">
                 <el-input v-model="scope.row[item.field]" @change="change(scope.row)"
                           @blur="change(scope.row)"/>
             </template>
         </el-table-column>
 
-        <el-table-column align="center">
+<!--使用：
+<template slot-scope="scope">
+    <el-table-column  align="center" :prop="scope.cell.field" :label="scope.cell.title">
+    </el-table-column>
+</>template> -->
+        <slot v-bind:cell="item"></slot>
+
+        <el-table-column align="center" width="68">
             <template slot="header" slot-scope="scope">
                 <el-button
                     type="primary"
@@ -21,7 +29,7 @@
             </template>
 
             <template slot-scope="scope">
-                <el-button icon="el-icon-delete-solid" plain @click="remove_click(scope.row)" size="small"
+                <el-button icon="el-icon-delete-solid" plain @click="remove_click(scope)" size="small"
                            type="primary">
                 </el-button>
             </template>
@@ -69,9 +77,9 @@ export default {
         value: {
             type: Array, default: () => []
         },
-        // [{title,field}]
+        // [{title,field,width}]
         fields: {
-            type: String, default: () => ""
+            type: [String, Array], default: () => ""
         }
     },
     data() {
@@ -89,26 +97,32 @@ export default {
         },
         fields: {
             immediate: true, deep: true, handler(val) {
-                if (!val) {
+                if (!val || !val.length) {
                     this.tableFields = [];
-                } else {
-                    this.tableFields = val.split(",").map(it => {
-                        var sect = it.split(":");
-                        return {field: sect[0], title: sect[1]};
-                    });
+                    return;
                 }
+
+                if (val.Type != "string") {
+                    this.tableFields = val;
+                    return;
+                }
+
+                this.tableFields = val.split(",").map(it => {
+                    var sect = it.split(":");
+                    return {field: sect[0], title: sect[1]};
+                });
             }
         }
     },
     mounted() {
     },
     methods: {
-
         change(row) {
             this.$emit("value", this.tableData.data)
         },
-        remove_click(index) {
-            this.tableData.data.removeAt(index)
+        remove_click(scope) {
+            var rowIndex = scope.$index;
+            this.tableData.data.removeAt(rowIndex)
             this.$emit("value", this.tableData.data)
         },
         add_click() {

@@ -21,12 +21,15 @@
             </template>
 
             <template slot-scope="scope">
-                <el-button icon="el-icon-delete" @click="delete_click(scope.row)" size="small">
+                <el-button icon="el-icon-delete-solid" plain @click="remove_click(scope.row)" size="small"
+                           type="primary">
                 </el-button>
             </template>
         </el-table-column>
 
-        <template slot="query-button"><div></div> </template>
+        <template slot="query-button">
+            <div></div>
+        </template>
     </my-list>
 </template>
 <style scoped>
@@ -100,16 +103,7 @@ export default {
     mounted() {
     },
     methods: {
-        getDisplay(item) {
-            if (!this.displayField) {
-                return item;
-            }
-            var v = item[this.displayField];
-            if (v.Type == "function") {
-                return v();
-            }
-            return v;
-        },
+
         change(row) {
             this.$emit("value", this.tableData.data)
         },

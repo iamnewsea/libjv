@@ -53,6 +53,10 @@
     font-weight: bold;
 }
 
+.el-cell-index{
+    cursor: default;
+}
+
 .el-cell-index .cell div {
     text-align: center;
 }

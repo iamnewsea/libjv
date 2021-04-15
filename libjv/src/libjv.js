@@ -479,9 +479,9 @@ jv.asInt = (value) => {
 /**
  * 遍历Json对象。返回 false 停止遍历所有
  * @param json
- * @param eachJsonItemCallback 参数：key,value,object,deepth
+ * @param eachJsonItemCallback 参数：item,depth,parent
  */
-jv.recursionJson = (json, eachJsonItemCallback, deepth) => {
+jv.recursionJson = (json, eachJsonItemCallback, deepth, parent) => {
     if (!json) {
         return;
     }
@@ -490,20 +490,20 @@ jv.recursionJson = (json, eachJsonItemCallback, deepth) => {
     var type = json.PrimitiveType;
     if (type == "array" || type == "set") {
         return Array.from(json).ForEach(it => {
-            return jv.recursionJson(it, eachJsonItemCallback, deepth + 1);
+            return jv.recursionJson(it, eachJsonItemCallback, deepth + 1, json);
         });
     } else if (!json.ObjectType) {
         return;
     }
 
-    if (eachJsonItemCallback(json, deepth) === false) {
+    if (eachJsonItemCallback(json, parent, deepth) === false) {
         return false;
     }
 
     return Object.keys(json).ForEach(key => {
         var value = json[key];
         if (value) {
-            if (jv.recursionJson(value, eachJsonItemCallback, deepth + 1) === false) {
+            if (jv.recursionJson(value, eachJsonItemCallback, deepth + 1, json) === false) {
                 return false;
             }
         }

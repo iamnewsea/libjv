@@ -65,6 +65,7 @@
     color: white;
     background-color: #df5000;
     border-radius: 30px;
+    padding:2px 4px;
 }
 </style>
 <script type="text/ecmascript-6">

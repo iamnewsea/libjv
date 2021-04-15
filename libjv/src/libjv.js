@@ -490,7 +490,7 @@ jv.recursionJson = (json, eachJsonItemCallback, deepth, parent) => {
     var type = json.PrimitiveType;
     if (type == "array" || type == "set") {
         return Array.from(json).ForEach(it => {
-            return jv.recursionJson(it, eachJsonItemCallback, deepth + 1, json);
+            return jv.recursionJson(it, eachJsonItemCallback, deepth + 1, parent);
         });
     } else if (!json.ObjectType) {
         return;

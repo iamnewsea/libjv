@@ -35,11 +35,11 @@
                     <slot name="query" v-bind:query="scope.query"></slot>
                 </template>
 
-                <template #button>
+                <template #right-buttons>
                     <el-dropdown split-button size="small" trigger="click" type="primary" icon="el-icon-goods"
                                  @click="handleClick" v-if="multi" @command="removeTag">
-                        选择 {{ dbRefValue.length }} 项
-                        <el-dropdown-menu slot="dropdown" title="选中对其删除" style="width:200px;">
+                        选中 {{ dbRefValue.length }} 项
+                        <el-dropdown-menu slot="dropdown" title="点击对其删除" style="width:200px;">
                             <el-dropdown-item v-for="item in dbRefValue" :key="item.id" :command="item.id">
                                 {{ item.name }}
                             </el-dropdown-item>
@@ -162,8 +162,8 @@ export default {
             return "330px";
         },
         removeTag(id) {
-            // var index = this.dbRefValue.findIndex(it => it.id == id)
-            // this.dbRefValue.splice(index, 1);
+            var index = this.dbRefValue.findIndex(it => it.id == id)
+            this.dbRefValue.splice(index, 1);
             return false;
         },
         removeTagClose(id) {

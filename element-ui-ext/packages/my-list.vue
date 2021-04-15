@@ -4,12 +4,17 @@
             <!-- 通过 slot 传递 query 用法： <template #query="scope"> <input v-model="scope.query.name" /> </template> -->
             <slot name="query" v-bind:query="query2"></slot>
             <slot name="buttons">
-                <div class="buttons">
-                    <slot name="query-button">
-                        <el-button size="mini" icon="el-icon-search" @click="loadData(1)" type="primary">查询</el-button>
-                    </slot>
-                    <slot name="button">
-                    </slot>
+                <div class="buttons-container">
+                    <div class="buttons">
+                        <slot name="query-button">
+                            <el-button size="mini" icon="el-icon-search" @click="loadData(1)" type="primary">查询
+                            </el-button>
+                        </slot>
+                        <slot name="button">
+                        </slot>
+                    </div>
+
+                    <slot name="right-buttons"></slot>
                 </div>
             </slot>
         </div>
@@ -32,10 +37,21 @@
     </div>
 </template>
 <style scoped>
+.buttons-container {
+    min-width: auto;
+    max-width: unset;
+    width: auto;
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+}
+
 .buttons {
     min-width: auto;
     max-width: unset;
     width: auto;
+    flex: 1;
+    display: flex;
 }
 
 .buttons > * {
@@ -53,7 +69,7 @@
     font-weight: bold;
 }
 
-.el-cell-index{
+.el-cell-index {
     cursor: default;
 }
 
@@ -65,7 +81,7 @@
     color: white;
     background-color: #df5000;
     border-radius: 30px;
-    padding:2px 4px;
+    padding: 2px 4px;
 }
 </style>
 <script type="text/ecmascript-6">

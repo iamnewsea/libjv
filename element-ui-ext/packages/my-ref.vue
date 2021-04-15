@@ -19,7 +19,7 @@
             </slot>
         </div>
 
-        <el-dialog ref="dialog" :title="'选择 ' +name" :visible.sync="popOpen" :center="true" width="80%"
+        <el-dialog ref="dialog" :title="'选择 ' +name" :visible.sync="popOpen" :center="true" width="80%" append-to-body
                    style="padding:20px;">
 
 

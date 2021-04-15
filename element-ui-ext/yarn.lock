@@ -3287,9 +3287,9 @@ electron-to-chromium@^1.3.649:
   resolved "http://saas-dev.nancal.com:31016/repository/npm-group/electron-to-chromium/-/electron-to-chromium-1.3.687.tgz#c336184b7ab70427ffe2ee79eaeaedbc1ad8c374"
   integrity sha1-wzYYS3q3BCf/4u556urtvBrYw3Q=
 
-element-ui@^2.13.2:
+element-ui@^2.15.1:
   version "2.15.1"
-  resolved "http://saas-dev.nancal.com:31016/repository/npm-group/element-ui/-/element-ui-2.15.1.tgz#ada00aa6e32c02774a2e77563dd84668f813cdff"
+  resolved "https://registry.npm.taobao.org/element-ui/download/element-ui-2.15.1.tgz?cache=0&sync_timestamp=1614082623756&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Felement-ui%2Fdownload%2Felement-ui-2.15.1.tgz#ada00aa6e32c02774a2e77563dd84668f813cdff"
   integrity sha1-raAKpuMsAndKLndWPdhGaPgTzf8=
   dependencies:
     async-validator "~1.8.1"

@@ -476,8 +476,17 @@ jv.asInt = (value) => {
 //     }, enumerable: false
 // });
 jv.initDomResize = function (element) {
+    var bind_resize = function (e) {
+        e.target.frameElement.observer.forEach(function (it) {
+            it(e);
+        })
+    };
+
     var observerDom = Array.from(element.children).last(it => it.observer);
     if (observerDom) {
+        //判断是否有事件
+        observerDom.contentWindow.removeEventListener('resize', bind_resize);
+        observerDom.contentWindow.addEventListener('resize', bind_resize);
         return observerDom;
     }
     const maxLeft = 3.35544e+07,
@@ -488,11 +497,8 @@ jv.initDomResize = function (element) {
     observerDom.observer = [];
     observerDom.style.cssText = `position:absolute;width:100%;height:100%;left:${-maxLeft}px;top:${-maxTop}px;overflow:hidden`;
     element.appendChild(observerDom);
-    observerDom.contentWindow.addEventListener('resize', function (e) {
-        e.target.frameElement.observer.forEach(function (it) {
-            it(e);
-        })
-    });
+    observerDom.contentWindow.removeEventListener('resize', bind_resize);
+    observerDom.contentWindow.addEventListener('resize', bind_resize);
 
     return observerDom;
 }
@@ -511,8 +517,9 @@ jv.domResize = function (element, callback) {
     }
 }
 
-jv.removeDomResize = function (element, callback) {
-    jv.initDomResize(element).observer.remove(callback);
+jv.removeDomResizes = function (element) {
+    var dom = jv.initDomResize(element);
+    dom.parentElement.removeChild(dom);
 }
 
 /**

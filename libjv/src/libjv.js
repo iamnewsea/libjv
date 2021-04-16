@@ -476,6 +476,39 @@ jv.asInt = (value) => {
 //     }, enumerable: false
 // });
 
+//
+jv.domResize = function (element, callback) {
+    /**
+     * 监听dom元素尺寸是否发生了变化
+     * @param {HTMLElement} element
+     * @param {function} callback
+     */
+
+    var observerDom = Array.from(element.children).last(it => it.observer);
+    if (observerDom) {
+        if (!observerDom.observer.indexOf(callback)) {
+            observerDom.observer.push(callback);
+        }
+        return () => observerDom.observer.remove(callback);
+    }
+    const maxLeft = 3.35544e+07,
+        maxTop = 3.35544e+07;
+
+    observerDom = document.createElement('iframe');
+    observerDom.observer = [callback];
+    observerDom.style.cssText = `position:absolute;width:100%;height:100%;left:${-maxLeft}px;top:${-maxTop}px;overflow:hidden`;
+
+    element.appendChild(observerDom);
+
+    const fn = function (e) {
+        e.target.frameElement.observer.forEach(it => it(e));
+    };
+    observerDom.contentWindow.addEventListener('resize', fn);
+    observerDom.addEventListener('load', fn);
+    return () => observerDom.observer.remove(callback);
+}
+
+
 /**
  * 遍历Json对象。返回 false 停止遍历所有
  * @param json

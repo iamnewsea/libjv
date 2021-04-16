@@ -475,7 +475,27 @@ jv.asInt = (value) => {
 //         return this.list;
 //     }, enumerable: false
 // });
+jv.initDomResize = function (element) {
+    var observerDom = Array.from(element.children).last(it => it.observer);
+    if (observerDom) {
+        return observerDom;
+    }
+    const maxLeft = 3.35544e+07,
+        maxTop = 3.35544e+07;
 
+
+    observerDom = document.createElement('iframe');
+    observerDom.observer = [];
+    observerDom.style.cssText = `position:absolute;width:100%;height:100%;left:${-maxLeft}px;top:${-maxTop}px;overflow:hidden`;
+    element.appendChild(observerDom);
+    observerDom.contentWindow.addEventListener('resize', function (e) {
+        e.target.frameElement.observer.forEach(function (it) {
+            it(e);
+        })
+    });
+
+    return observerDom;
+}
 //
 jv.domResize = function (element, callback) {
     /**
@@ -484,30 +504,16 @@ jv.domResize = function (element, callback) {
      * @param {function} callback
      */
 
-    var observerDom = Array.from(element.children).last(it => it.observer);
-    if (observerDom) {
-        if (!observerDom.observer.indexOf(callback)) {
-            observerDom.observer.push(callback);
-        }
-        return () => observerDom.observer.remove(callback);
+    var observerDom = jv.initDomResize(element);
+
+    if (!observerDom.observer.includes(callback)) {
+        observerDom.observer.push(callback);
     }
-    const maxLeft = 3.35544e+07,
-        maxTop = 3.35544e+07;
-
-    observerDom = document.createElement('iframe');
-    observerDom.observer = [callback];
-    observerDom.style.cssText = `position:absolute;width:100%;height:100%;left:${-maxLeft}px;top:${-maxTop}px;overflow:hidden`;
-
-    element.appendChild(observerDom);
-
-    const fn = function (e) {
-        e.target.frameElement.observer.forEach(it => it(e));
-    };
-    observerDom.contentWindow.addEventListener('resize', fn);
-    observerDom.addEventListener('load', fn);
-    return () => observerDom.observer.remove(callback);
 }
 
+jv.removeDomResize = function (element, callback) {
+    jv.initDomResize(element).observer.remove(callback);
+}
 
 /**
  * 遍历Json对象。返回 false 停止遍历所有

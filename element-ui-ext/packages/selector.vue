@@ -131,6 +131,11 @@ export default {
                 return "radio"
             }
         },
+        multi: {
+            type: Boolean, default() {
+                return false
+            }
+        },
         //如果是多选，是数组， 如果是单选是对象或值。
         //value 必须是 keyField 的内容。
         value: {
@@ -154,6 +159,11 @@ export default {
                     return;
                 }
                 this.ajaxUrl(v);
+            }
+        },
+        multi: {
+            immediate: true, handler(v) {
+                this.type = v ? "check" : "radio";
             }
         },
         data: {

@@ -100,9 +100,9 @@ export default {
         },
         /**
          * 当data是Array的时候，需要指定 field的两个值,第一个是 key , 第2个是 value
-         * v-model 永远表示 keyField
+         * v-model 表示 keyField
          * 如果是 枚举, valueIsBoolean ,valueArray ,valueIsObject 那么 $emit的值是 item.value。
-         * 如果想返回值是某个值， fields的值部分，使用 #开头。一般第一项是返回的keyField。
+         * 返回值 是 fields.split(",").first()
          *
          * 如果想返回对象， v-model == {code,name} ：
          *  <selector v-model="info.park.code" url="url" fields="code,name" @change="(v,m)=>info.park.name = m.name"/>
@@ -112,6 +112,14 @@ export default {
         fields: {
             type: String, default() {
                 return ""       //enum时默认是name,remark ， array时默认是value,label
+            }
+        },
+        /**
+         * 表示 v-model 是一个对象，使用 keyField 绑定对象
+         */
+        valueIsObject: {
+            type: Boolean, default() {
+                return false
             }
         },
         readOnly: {
@@ -390,10 +398,11 @@ export default {
                 }
 
                 //先使用字符串格式值对 data2进行查找。
-                fullModel = this.data2.filter(it => it[this.keyField] == v);
+                fullModel = this.data2.filter(it => v.includes(it[this.keyField]));
 
                 v = nv;
             }
+
             this.$emit("input", v);
             this.$emit("change", v, fullModel || {});
             return;
@@ -540,13 +549,17 @@ export default {
             }
 
             //如果 v 是对象，先转成值
-            var type = v.Type;
-            if (["map", "object"].includes(type)) {
-                if (!this.keyField) {
-                    return;
-                }
+            // var type = v.Type;
+            // if (["map", "object"].includes(type)) {
+            //     if (!this.keyField) {
+            //         return;
+            //     }
+            //
+            //     v = v[this.keyField];
+            // }
 
-                v = v[this.keyField];
+            if (this.valueIsObject) {
+                v = v[this.keyField]
             }
 
             if (this.valueIsBoolean) {
@@ -591,10 +604,14 @@ export default {
             //     v = v.map(it => it[this.keyField]);
             // }
 
+            if (this.valueIsObject) {
+                v = v.map(it => it[this.keyField]);
+            }
+
             if (this.valueIsBoolean) {
-                v.map(it => jv.asBoolean(it))
+                v = v.map(it => jv.asBoolean(it))
             } else if (this.valueIsNumber) {
-                v.map(it => jv.asInt(it))
+                v = v.map(it => jv.asInt(it))
             }
 
             this.value2 = v;

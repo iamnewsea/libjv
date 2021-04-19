@@ -114,7 +114,7 @@ jv.initVue = (setting) => {
 
             var vnode = this.$vnode, vdata = vnode.data, data = vnode.context._data;
             if (vdata && vdata.model && vdata.model.expression) {
-                if ("value" in vdata.model) {
+                if (vdata.model.value) {
                     return {value: convertValue(vdata.model.value), data: data};
                 }
 

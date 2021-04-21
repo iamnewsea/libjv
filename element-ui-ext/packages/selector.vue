@@ -115,9 +115,9 @@ export default {
             }
         },
         /**
-         * 表示 v-model 是一个对象，使用 keyField 绑定对象
+         * 表示 v-model 是一个对象，使用 keyField 绑定对象，仅当多选时有效。
          */
-        valueIsObject: {
+        : {
             type: Boolean, default() {
                 return false
             }
@@ -558,9 +558,9 @@ export default {
             //     v = v[this.keyField];
             // }
 
-            if (this.valueIsObject) {
-                v = v[this.keyField]
-            }
+            // if (this.valueIsObject) {
+            //     v = v[this.keyField]
+            // }
 
             if (this.valueIsBoolean) {
                 v = jv.asBoolean(v)

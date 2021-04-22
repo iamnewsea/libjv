@@ -226,6 +226,7 @@ export default {
         },
         value: {
             deep: true, immediate: true, handler(v) {
+                this.ori_value = v;
                 this.setValue(v);
             }
         },
@@ -282,6 +283,7 @@ export default {
     },
     data() {
         return {
+            ori_value: {},
             //内部使用的数据
             data2: [],
             //单选的值
@@ -429,6 +431,10 @@ export default {
 
         //可能是对象，也可能是值。在处理之前，先转成值。
         setValue(v) {
+            if (jv.isNull(v)) {
+                v = this.ori_value;
+            }
+
             if (this.type == "radio") {
                 this.setValue_1(v);
                 return;
@@ -544,11 +550,7 @@ export default {
         //设置单选值
         setValue_1(v) {
             if (jv.isNull(v)) {
-                v = this.value1;
-
-                if (jv.isNull(v)) {
-                    v = "";
-                }
+                v = "";
             }
 
             if (v === "") {
@@ -588,11 +590,7 @@ export default {
         //设置多选值
         setValue_2(v) {
             if (jv.isNull(v)) {
-                v = this.value2;
-
-                if (jv.isNull(v)) {
-                    v = [];
-                }
+                v = [];
             }
 
             if (["array", "set"].includes(v.Type) == false) {

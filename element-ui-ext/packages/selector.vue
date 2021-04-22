@@ -399,8 +399,16 @@ export default {
 
                 //先使用字符串格式值对 data2进行查找。
                 fullModel = this.data2.filter(it => v.includes(it[this.keyField]));
-
-                v = nv;
+                if (this.valueIsObject) {
+                    v = fullModel.map(it => {
+                        var r = {};
+                        r[this.keyField] = it[this.keyField];
+                        r[this.valueField] = it[this.valueField];
+                        return r;
+                    })
+                } else {
+                    v = nv;
+                }
             }
 
             this.$emit("input", v);

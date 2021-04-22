@@ -403,7 +403,7 @@ export default {
                     v = fullModel.map(it => {
                         var r = {};
                         r[this.keyField] = it[this.keyField];
-                        r[this.valueField] = it[this.valueField];
+                        r[this.labelField] = it[this.labelField];
                         return r;
                     })
                 } else {

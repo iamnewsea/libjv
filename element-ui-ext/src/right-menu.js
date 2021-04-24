@@ -21,7 +21,7 @@ export default {
                     menu.style.top = ev.pageY + "px";
                     menu.classList.remove("context-menu-hide");
                     menu.classList.add("context-menu-show");
-
+                    menu.target = ev.target;
 
                     setTimeout(() => {
                         var chkEvent = jv.createEvent("show", {});

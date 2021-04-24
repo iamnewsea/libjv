@@ -19,6 +19,7 @@ import image_edit from '../packages/image-edit.vue';
 
 //引入即可
 import "./jv_vue"
+import "./ext.scss"
 
 import Col from "../packages/col"
 import Row from "../packages/row"

@@ -242,6 +242,10 @@ export default {
             this.loading = true;
             if (this.url) {
                 this.$http.post(this.url, para).then(res => {
+                    if (!res.data.data) {
+                        res.data.data = [];
+                    }
+
                     this.$emit("loaded", res, para);
                     var newData = res.data.data[0] || {};
 

@@ -5,7 +5,7 @@ import jv from "libjv"
     jv.last_msgs = {};
     jv.showLastInfo = function () {
         if (!jv.last_msgs.info) return;
-        jv.info.apply(null, jv.last_msgs.info);
+        (top.jv || jv).info.apply(null, jv.last_msgs.info);
     };
 
     jv.alert = function (msg, title, opt) {
@@ -40,7 +40,7 @@ import jv from "libjv"
 
     jv.showLastError = function () {
         if (!jv.last_msgs.error) return;
-        jv.error.apply(null, jv.last_msgs.error);
+        (top.jv || jv).error.apply(null, jv.last_msgs.error);
     };
 
     jv.error = function (msg, title, opt) {

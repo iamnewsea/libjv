@@ -2,6 +2,7 @@
 
 import c from '../packages/c.vue';
 import e from '../packages/e.vue';
+import sect from '../packages/sect.vue';
 import kv from '../packages/kv.vue';
 import selector from '../packages/selector.vue';
 import my_list from '../packages/my-list.vue';
@@ -25,9 +26,9 @@ import Col from "../packages/col"
 import Row from "../packages/row"
 
 const js_components = [
-    Col,Row
+    Col, Row
 ]
-js_components.forEach(component=>{
+js_components.forEach(component => {
     component.install = function (Vue) {
         Vue.component(component.name, component);
     };
@@ -35,6 +36,7 @@ js_components.forEach(component=>{
 
 const components = [
     c, e,
+    sect,
     kv,
     selector,
     my_list,

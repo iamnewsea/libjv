@@ -154,7 +154,7 @@ tinymce显示错乱
 
 .chk-msg {
     color: red;
-    padding: 5px 0;
+    padding: 1px 0 5px;
 }
 
 .link {

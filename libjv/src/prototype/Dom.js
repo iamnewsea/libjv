@@ -159,6 +159,18 @@
         }, enumerable: false
     });
 
+    /**
+     * 获取从根元素到该元素的所有路径
+     */
+    Object.defineProperty(Element.prototype, "wbs", {
+        value() {
+            var p = this.parentElement;
+            if (p) {
+                return [...p.wbs(), this];
+            }
+            return [this];
+        }, enumerable: false
+    });
 
     if (!Element.prototype.closest) {
         //兼容性添加。

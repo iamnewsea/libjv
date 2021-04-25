@@ -283,7 +283,7 @@ export default {
     },
     data() {
         return {
-            ori_value: {},
+            ori_value: null,
             //内部使用的数据
             data2: [],
             //单选的值

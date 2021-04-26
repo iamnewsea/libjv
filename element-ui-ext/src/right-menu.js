@@ -11,32 +11,42 @@ export default {
             inserted(el, binding, vnode) {
                 var ref = binding.arg || binding.expression,
                     menu = vnode.context.$refs[ref];
+
                 if (menu) {
                     menu.classList.add("context-menu-hide");
                 }
+
                 el.addEventListener("contextmenu", function (ev) {
+                    var menu = menu = vnode.context.$refs[ref];
+                    if (!menu) return;
+
+                    menu.target = ev.target;
+
+                    var chkEvent = jv.createEvent("show", {cancelable: true});
+                    menu.trigger(chkEvent);
+
+                    if (chkEvent.defaultPrevented || (chkEvent.returnValue === false)) {
+                        return;
+                    }
+
+
                     ev.preventDefault();
-                    var menu = vnode.context.$refs[ref];
                     menu.style.left = ev.pageX + "px";
                     menu.style.top = ev.pageY + "px";
                     menu.classList.remove("context-menu-hide");
                     menu.classList.add("context-menu-show");
-                    menu.target = ev.target;
 
-                    setTimeout(() => {
-                        var chkEvent = jv.createEvent("show", {});
+
+                    document.once("click", function (event) {
+                        var menu = menu = vnode.context.$refs[ref];
+                        if (!menu) {
+                            return;
+                        }
+                        var chkEvent = jv.createEvent("hide", {});
                         menu.trigger(chkEvent);
-
-                        document.once("click", function (event) {
-                            var menu = vnode.context.$refs[ref];
-                            if (menu) {
-                                var chkEvent = jv.createEvent("hide", {});
-                                menu.trigger(chkEvent);
-                                menu.classList.remove("context-menu-show");
-                                menu.classList.add("context-menu-hide");
-                            }
-                        });
-                    }, 0);
+                        menu.classList.remove("context-menu-show");
+                        menu.classList.add("context-menu-hide");
+                    });
                     return false;
                 });
 

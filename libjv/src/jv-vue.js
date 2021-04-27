@@ -114,11 +114,13 @@ jv.initVue = (setting) => {
 
             var vnode = this.$vnode, vdata = vnode.data, data = vnode.context._data;
             if (vdata && vdata.model && vdata.model.expression) {
-                if (vdata.model.value) {
+                //什么情况下？ 用 vdata.model.value 判断 ？
+                if ("value" in vdata.model) {
                     return {value: convertValue(vdata.model.value), data: data};
                 }
 
                 //对于 el-input 它的值在 component._data.currentValue,对于其它 v-model 它的值在  vdata.model.value
+                //对于 scope.row.name 这种表达式来说， 肯定会出错。
                 var ret = jv.evalExpression(data, vdata.model.expression);
                 if (jv.evalExpressionError) {
                     return {};

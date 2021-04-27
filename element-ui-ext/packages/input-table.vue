@@ -2,21 +2,7 @@
     <my-list v-model="tableData" :noQueryPart="true">
         <el-table-column type="index" clign="center" width="50"></el-table-column>
 
-        <el-table-column v-for="(item,index) in tableFields" :key="item.field" :label="item.title" align="center"
-                         :width="item.width">
-            <template slot-scope="scope">
-                <el-input v-model="scope.row[item.field]" @change="change(scope.row)"
-                          @blur="change(scope.row)"/>
-            </template>
-        </el-table-column>
-
-<!--使用：
-<template slot-scope="scope">
-    <el-table-column  align="center" :prop="scope.cell.field" :label="scope.cell.title">
-    </el-table-column>
-</>template> -->
-        <slot v-bind:cell="item"></slot>
-
+        <slot></slot>
         <el-table-column align="center" width="68">
             <template slot="header" slot-scope="scope">
                 <el-button
@@ -78,46 +64,52 @@ export default {
             type: Array, default: () => []
         },
         // [{title,field,width}]
-        fields: {
-            type: [String, Array], default: () => ""
-        }
+        // fields: {
+        //     type: [String, Array], default: () => ""
+        // }
     },
     data() {
         return {
             tableData: {data: []},
-            tableFields: [],
-            displayField: ""
+            // tableFields: [],
+            // displayField: ""
         }
     },
     watch: {
         value: {
             immediate: true, deep: true, handler(val) {
+                if (this.tableData.data == val) return;
                 this.tableData.data = val
             }
         },
-        fields: {
+        "tableData.data": {
             immediate: true, deep: true, handler(val) {
-                if (!val || !val.length) {
-                    this.tableFields = [];
-                    return;
-                }
-
-                if (val.Type != "string") {
-                    this.tableFields = val;
-                    return;
-                }
-
-                this.tableFields = val.split(",").map(it => {
-                    var sect = it.split(":");
-                    return {field: sect[0], title: sect[1]};
-                });
+                this.$emit("value", this.tableData.data)
             }
         }
+        // fields: {
+        //     immediate: true, deep: true, handler(val) {
+        //         if (!val || !val.length) {
+        //             this.tableFields = [];
+        //             return;
+        //         }
+        //
+        //         if (val.Type != "string") {
+        //             this.tableFields = val;
+        //             return;
+        //         }
+        //
+        //         this.tableFields = val.split(",").map(it => {
+        //             var sect = it.split(":");
+        //             return {field: sect[0], title: sect[1]};
+        //         });
+        //     }
+        // }
     },
     mounted() {
     },
     methods: {
-        change(row) {
+        change() {
             this.$emit("value", this.tableData.data)
         },
         remove_click(scope) {

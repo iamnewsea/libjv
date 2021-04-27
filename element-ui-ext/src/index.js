@@ -20,7 +20,11 @@ import image_edit from '../packages/image-edit.vue';
 
 //引入即可
 import "./jv_vue"
+
+
+import "./base.scss"
 import "./ext.scss"
+import "./menu.scss"
 
 import Col from "../packages/col"
 import Row from "../packages/row"

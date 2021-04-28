@@ -433,7 +433,7 @@ jv.initVue = (setting) => {
                 if (!this.readyState     //这是FF的判断语句，因为ff下没有readyState这人值，IE的readyState肯定有值
                     || this.readyState == 'loaded' || this.readyState == 'complete'   // 这是IE的判断语句
                 ) {
-                    r();
+                    r(fileName);
                 }
             };
 

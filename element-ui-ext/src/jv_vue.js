@@ -78,7 +78,7 @@ import jv from "libjv"
         }, opt));
     };
 
-
+    /* my-list 专用API */
     jv.setLastRowId = function (route, ref, lastRowId) {
         if (!lastRowId) {
             lastRowId = ref;
@@ -86,9 +86,8 @@ import jv from "libjv"
         }
 
         var storeId = ref || "list";
-        var ori_value = this.$my_store.getItem(route, storeId)
-        ori_value["lastRowId"] = lastRowId;
-        this.$my_store.setItem(route, storeId, ori_value);
+        var key = "ext:" + storeId + ":" + route;
+        localStorage.patchJson(key, {lastRowId:lastRowId});
     }
 
 })();

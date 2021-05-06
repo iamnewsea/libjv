@@ -296,6 +296,35 @@
     });
 
 
+    Object.defineProperty(Storage.prototype, "getJson", {
+        value(key) {
+            var value = this.getItem(key);
+            if (!value) return null;
+            return JSON.parse(value);
+        }, enumerable: false
+    })
+
+    Object.defineProperty(Storage.prototype, "setJson", {
+        value(key, json) {
+            if (jv.isNull(json)) {
+                return this.removeItem(key);
+            }
+            this.setItem(key, JSON.stringify(json))
+        }, enumerable: false
+    })
+
+    /*在原来Json基础上修改Json*/
+    Object.defineProperty(Storage.prototype, "patchJson", {
+        value(key, json) {
+            if (jv.isNull(json)) {
+                return;
+            }
+
+            var value2 = Object.assign({}, this.getJson(key), json)
+            this.setItem(key, JSON.stringify(value2));
+        }, enumerable: false
+    })
+
     //只读化.
     Object.defineProperty(Element.prototype, "nonEdit", {
         value() {

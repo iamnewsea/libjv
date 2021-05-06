@@ -127,11 +127,12 @@ export default {
     mounted() {
         if (this.store) {
             var storeId = this.$vnode.data.ref || "list";
-            var store = this.$my_store.getJson(storeId);
+            var key = "ext:" + storeId + ":" + this.$route.fullPath;
+            var store = localStorage.getJson(key) || {};
             this.total = store.total || 0;
             this.pageNumber = store.pageNumber || 1;
             this.lastRowId = store.lastRowId || "";
-            this.query2 = Object.assign({}, this.query2, store.query, this.query);
+            this.query2 = Object.assign({}, this.query2, this.query, store.query);
         }
         this.loadData();
     },
@@ -179,7 +180,8 @@ export default {
         //获取保存的查询条件
         getStoredQuery() {
             var storeId = this.$vnode.data.ref || "list";
-            return this.$my_store.getJson(storeId).query;
+            var key = "ext:" + storeId + ":" + this.$route.fullPath;
+            return (localStorage.getJson(key) || {}).query;
         },
         setTotal(total) {
             this.total = total;
@@ -190,7 +192,8 @@ export default {
         setLastRowId(lastRowId) {
             this.lastRowId = lastRowId;
             var storeId = this.$vnode.data.ref || "list";
-            this.$my_store.setJson(storeId, Object.assign(this.$my_store.getJson(storeId), {lastRowId: lastRowId}));
+            var key = "ext:" + storeId + ":" + this.$route.fullPath;
+            localStorage.patchJson(key, {lastRowId: lastRowId});
         },
         setLastRow(row) {
             var lastRowId = jv.evalExpression(row, this.rowKey || 'id');
@@ -307,8 +310,8 @@ export default {
 
                 if (this.store) {
                     var storeId = this.$vnode.data.ref || "list";
-
-                    this.$my_store.setJson(storeId, Object.assign(this.$my_store.getJson(storeId), storeData));
+                    var key = "ext:" + storeId + ":" + this.$route.fullPath;
+                    localStorage.patchJson(key, storeData);
                 }
 
                 this.$emit("input", this.tableData);
@@ -348,7 +351,7 @@ export default {
  * query 查询：绑定传递到服务器端的查询条件，额外的，还会增加两个查询字段：skip,take。
  * page-size 每页条数：即 take , 默认10条
  * row-key 返回数据标志每一行的key,默认是 id，lastRowId 使用。
- * store 是否存储： 默认为true。会在查询时，把 query,total,skip,take,pageNumber, 保存到 $my_store.setJson(ref,{}) 中。
+ * store 是否存储： 默认为true。会在查询时，把 query,total,skip,take,pageNumber, 保存到 localStorage 中。
  *
  * 使用方式：
  * mounted 方法

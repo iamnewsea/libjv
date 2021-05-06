@@ -53,18 +53,12 @@ jv.initVue = (setting) => {
     }, false);
 
     //创建简单的 local store
-    Object.defineProperty(vueProtype, "$my_store", {
+/*    Object.defineProperty(vueProtype, "$my_store", {
         get() {
             return localStorage.my_store;
         }, enumerable: false
-    });
+    });*/
 
-    //创建简单的 session store
-    Object.defineProperty(vueProtype, "$my_session_store", {
-        get() {
-            return sessionStorage.my_store;
-        }, enumerable: false
-    });
 
     //重置数据
     Object.defineProperty(vueProtype, "$resetData", {

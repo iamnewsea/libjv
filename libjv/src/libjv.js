@@ -142,7 +142,6 @@ jv.getUrlHost = (url) => {
 //---------------------------------------------
 
 
-
 //缓存在内存的数据
 jv.cache = {};
 // jv.getCacheData = function(url){
@@ -1002,15 +1001,25 @@ let param_jmap = (obj) => {
 };
 
 /**
+ * 获取Url中 非 _部分
+ * @param url
+ * @private
+ */
+jv.getUrlWithout_ = url =>{
+    var queryJson= jv.query2Json(url);
+    Object.keys(queryJson).filter(it=>it.startsWith("_") && it.endsWith("_")).forEach(it=>{
+        delete queryJson[it];
+    })
+    return jv.param(queryJson,true);
+}
+
+/**
  * 把 JSON 转换为 URL 格式。
  * @param obj
  * @returns {string}
  */
 jv.param = (obj, withHost) => {
     var host = withHost && obj.getUrlPart && obj.getUrlPart() || "";
-    if (host) {
-        host += "?"
-    }
     var ret = param_jmap(obj);
     var ary = [];
     ary.pushAll(Object.keys(ret.json).map(it => {
@@ -1018,7 +1027,7 @@ jv.param = (obj, withHost) => {
     }));
     ary.pushAll(ret.ary)
 
-    return host + ary.join("&")
+    return [host, ary.join("&")].filter(it => it).join("?")
 };
 
 jv.getOrPutDiv = (divId, attributes, styles) => {

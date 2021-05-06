@@ -1,5 +1,4 @@
 //-----------------------------------------------------------------
-
 (function () {
     // Node环境需要
     if (typeof document === 'undefined') {
@@ -296,9 +295,12 @@
     });
 
 
+
     Object.defineProperty(Storage.prototype, "getJson", {
         value(key) {
-            var value = this.getItem(key);
+            //去除 _{名称}_ 前后下划线的部分。
+            var url = jv.getUrlWithout_(key);
+            var value = this.getItem(url);
             if (!value) return null;
             return JSON.parse(value);
         }, enumerable: false
@@ -306,10 +308,12 @@
 
     Object.defineProperty(Storage.prototype, "setJson", {
         value(key, json) {
+            var url = jv.getUrlWithout_(key);
+
             if (jv.isNull(json)) {
-                return this.removeItem(key);
+                return this.removeItem(url);
             }
-            this.setItem(key, JSON.stringify(json))
+            this.setItem(url, JSON.stringify(json))
         }, enumerable: false
     })
 
@@ -319,9 +323,10 @@
             if (jv.isNull(json)) {
                 return;
             }
+            var url = jv.getUrlWithout_(key);
 
-            var value2 = Object.assign({}, this.getJson(key), json)
-            this.setItem(key, JSON.stringify(value2));
+            var value2 = Object.assign({}, this.getJson(url), json)
+            this.setItem(url, JSON.stringify(value2));
         }, enumerable: false
     })
 

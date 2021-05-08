@@ -53,11 +53,11 @@ jv.initVue = (setting) => {
     }, false);
 
     //创建简单的 local store
-/*    Object.defineProperty(vueProtype, "$my_store", {
-        get() {
-            return localStorage.my_store;
-        }, enumerable: false
-    });*/
+    /*    Object.defineProperty(vueProtype, "$my_store", {
+            get() {
+                return localStorage.my_store;
+            }, enumerable: false
+        });*/
 
 
     //重置数据
@@ -180,10 +180,11 @@ jv.initVue = (setting) => {
                 return null;
             }
 
+            var __vue__ = this.__vue__;
             if (this.$vnode) {
                 return recusion_vue(this, findExp);
-            } else if (this.__vue__) {
-                return recusion_vue(this.__vue__, findExp);
+            } else if (__vue__) {
+                return recusion_vue(__vue__, findExp);
             }
             return recusion_html(this, findExp);
         }, enumerable: false
@@ -199,8 +200,9 @@ jv.initVue = (setting) => {
             var ret = callback(this);
             if ((ret === false) || (ret === 0) || (ret === -1)) return false;
 
-            for (var i in this.$children) {
-                var ret = this.$children[i].$RecursionVNode(callback);
+            var child = this.$children;
+            for (var i in child) {
+                var ret = child[i].$RecursionVNode(callback);
                 if (ret === -1) {
                     return false;
                 }
@@ -209,10 +211,15 @@ jv.initVue = (setting) => {
         }, enumerable: false
     });
 
-    //向上查找Vue元素.
+    /**
+     * Html元素向上找Vue元素,如果参数为空，找向上的第一个Vue元素。
+     **/
     Object.defineProperty(vueProtype, "$Closest", {
         value(vueTagName) {
             let cur = this;
+            if (!vueTagName && cur.$vnode) {
+                return cur;
+            }
             while (cur) {
                 if (cur.$vnode && cur.$vnode.componentOptions.tag == vueTagName) {
                     return cur;
@@ -222,7 +229,9 @@ jv.initVue = (setting) => {
         }, enumerable: false
     });
 
-    /*Html元素向上找Vue元素*/
+    /**
+     * Html元素向上找Vue元素,如果参数为空，找向上的第一个Vue元素。
+     **/
     Object.defineProperty(HTMLElement.prototype, "$Closest", {
         value(vueTagName) {
             let cur = this;

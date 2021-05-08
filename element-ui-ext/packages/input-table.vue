@@ -1,5 +1,5 @@
 <template>
-    <my-list v-model="tableData" :noQueryPart="true">
+    <my-list v-bind="$attrs" v-model="tableData" :noQueryPart="true">
         <el-table-column type="index" clign="center" width="50"></el-table-column>
 
         <slot></slot>
@@ -45,10 +45,15 @@ export default {
     inheritAttrs: false,
     props: {
         readOnly: {
-            type: Boolean, default() {
-                return false
-            }
+            type: Boolean, default: () => false
         },
+        // defaultSort: {
+        //     type: String, default: () => ""
+        // },
+        // //ascending, descending
+        // order: {
+        //     type: String, default: () => ""
+        // },
         // canMoveDown: {
         //     type: Boolean, default() {
         //         return false
@@ -84,7 +89,7 @@ export default {
         },
         "tableData.data": {
             immediate: true, deep: true, handler(val) {
-                this.$emit("value", this.tableData.data)
+                this.$emit("input", this.tableData.data)
             }
         }
         // fields: {
@@ -110,16 +115,16 @@ export default {
     },
     methods: {
         change() {
-            this.$emit("value", this.tableData.data)
+            this.$emit("input", this.tableData.data)
         },
         remove_click(scope) {
             var rowIndex = scope.$index;
             this.tableData.data.removeAt(rowIndex)
-            this.$emit("value", this.tableData.data)
+            this.$emit("input", this.tableData.data)
         },
         add_click() {
             this.tableData.data.push({});
-            this.$emit("value", this.tableData.data);
+            this.$emit("input", this.tableData.data);
         }
     }
 }

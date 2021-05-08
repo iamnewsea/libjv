@@ -1,27 +1,26 @@
 <template>
-    <div style="display: inline-block">
+    <div class="my-ref">
         <div @click="popClick">
-      <span v-for="(item) in oriValue" :key="item.id" class="tag-product-name"
-            :style="{minWidth: computeWidth(item.name && item.name.length)}">
+            <span v-for="(item) in oriValue" :key="item.id" class="tag-product-name"
+                  :style="{minWidth: computeWidth(item.name && item.name.length)}">
 
 
-          <el-tag @click.prevent.stop="popClick"
-                  :closable="!readOnly" :close-transition="true"
-                  @close.prevent.stop="removeTagClose(item.id,$event)" style="margin-right:18px;margin-bottom: 8px;">
-<!--              {{item.name}}-->
-            <slot name="display" v-bind:item="item">
-              {{ item.name }}
-            </slot>
-          </el-tag>
-        </span>
+              <el-tag @click.prevent.stop="popClick"
+                      :closable="!readOnly" :close-transition="true"
+                      @close.prevent.stop="removeTagClose(item.id,$event)"
+                      style="margin-right:18px;margin-bottom: 8px;">
+    <!--              {{item.name}}-->
+                <slot name="display" v-bind:item="item">
+                  {{ item.name }}
+                </slot>
+              </el-tag>
+            </span>
             <slot name="button" v-if="!readOnly && !oriValue.length">
                 <el-button size="mini" icon="el-icon-folder-opened">选择{{ name }}</el-button>
             </slot>
         </div>
 
-        <el-dialog ref="dialog" :title="'选择 ' +name" :visible.sync="popOpen" :center="true" width="80%" append-to-body
-                   style="padding:20px;">
-
+        <el-dialog ref="dialog" :title="'选择 ' +name" :visible.sync="popOpen" :center="true" width="80%" append-to-body>
 
             <my-list ref="ref" :url="url" :query="query" :page-size="pageSize" @loaded="dataLoaded"
                      @row-dblclick="dbl_click"
@@ -29,7 +28,6 @@
                      v-bind="[attrs]"
             >
                 <slot></slot>
-
 
                 <template #query="scope">
                     <slot name="query" v-bind:query="scope.query"></slot>
@@ -50,6 +48,7 @@
         </el-dialog>
     </div>
 </template>
+
 <script>
 /**
  *插槽：
@@ -88,15 +87,11 @@ export default {
         // minNumber: {type: Number, default: 3},
         name: {
             type: String, default: () => ""
-        }, //显示的主体名称
+        },
+        // 回传id
         id: {
             type: [Object, String, Number], default: () => ""
-        },    //标志数据，在change时传回。
-        // query: {
-        //     type: Object, default: function () {
-        //         return {}
-        //     }
-        // },
+        },
         value: {
             type: [Object, Array], default: () => []
         }
@@ -248,3 +243,10 @@ export default {
     }
 }
 </script>
+
+
+<style>
+.my-ref {
+    display: inline-block;
+}
+</style>

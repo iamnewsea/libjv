@@ -3,9 +3,11 @@
         <template v-if="readOnly">
             <el-tag v-for="(item,index) in items" :key="index">{{ getDisplay(item) }}</el-tag>
         </template>
-        <el-input v-else v-for="(item,index) in items" :key="index"
-                  v-model="valueField? items[index][valueField] : items[index]" @change="change(index)"
-                  @blur="change(index)">
+        <el-input v-else v-for="(item,index) in items"
+                  :key="index"
+                  v-model="valueField? items[index][valueField] : items[index]"
+                  @change="change(index)"
+        >
             <template slot="prepend">
                 <slot name="prepend"></slot>
             </template>

@@ -43,7 +43,7 @@ export default {
             type: String, default: () => ""
         },
         value: {
-            type: [Object, Array], default: () => []
+            type: String, default: () => ""
         },
         length: {
             type: Number, default: () => 32

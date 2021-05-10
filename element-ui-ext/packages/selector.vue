@@ -194,8 +194,20 @@ export default {
 
           if (this.valueIsBoolean) {
             data = keys.map(it => {
-              return {name: it ? jv.asBoolean(it) : it, remark: data[it]};
+                var key = it;
+                if( key === "true") key = true;
+                else if( key === "false") key = false;
+
+              return {name: key, remark: data[it]};
             });
+          } else if( this.valueIsNumber){
+              data = keys.map(it => {
+                  var key = it;
+                  if( key === "0") key = 0;
+                  else if( key ) key = jv.asInt(key);
+
+                  return {name: key, remark: data[it]};
+              });
           } else {
             data = keys.map(it => {
               return {name: it, remark: data[it]};
@@ -530,7 +542,7 @@ export default {
         }
       }
 
-      this.setValue();
+      this.setValue(this.value);
 
       if (jv.dataEquals(this.data2, data)) {
         return;

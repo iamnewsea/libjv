@@ -69,36 +69,42 @@ import jv from "./libjv"
 
     jv.chk_types = {
         "float": function (value, chk_body) {
-            return (/^[+-]?[0-9]+.?[0-9]*$/).test(value);
+            return (/^[+-]?[0-9]+.?[0-9]*$/).test(value) ? "" : "请输入小数格式";
         },
         "int": function (value, chk_body) {
-            return (/^[+-]?[0-9]+$/).test(value);
+            return (/^[+-]?[0-9]+$/).test(value) ? "" : "请输入数字格式";
         },
         "date": function (value, chk_body) {
-            return (/^\d{4}[-/]([01]?\d|2[0-4])[-/]([0-2]?\d|3[0-1])$/).test(value);
+            return (/^\d{4}[-/]([01]?\d|2[0-4])[-/]([0-2]?\d|3[0-1])$/).test(value) ? "" : "请输入日期格式";
         },
         "date-time": function (value, chk_body) {
-            return (/^\d{4}[-/]([01]?\d|2[0-4])[-/]([0-2]?\d|3[0-1]) ([01]?\d|2[0-3]):[0-5]?\d:[0-5]?\d$/).test(value);
+            return (/^\d{4}[-/]([01]?\d|2[0-4])[-/]([0-2]?\d|3[0-1]) ([01]?\d|2[0-3]):[0-5]?\d:[0-5]?\d$/).test(value) ? "" : "请输入日期时间格式";
         },
         "time": function (value, chk_body) {
-            return (/^([01]?\d|2[0-3]):[0-5]?\d:[0-5]?\d$/).test(value);
+            return (/^([01]?\d|2[0-3]):[0-5]?\d:[0-5]?\d$/).test(value) ? "" : "请输入时间格式";
         },
         "email": function (value, chk_body) {
-            return (/^([\w-])+@([\w-])+(\.[\w-]{1,})$/).test(value);
+            return (/^([\w-])+@([\w-])+(\.[\w-]{1,})$/).test(value) ? "" : "请输入邮件格式";
         },
         //名称
         "name": function (value, chk_body) {
-            return (/^[\w\d]+$/).test(value);
+            return (/^[\w\d]+$/).test(value) ? "" : "只能输入数字及字母";
         },
         //*号必填
         "*": function (value, chk_body) {
-            if (value === 0) return true;
-            if (value === false) return true;
-            return jv.hasValue(value);
+            if (value === 0) return;
+            if (value === false) return;
+            return jv.hasValue(value) ? "" : "必填项";
+        },
+        ":":function(value,chk_body,data){
+            return eval("(value,data) => {" + chk_body + "}")(value, data);
+        },
+        "reg":function(value,chk_body){
+
         },
         //文本类型，返回 true,可空.
         "": function () {
-            return true;
+            return "";
         }
     };
 
@@ -108,10 +114,6 @@ import jv from "./libjv"
         var chk_type_index = Array.from(exp).findIndex(it => {
             return !isValidateChar(it.charCodeAt())
         });
-
-        if (chk_type_index < 0) {
-            chk_type_index = exp.length;
-        }
         return chk_type_index;
     };
 
@@ -297,40 +299,30 @@ import jv from "./libjv"
     jv.chk_core = function (chk, value, data) {
         var ret = {result: true};
 
-        var chk_type_index = getNextNonCharIndex(chk),
-            chk_type = chk.slice(0, chk_type_index),
-            chk_body;
-
-        if (chk[0] == ':') {
-            chk_type = ":";
-            chk_body = chk.slice(1);
-        } else if (chk_type == "reg") {
-            if (chk[chk_type_index] != ':') {
-                ret.result = false;
-                ret.detail = "[Error]正则表达式缺少冒号";
-                return ret;
-            }
-            chk_body = chk.slice(chk_type_index + 1);
-        } else {
-            chk_body = chk.slice(chk_type_index);
+        //如果开头是?表示可空.
+        if (chk[0] == '?' && (value === "" || value === 0)) {
+            return ret;
         }
 
+        var chk_type_index = getNextNonCharIndex(chk),
+            chk_type = "",
+            chk_body = "";
 
-        //如果是类型带着?表示可空.
-        if (chk_body[0] == '?') {
-            chk_body = chk_body.slice(1);
-            if (!value) {
-                chk = "";
-                chk_type = "";
-                chk_body = "";
-            }
+        //找不到
+        if (chk_type_index < 0) {
+            chk_type = chk;
+        } else if (chk_type_index === 0) {
+            chk_type = chk[0];
+            chk_body = chk.slice(1).trim();
+        } else {
+            chk_type = chk.slice(0, chk_type_index);
+            chk_body = chk.slice(chk_type_index)
         }
 
         if (chk_type == ":") {
             //函数内部也可以调用 jv.chk_core("enum('a','b','c')",value,data);
-            var r = eval("(value,data) => {" + chk_body + "}")(value, data);
-            ret.result = !r;
-            ret.msg = r;
+            ret.msg = eval("(value,data) => {" + chk_body + "}")(value, data);
+            ret.result = !ret.msg;
             return ret;
         } else if (chk_type == "reg") {
             //如果不是类型，则整体按正则算。
@@ -359,15 +351,10 @@ import jv from "./libjv"
                 return ret;
             }
 
-            var r2 = jv.chk_types[chk_type](value, chk_body);
+            ret.detail = jv.chk_types[chk_type](value, chk_body);
 
-            if (!r2) {
+            if (ret.detail) {
                 ret.result = false;
-                if (chk_type == "*") {
-                    ret.detail = "必填项!";
-                } else {
-                    ret.detail = "需要 " + chk_type + " 类型";
-                }
                 return ret;
             }
 

@@ -23,11 +23,30 @@ if (this.$refs.query.chk() == false) {
 在指定 dom 上添加 chk 属性，对每一个chk属性,验证里面的 v-model 绑定表达式值 或 input,textarea 元素的值. 优先使用 v-model值。chk用法：
 可以自定义 chkmsg 属性用于校验失败后显示的消息。 如果不定义会有默认消息提示。
 
-1. 冒号开头，表示回调函数，参数：当前值,vue定义的data ,这是最灵活的方式. 函数返回的是错误消息，没有消息表示通过。
+
+### 整体结构
+
+```{value}``` ```?``` ```chk_type``` ```表达式```
+
+#### 结束说明
+1. 以 {} 包裹开头，表示对v-model进行求值。
+2. 问号开头，表示可空，如果值为空，则直接跳过，不进行任何校验。
+3. chk_type 可以是 ```:```,```@```, ```自定义类型```
+4. 表达式是其作部分。
+   
+
+### 规则 
+1. chk_type 是冒号，表示回调函数，其实部分是表达式式，接收参数：当前值,vue定义的data ,这是最灵活的方式. 函数返回的是错误消息，没有消息表示通过。
 
 > chk=": if( value.length<8 ) return '长度不能小于8'; "
 
-2. 内置类型写法 目前插件有以下内置类型 int,float,date,time,datetime,email
+3. 绑定自定义函数，也是很灵活的写法，接收参数：当前值,vue定义的data
+
+> chk="@chk_order_code"  
+
+需要在本 vue 页面写一个  chk_order_code(value){}  的函数。
+
+4. 内置类型写法 目前插件有以下内置类型 int,float,date,time,datetime,email
 
 公式:
 > chk_type{值表达式}(开始值,结束值)
@@ -47,13 +66,18 @@ int[20,79]            //表示是int类型,大于等于20,小于等于79
 
 > chk="int"
 
-3. 枚举写法
+5. 枚举写法
 
 ```
-enum(红,黄,蓝)
+chk="enum(红,黄,蓝)"
+```
+或
+```
+//表示使用 jv.enum.UserSexEnum.getData().map(it=>it.name) 进行校验。
+chk="enum:UserSexEnum"
 ```
 
-4. 正则表达式写法
+6. 正则表达式写法
 
 ```
 chk="reg{值}:正则表达式"
@@ -62,7 +86,7 @@ chk="reg{值}:正则表达式"
 chk="reg{value.code}:/^\d{9,11}$/"   表示value.code 必须是9到11位数字.
 ```
 
-5. 扩展类型 如果需要重复使用某一个通用的类型,可以扩展,如下:
+7. 扩展类型 如果需要重复使用某一个通用的类型,可以扩展,如下:
 
 ```
  jv.chk_types["mobile"] = function(value, inputDom){

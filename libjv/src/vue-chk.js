@@ -16,26 +16,7 @@ import jv from "./libjv"
     jv.chk_range = function (chk_type, chk_body, value) {
         chk_body = chk_body.trim();
 
-        var getNextCharIndex = function (exp, char, startIndex) {
-            for (var i = startIndex || 0, len = exp.length; i < len; i++) {
-                if (exp[i] == char) return i;
-            }
-            return -1;
-        }
-
-        //{value.length}(1,4] & ( {value[0]}[3,3] | {value[1]}[5,5] )
-        //{}表示表达式，后面接着 (] 表示区间。 中间用 & | 连接。
-        if (chk_body[0] == "{") {
-            var valueRangeIndex = getNextCharIndex(chk_body, "}");
-            if (valueRangeIndex < 0) {
-                return "[Error]:表达式" + chk_body + "缺少 }";
-            }
-            value = eval("(value) => { return  " + chk_body.slice(1, valueRangeIndex) + "}")(value)
-
-            chk_body = chk_body.slice(valueRangeIndex + 1);
-        }
-
-        chk_body = chk_body.trim();
+        // (1,4]  表示 大于1 小于等于4
 
         if (chk_body[0] != '(' && chk_body[0] != '[') {
             return "[Error]:表达式" + chk_body + "非法";
@@ -46,25 +27,22 @@ import jv from "./libjv"
 
         var range = chk_body.slice(1, chk_body.length - 1).split(",").map(it => it.trim());
 
-        if (chk_type == "enum") {
-            return range.indexOf(value) >= 0;
-        }
+        var beginValue = range[0], endValue = range[1],
+            begin = chk_body[0], end = chk_body[chk_body.length - 1];
 
-
-        if (chk_body[0] == '(' && value <= range[0]) {
-            return false;
-        } else if (chk_body[0] == "[" && value < range[0]) {
-            return false;
+        if (begin == '(' && value <= beginValue) {
+            return "不能小于 " + beginValue;
+        } else if (begin == "[" && value < beginValue) {
+            return "必于大于 " + beginValue;
         } else if (range.length > 1) {
-            var lastSign = chk_body[chk_body.length - 1], lastValue = range[1];
-            if (lastSign == ")" && value >= lastValue) {
-                return false;
-            } else if (lastSign == "]" && value > lastValue) {
-                return false;
+            if (end == ")" && value >= endValue) {
+                return "必于小于 " + endValue;
+            } else if (end == "]" && value > endValue) {
+                return "不能大于 " + endValue;
             }
         }
 
-        return true;
+        return "";
     };
 
     jv.chk_types = {
@@ -96,10 +74,16 @@ import jv from "./libjv"
             if (value === false) return;
             return jv.hasValue(value) ? "" : "必填项";
         },
-        ":":function(value,chk_body,data){
+        "enum": function (value, chk_body) {
+            if (chk_body.slice(1, -1).split(",").map(it => it.trim()).includes(value)) {
+                return "";
+            }
+            return value + " 不在枚举范围" + chk_body;
+        },
+        ":": function (value, chk_body, data) {
             return eval("(value,data) => {" + chk_body + "}")(value, data);
         },
-        "reg":function(value,chk_body){
+        "reg": function (value, chk_body) {
 
         },
         //文本类型，返回 true,可空.
@@ -291,7 +275,7 @@ import jv from "./libjv"
     /**
      * 核心校验函数，可以从脚本中递归执行。如：
      * <input chk=": var r = jv.chk_core(int); if( r.result == false) return r.msg; "
-     * @param chk
+     * @param chk 结构： {value} ? chk_type 表达式
      * @param value
      * @param data
      * @returns {*|boolean}
@@ -299,9 +283,25 @@ import jv from "./libjv"
     jv.chk_core = function (chk, value, data) {
         var ret = {result: true};
 
+        var rang = "";
+        //先处理表达式的值
+        if (chk[0] == "{") {
+            var valueRangeIndex = chk.lastIndexOf("}");
+            if (valueRangeIndex < 0) {
+                return "[Error]:表达式" + chk + "缺少 }";
+            }
+            rang = chk.slice(1, valueRangeIndex)
+            value = eval("(value) => { return  " + rang + "}")(value)
+
+            chk = chk.slice(valueRangeIndex + 1).trim();
+        }
+
         //如果开头是?表示可空.
-        if (chk[0] == '?' && (value === "" || value === 0)) {
-            return ret;
+        if (chk[0] == '?') {
+            if (value === "" || value === 0) {
+                return ret;
+            }
+            chk = chk.slice(1).trim();
         }
 
         var chk_type_index = getNextNonCharIndex(chk),
@@ -319,60 +319,56 @@ import jv from "./libjv"
             chk_body = chk.slice(chk_type_index)
         }
 
-        if (chk_type == ":") {
-            //函数内部也可以调用 jv.chk_core("enum('a','b','c')",value,data);
-            ret.msg = eval("(value,data) => {" + chk_body + "}")(value, data);
-            ret.result = !ret.msg;
+        // if (chk_type == ":") {
+        //     //函数内部也可以调用 jv.chk_core("enum('a','b','c')",value,data);
+        //     ret.msg = eval("(value,data) => {" + chk_body + "}")(value, data);
+        //     ret.result = !ret.msg;
+        //     return ret;
+        // } else if (chk_type == "reg") {
+        //     //如果不是类型，则整体按正则算。
+        //     var reg;
+        //     ret.detail = "校验正则表达式不通过";
+        //     try {
+        //         reg = eval(chk_body);
+        //         ret.result = reg.test(value);
+        //         return ret;
+        //     } catch (e) {
+        //         ret.result = false;
+        //         ret.detail = "正则表达式非法";
+        //         return ret;
+        //     }
+        // } else if (chk) {
+
+        //如果定义了 * 号,表示必填.
+        // var chk_type2 = Object.keys(jv.chk_types).find(it => chk.startsWith(it)) || "";
+        // if (chk_type2) {
+        //     chk_type = chk_type2;
+        //     chk_body = chk.slice(chk_type.length).trim();
+        // }
+
+        if (!(chk_type in jv.chk_types)) {
+            ret.result = false;
+            ret.detail = "[Error]不识别的类型" + chk_type;
             return ret;
-        } else if (chk_type == "reg") {
-            //如果不是类型，则整体按正则算。
-            var reg;
-            ret.detail = "校验正则表达式不通过";
-            try {
-                reg = eval(chk_body);
-                ret.result = reg.test(value);
-                return ret;
-            } catch (e) {
-                ret.result = false;
-                ret.detail = "正则表达式非法";
-                return ret;
-            }
-        } else if (chk) {
-            //如果定义了 * 号,表示必填.
-            var chk_type2 = Object.keys(jv.chk_types).find(it => chk.startsWith(it)) || "";
-            if (chk_type2) {
-                chk_type = chk_type2;
-                chk_body = chk.slice(chk_type.length).trim();
-            }
+        }
 
-            if (!(chk_type in jv.chk_types)) {
-                ret.result = false;
-                ret.detail = "[Error]不识别的类型" + chk_type;
+        ret.detail = jv.chk_types[chk_type](value, chk_body);
+
+        if (ret.detail) {
+            ret.result = false;
+            return ret;
+        }
+
+        if (chk_body) {
+            // chk_body.split("&")
+            var r = jv.chk_range(chk_type, chk_body, value);
+            if (r) {
+                ret.result = !r;
+                ret.detail = rang + r;
                 return ret;
-            }
-
-            ret.detail = jv.chk_types[chk_type](value, chk_body);
-
-            if (ret.detail) {
-                ret.result = false;
-                return ret;
-            }
-
-            if (chk_body) {
-                // chk_body.split("&")
-                var r = jv.chk_range(chk_type, chk_body, value);
-                if (r === false) {
-                    ret.result = r;
-                    ret.detail = "范围不正确";
-                    return ret;
-                }
-                if (r && (r.Type == "string")) {
-                    ret.result = false;
-                    ret.detail = r;
-                    return r;
-                }
             }
         }
+
 
         return ret;
     };

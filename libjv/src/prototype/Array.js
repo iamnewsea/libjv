@@ -58,6 +58,9 @@
         }, enumerable: false
     });
 
+    /**
+     * 区别于 lastIndexOf, LastIndexOf参数可以是回调。
+     */
     Object.defineProperty(Array.prototype, "LastIndexOf", {
         value(filter) {
             if (!this.length) return -1;

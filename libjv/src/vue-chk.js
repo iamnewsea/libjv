@@ -302,6 +302,11 @@ import jv from "./libjv"
                 return ret;
             }
             chk = chk.slice(1).trim();
+        } else {
+            if (value === "" || value === 0) {
+                ret.msg = "必填项"
+                return ret;
+            }
         }
 
         var chk_type_index = getNextNonCharIndex(chk),

@@ -17,18 +17,16 @@ import jv from "./libjv"
         chk_body = chk_body.trim();
 
         // (1,4]  表示 大于1 小于等于4
-
-        if (chk_body[0] != '(' && chk_body[0] != '[') {
+        var begin = chk_body[0], end = chk_body[chk_body.length - 1]
+        if (begin != '(' && begin != '[') {
+            return "";
+        }
+        if (end != ')' && end != ']') {
             return "[Error]:表达式" + chk_body + "非法";
         }
-        if (chk_body[chk_body.length - 1] != ')' && chk_body[chk_body.length - 1] != ']') {
-            return "[Error]:表达式" + chk_body + "非法";
-        }
 
-        var range = chk_body.slice(1, chk_body.length - 1).split(",").map(it => it.trim());
-
-        var beginValue = range[0], endValue = range[1],
-            begin = chk_body[0], end = chk_body[chk_body.length - 1];
+        var range = chk_body.slice(1, -1).split(",").map(it => it.trim()),
+            beginValue = range[0], endValue = range[1];
 
         if (begin == '(' && value <= beginValue) {
             return "不能小于 " + beginValue;
@@ -363,7 +361,7 @@ import jv from "./libjv"
             return ret;
         }
 
-        ret.detail = jv.chk_types[chk_type].call(this,value, chk_body);
+        ret.detail = jv.chk_types[chk_type].call(this, value, chk_body);
 
         if (ret.detail) {
             ret.result = false;

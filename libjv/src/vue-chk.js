@@ -308,6 +308,7 @@ import jv from "./libjv"
             chk = chk.slice(1).trim();
         } else {
             if (value === "" || value === 0) {
+                ret.result = false;
                 ret.msg = "必填项"
                 return ret;
             }

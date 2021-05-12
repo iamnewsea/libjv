@@ -10,7 +10,7 @@ import jv from "./file-upload"
  */
 jv.initVue = (setting) => {
     window.jv = jv;
-    var {vue, axios, router, ajaxJavaBooleanKey, ajaxResType, ajaxErrorMsg} = setting;
+    var {vue, axios, router, ajaxJavaBooleanKey, ajaxResType, ajaxErrorMsg,elementUI} = setting;
     jv.Vue = vue;
     //关闭环境给出的提示.
     // vue.config.productionTip = false;
@@ -251,7 +251,7 @@ jv.initVue = (setting) => {
     //----------------------------------- axios
     //代理 post
 
-    jv.Vue.mixin({
+    vue.mixin({
         // data() {
         //     return {
         //         //轻量化，控制 vue_jv.an_version (data 里属性不能以 $,_ 开头。)
@@ -406,113 +406,7 @@ jv.initVue = (setting) => {
         return Promise.reject(error);
     });
 
-    jv.getIdFromUrl = function (url) {
-        return url.replace(/\//g, "-").replace(/[^0-9a-zA-Z]/g, "");
-    };
 
-    //----------------------router
-    /**
-     * 添加外部的 script 标签
-     */
-    jv.addScriptFile = (fileName, attributes) => {
-        if (!fileName) return Promise.reject();
-
-        var id = jv.getIdFromUrl(fileName);
-
-        var script = document.getElementById(id);
-        if (script) {
-            return Promise.resolve();
-        }
-        attributes = attributes || {};
-        if (!attributes.type) {
-            attributes.type = "text/javascript";
-        }
-        attributes.id = id;
-
-        var self = this;
-        return new Promise((r, e) => {
-            script = document.createElement("script");
-
-            script.onload = script.onreadystatechange = function () {
-                if (!this.readyState     //这是FF的判断语句，因为ff下没有readyState这人值，IE的readyState肯定有值
-                    || this.readyState == 'loaded' || this.readyState == 'complete'   // 这是IE的判断语句
-                ) {
-                    r.call(self, fileName);
-                }
-            };
-
-            Object.keys(attributes).forEach(it => {
-                script.setAttribute(it, attributes[it]);
-            });
-
-            script.src = fileName;
-            document.head.appendChild(script);
-        });
-    };
-
-    /**
-     * 添加 link css的文件引用。
-     */
-    jv.addLinkCssFile = (fileName, attributes) => {
-        if (!fileName) return;
-
-        var id = jv.getIdFromUrl(fileName);
-
-        var link = document.getElementById(id);
-        if (link) {
-            return;
-        }
-
-        link = document.createElement("link");
-
-        attributes = attributes || {};
-
-        if (!attributes.type) {
-            attributes.type = "text/css";
-        }
-        if (!attributes.rel) {
-            attributes.rel = "stylesheet";
-        }
-        attributes.id = id;
-
-        Object.keys(attributes).forEach(it => {
-            link.setAttribute(it, attributes[it]);
-        });
-
-        link.href = fileName;
-        document.head.appendChild(link);
-    };
-
-    //添加 style 标签
-    jv.addStyleDom = (id, cssContent, attributes) => {
-        if (!cssContent) return;
-
-
-        var style = id && document.getElementById(id);
-        if (!style) {
-            style = document.createElement("style");
-            document.head.appendChild(style);
-        }
-        attributes = attributes || {};
-
-        if (!attributes.type) {
-            attributes.type = "text/css";
-        }
-
-        if (id) {
-            attributes.id = id;
-        }
-
-        Object.keys(attributes).forEach(it => {
-            style.setAttribute(it, attributes[it]);
-        });
-
-        if (style.styleSheet) {
-            style.styleSheet.cssText = cssContent;
-        } else {
-            style.innerHTML = cssContent;
-        }
-    };
 
 
     /** PrerenderSPAPlugin 插件，需要手动触发完成事件
@@ -523,7 +417,7 @@ jv.initVue = (setting) => {
     jv.vue_spa_render_event = "render-event";
     jv.vue_spa_enum = "SpaAjaxEnum";
 
-    jv.Vue.prototype.$done = function (spa_enum, value) {
+    vueProtype.$done = function (spa_enum, value) {
         if (!value) {
             value = spa_enum;
             spa_enum = jv.vue_spa_enum;
@@ -542,38 +436,169 @@ jv.initVue = (setting) => {
         });
     };
 
-    // jv.Vue.mixin({
-    //     updated() {
-    //         var tagName = this.$vnode && this.$vnode.componentOptions.tag;
-    //         if (!tagName) {
-    //             return;
-    //         }
-    //         // var p = this.$vnode.componentOptions;
-    //         var p = this;
-    //         //有的时候不灵，很奇怪。
-    //         if (tagName == "el-button") {
-    //             if (!p.size) {
-    //                 p.size = "mini";
-    //             }
-    //
-    //         } else if (tagName == "el-table") {
-    //             // if (this.$vnode.componentOptions.tag == "my-list") {
-    //             //     return;
-    //             // }
-    //
-    //             if (jv.isNull(p.border)) {
-    //                 p.border = true;
-    //             }
-    //             if (jv.isNull(p.stripe)) {
-    //                 p.stripe = true;
-    //             }
-    //         }
-    //     }
-    // });
 
-    // router.afterEach((to, from, next) => {
-    //   jv.loadAllJson(to.fullPath);
-    // });
+    //elementUI
+    jv.initElementUI(elementUI);
+};
+
+jv.initElementUI = function(ELEMENT){
+    if(!ELEMENT) return;
+
+    ELEMENT.Button.props.size.default="mini"
+    ELEMENT.Input.props.size.default="small"
+    ELEMENT.Table.props.rowKey.default = "id";
+
+    //设置 Element-ui 属性的默认值
+    ELEMENT.Dialog.props.closeOnClickModal.default = false
+    ELEMENT.Dialog.props.top.default = "";
+    ELEMENT.Dialog.methods.setResizeDlg = function (el) {
+        var self = this;
+        var dlg_resize = function (e) {
+            var body = e.target.frameElement.parentElement;
+            self.$nextTick(() => {
+                if (!self.visible) return;
+                var bodyHeight = body.clientHeight;
+                var winHeight = body.ownerDocument.documentElement.clientHeight;
+                if ((bodyHeight + 30) < winHeight) {
+                    body.style.marginTop = ((winHeight - bodyHeight) / 2 - 24) + "px";
+                } else {
+                    body.style.marginTop = "20px";
+                }
+            });
+        }
+
+
+        var body = this.$el.children[0];
+        jv.domResize(body, dlg_resize)
+    }
+
+    ELEMENT.Dialog.methods.elChange = function (el) {
+        this.setResizeDlg(el);
+    }
+
+    var dlg_ori_mounted = ELEMENT.Dialog.mounted;
+    ELEMENT.Dialog.mounted = function () {
+        dlg_ori_mounted.call(this);
+
+        this.elChange(this.$el);
+    }
+
+    var dlg_ori_visible = ELEMENT.Dialog.watch.visible;
+    ELEMENT.Dialog.watch.visible = function (val) {
+        dlg_ori_visible.call(this, val);
+
+        if (val && this.appendToBody) {
+            this.elChange(this.$el)
+        }
+    }
+}
+
+jv.getIdFromUrl = function (url) {
+    return url.replace(/\//g, "-").replace(/[^0-9a-zA-Z]/g, "");
+};
+
+//----------------------router
+/**
+ * 添加外部的 script 标签
+ */
+jv.addScriptFile = (fileName, attributes) => {
+    if (!fileName) return Promise.reject();
+
+    var id = jv.getIdFromUrl(fileName);
+
+    var script = document.getElementById(id);
+    if (script) {
+        return Promise.resolve();
+    }
+    attributes = attributes || {};
+    if (!attributes.type) {
+        attributes.type = "text/javascript";
+    }
+    attributes.id = id;
+
+    var self = this;
+    return new Promise((r, e) => {
+        script = document.createElement("script");
+
+        script.onload = script.onreadystatechange = function () {
+            if (!this.readyState     //这是FF的判断语句，因为ff下没有readyState这人值，IE的readyState肯定有值
+                || this.readyState == 'loaded' || this.readyState == 'complete'   // 这是IE的判断语句
+            ) {
+                r.call(self, fileName);
+            }
+        };
+
+        Object.keys(attributes).forEach(it => {
+            script.setAttribute(it, attributes[it]);
+        });
+
+        script.src = fileName;
+        document.head.appendChild(script);
+    });
+};
+
+/**
+ * 添加 link css的文件引用。
+ */
+jv.addLinkCssFile = (fileName, attributes) => {
+    if (!fileName) return;
+
+    var id = jv.getIdFromUrl(fileName);
+
+    var link = document.getElementById(id);
+    if (link) {
+        return;
+    }
+
+    link = document.createElement("link");
+
+    attributes = attributes || {};
+
+    if (!attributes.type) {
+        attributes.type = "text/css";
+    }
+    if (!attributes.rel) {
+        attributes.rel = "stylesheet";
+    }
+    attributes.id = id;
+
+    Object.keys(attributes).forEach(it => {
+        link.setAttribute(it, attributes[it]);
+    });
+
+    link.href = fileName;
+    document.head.appendChild(link);
+};
+
+//添加 style 标签
+jv.addStyleDom = (id, cssContent, attributes) => {
+    if (!cssContent) return;
+
+
+    var style = id && document.getElementById(id);
+    if (!style) {
+        style = document.createElement("style");
+        document.head.appendChild(style);
+    }
+    attributes = attributes || {};
+
+    if (!attributes.type) {
+        attributes.type = "text/css";
+    }
+
+    if (id) {
+        attributes.id = id;
+    }
+
+    Object.keys(attributes).forEach(it => {
+        style.setAttribute(it, attributes[it]);
+    });
+
+    if (style.styleSheet) {
+        style.styleSheet.cssText = cssContent;
+    } else {
+        style.innerHTML = cssContent;
+    }
 };
 
 

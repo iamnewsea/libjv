@@ -81,7 +81,13 @@ import jv from "./libjv"
             return value + " 不在枚举范围" + chk_body;
         },
         ":": function (value, chk_body, data) {
-            return eval("(value,data) => {" + chk_body + "}")(value, data);
+            return eval("(value,data) => {" + chk_body + "}").apply(this, value, data);
+        },
+        "@": function (value, chk_body, data) {
+            if (!(chk_body in this)) {
+                return "找不到 " + chk_body + " 方法";
+            }
+            return this[chk_body].call(this, value, data)
         },
         "reg": function (value, chk_body) {
 
@@ -144,7 +150,7 @@ import jv from "./libjv"
 
         var chk_result = Object.assign(
             {msg: attr.chkmsg || chk_msg},
-            jv.chk_core(chk, value, data));
+            jv.chk_core.call(chk_dom.$vnode.context, chk, value, data));
 
 
         var chkEvent = jv.createEvent("chked", {
@@ -241,7 +247,7 @@ import jv from "./libjv"
 
         var chk_result = Object.assign(
             {msg: chk_msg || chk_dom.getAttribute("chkmsg")},
-            jv.chk_core(chk, value, data));
+            jv.chk_core.call(window, chk, value, data));
 
 
         var chkEvent = jv.createEvent("chked", {
@@ -291,7 +297,7 @@ import jv from "./libjv"
                 return "[Error]:表达式" + chk + "缺少 }";
             }
             rang = chk.slice(1, valueRangeIndex)
-            value = eval("(value) => { return  " + rang + "}")(value)
+            value = eval("(value) => { return  " + rang + "}").call(this, value)
 
             chk = chk.slice(valueRangeIndex + 1).trim();
         }
@@ -357,7 +363,7 @@ import jv from "./libjv"
             return ret;
         }
 
-        ret.detail = jv.chk_types[chk_type](value, chk_body);
+        ret.detail = jv.chk_types[chk_type].call(this,value, chk_body);
 
         if (ret.detail) {
             ret.result = false;

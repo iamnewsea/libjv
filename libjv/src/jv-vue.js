@@ -10,7 +10,7 @@ import jv from "./file-upload"
  */
 jv.initVue = (setting) => {
     window.jv = jv;
-    var {vue, axios, router, ajaxJavaBooleanKey, ajaxResType, ajaxErrorMsg,elementUI} = setting;
+    var {vue, axios, router, ajaxJavaBooleanKey, ajaxResType, ajaxErrorMsg, elementUI} = setting;
     jv.Vue = vue;
     //关闭环境给出的提示.
     // vue.config.productionTip = false;
@@ -262,8 +262,12 @@ jv.initVue = (setting) => {
             //对所有 .kv [chk] 添加 must 样式。
             if (jv.chk_must_dom_class && this.$el && this.$el.querySelectorAll) {
                 Array.from(this.$el.querySelectorAll("." + jv.chk_must_dom_class)).forEach(it => {
-                    if (it.querySelector("[chk]")) {
-                        it.classList.add("must");
+                    var chk_item = it.querySelector("[chk]");
+                    if (chk_item) {
+                        var chk_attr = chk_item.getAttribute("chk") || "";
+                        if (chk_attr[0] != '?') {
+                            it.classList.add("must");
+                        }
                     }
                 });
             }
@@ -407,8 +411,6 @@ jv.initVue = (setting) => {
     });
 
 
-
-
     /** PrerenderSPAPlugin 插件，需要手动触发完成事件
      *  但是，在实际项目中，会有多次Ajax调用，在所有Ajax调用完成后再触发事件进行渲染。
      *  定义一个 SpaAjaxEnum 枚举，每次回发完成后进行设置，
@@ -441,11 +443,11 @@ jv.initVue = (setting) => {
     jv.initElementUI(elementUI);
 };
 
-jv.initElementUI = function(ELEMENT){
-    if(!ELEMENT) return;
+jv.initElementUI = function (ELEMENT) {
+    if (!ELEMENT) return;
 
-    ELEMENT.Button.props.size.default="mini"
-    ELEMENT.Input.props.size.default="small"
+    ELEMENT.Button.props.size.default = "mini"
+    ELEMENT.Input.props.size.default = "small"
     ELEMENT.Table.props.rowKey.default = "id";
 
     //设置 Element-ui 属性的默认值

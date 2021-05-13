@@ -27,7 +27,8 @@
     "npm": ">= 5.0.0"
   },
   "dependencies": {
-    "libjv": "latest"
+    "libjv": "^0.10.38",
+    "spark-md5": "^3.0.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

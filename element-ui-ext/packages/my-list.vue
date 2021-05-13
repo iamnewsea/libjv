@@ -27,6 +27,7 @@
                   @row-dblclick="dbClick"
                   @row-click="tableRowClick"
                   @rowKey="rowKey"
+                  ref="table"
         >
             <slot></slot>
         </el-table>
@@ -177,6 +178,12 @@ export default {
         }
     },
     methods: {
+        getData() {
+            return this.tableData;
+        },
+        getSelectionIds() {
+            return this.$refs.table.store.states.selection.map(it => it[this.rowKey]);
+        },
         //获取保存的查询条件
         getStoredQuery() {
             var storeId = this.$vnode.data.ref || "list";

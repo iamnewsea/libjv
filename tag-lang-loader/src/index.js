@@ -1,5 +1,5 @@
-module.exports = function (source, config) {
-    var langs = (process.env.VUE_APP_All_Langs || "").split(",").filter(it => it);
+module.exports = function (source) {
+    var langs = (process.env.VUE_APP_All_Langs || "").split(",").filter(it => it).map(it=>it.trim())
     if (!langs.length) return source;
 
     var lang = process.env.VUE_APP_Lang || "";
@@ -10,7 +10,6 @@ module.exports = function (source, config) {
     }
 
     var removeLangs = langs.filter(it => it != lang);
-
 
     source = source.replace(new RegExp(`<${lang}[^>]*>((.|\n)*?)</${lang}>`, "igm"), "$1");
 

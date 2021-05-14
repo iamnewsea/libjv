@@ -10,6 +10,7 @@ import input_list from '../packages/input-list.vue';
 import input_table from '../packages/input-table.vue';
 import my_ref from '../packages/my-ref.vue';
 import my_text from '../packages/my-text.vue';
+import tab_iframe from '../packages/tab-iframe.vue';
 
 // import Upload1 from '../packages/upload1.vue';
 import upload from '../packages/upload.vue';
@@ -49,6 +50,7 @@ const components = [
     input_table,
     my_ref,
     my_text,
+    tab_iframe,
     // Upload1,
     upload,
     my_city,

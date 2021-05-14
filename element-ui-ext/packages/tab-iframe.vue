@@ -60,12 +60,24 @@ export default {
             homePath: "/"
         };
     },
+    props: {
+        value: {
+            type: String, default: () => ""
+        },
+    },
     watch: {
         "$route": {
             immediate: true, deep: true, handler() {
                 this.init();
             }
         },
+        value: {
+            deep: true,
+            immediate: true,
+            handler(val) {
+                this.tabName = val;
+            }
+        }
     },
     methods: {
         closeTab(tabName) {
@@ -78,6 +90,7 @@ export default {
         },
         activeTab(tabName) {
             this.tabName = tabName;
+            this.$emit("input", tabName);
         },
         reloadTab(tabName) {
             this.activeTab(tabName);
@@ -87,7 +100,7 @@ export default {
             content_iframe.src = content_iframe.src;
         },
         fullscreen(tabName) {
-            this.active(tabName);
+            this.activeTab(tabName);
             var target = this.$refs.m1.target;
             var contents_div = target.closest(".el-tabs").querySelector(".el-tabs__content")
             var content_iframe = contents_div.children[target.indexOfParent].querySelector("iframe");
@@ -98,7 +111,7 @@ export default {
         toHomeTab(tabName) {
             // var target = this.$refs.m1.target;
             // var tabName = target.innerText.trim();
-            this.tabName = tabName;
+            this.activeTab(tabName)
             var tab = this.list.filter(it => it.name == tabName)[0];
             tab.path = tab.root;
             tab.path_com = tab.root_com;
@@ -113,7 +126,7 @@ export default {
                 tabs = [new TabItemData(homeName, homePath)]
             }
 
-            this.tabName = this.$route.meta[routeMetaKey || "tab"] || homeName;
+            this.activeTab(this.$route.meta[routeMetaKey || "tab"] || homeName);
             if (!this.loadedTabs.includes(this.tabName)) {
                 this.loadedTabs.push(this.tabName);
             }
@@ -156,7 +169,7 @@ export default {
             this.loadedTabs.removeItem(tab);
 
             if (tab == this.tabName && tabs.length) {
-                this.tabName = tabs.last().name;
+                this.activeTab(tabs.last().name);
             }
         }
     }

@@ -1,0 +1,40 @@
+{
+  "name": "tag-lang-loader",
+  "version": "0.10.38",
+  "description": "多语言编译loader",
+  "scripts": {
+    "build": "babel -d lib/ src/",
+    "prepublishOnly": "yarn build"
+  },
+  "main": "lib/index.js",
+  "files": [
+    "lib",
+    "src"
+  ],
+  "author": "于新海 <13466396863@163.com>",
+  "private": false,
+  "repository": {
+    "type": "Git",
+    "url": "https://gitee.com/imnewsea/libjv.git"
+  },
+  "keywords": [
+    "jv",
+    "tag-lang-loader"
+  ],
+  "license": "ISC",
+  "engines": {
+    "node": ">= 8.2.0",
+    "npm": ">= 5.0.0"
+  },
+  "dependencies": {
+    "libjv": "^0.10.38",
+    "spark-md5": "^3.0.0",
+    "commander": "^2.11.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-2": "^6.24.1",
+    "babel-plugin-transform-runtime": "^6.23.0"
+  }
+}

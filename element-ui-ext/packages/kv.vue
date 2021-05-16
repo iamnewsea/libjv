@@ -106,10 +106,6 @@ export default {
     padding: 8px;
 }
 
-.kv.must .k:before {
-    content: "*";
-    color: red;
-}
 
 /*.kv > * {*/
 /*  display: flex;*/

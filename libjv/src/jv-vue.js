@@ -260,13 +260,20 @@ jv.initVue = (setting) => {
         // },
         updated: function () {
             //对所有 .kv [chk] 添加 must 样式。
-            if (jv.chk_must_dom_class && this.$el && this.$el.querySelectorAll) {
-                Array.from(this.$el.querySelectorAll("." + jv.chk_must_dom_class)).forEach(it => {
-                    var chk_item = it.querySelector("[chk]");
-                    if (chk_item) {
-                        var chk_attr = chk_item.getAttribute("chk") || "";
+            if (this.$el && this.$el.querySelectorAll) {
+                Array.from(this.$el.querySelectorAll("[chk]")).forEach(chk_dom => {
+                    var chk_container = chk_dom.closest("." + jv.chk_must_dom_class);
+                    if (!chk_container) {
+                        chk_container = chk_dom.closest("." + jv.chk_msg_vue_tag);
+                        if (chk_container) {
+                            chk_container = chk_container.parentNode;
+                        }
+                    }
+
+                    if (chk_container) {
+                        var chk_attr = chk_dom.getAttribute("chk") || "";
                         if (chk_attr[0] != '?') {
-                            it.classList.add("must");
+                            chk_container.classList.add("must");
                         }
                     }
                 });

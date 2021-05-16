@@ -82,7 +82,14 @@ input.chk-error, .chk-error input {
   padding: 1px 0 5px;
 }
 
+:not(.kv).must{
+  display: flex;
+}
 
+.kv.must .k:before, :not(.kv).must:before {
+  content: "*";
+  color: red;
+}
 
 
 .fullscreen-div {

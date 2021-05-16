@@ -32,6 +32,11 @@ jv.exit_fullscreen = function () {
         iframe.classList.remove("fullscreen");
         document.body.classList.remove("fullscreen")
     }
+
+    top.document.body.classList.remove("fullscreen")
+    if (window.frameElement) {
+        window.frameElement.classList.remove("fullscreen");
+    }
 }
 
 class TabItemData {

@@ -67,7 +67,6 @@ export default {
         value: {
             type: String, default: () => ""
         },
-        tabs_key: {type: String, default: () => "$tabs"},
         homeName: {type: String, default: () => "首页"},
         homePath: {type: String, default: () => "/"},
         routeMetaKey: {type: String, default: () => "tab"}
@@ -85,6 +84,9 @@ export default {
                 this.tabName = val;
             }
         }
+    },
+    created() {
+        jv.tabIframe = this;
     },
     methods: {
         closeTab(tabName) {
@@ -137,34 +139,43 @@ export default {
             this.activeTab(tabName)
             var tab = this.list.filter(it => it.name == tabName)[0];
             tab.path = tab.root;
-            this.saveList(this.list);
+            this.$nextTick(() => {
+                this.saveList(this.list);
+            });
         },
         init() {
-            var tabs = localStorage.getJson(this.tabs_key);
+            var tabs = localStorage.getJson(jv.tabs_key);
+            if (!tabs) {
+                tabs = [new TabItemData(this.homeName, this.homePath)]
+            }
+
+            var tabName = this.$route.meta[this.routeMetaKey] || this.homeName;
+            this.setTab(tabName, this.$route.path);
+        },
+        setTab(tabName, path) {
+            var tabs = localStorage.getJson(jv.tabs_key);
             if (!tabs) {
                 tabs = [new TabItemData(this.homeName, this.homePath)]
             } else {
                 tabs = tabs.map(it => new TabItemData(it.name, it.root, it.path));
             }
 
-            this.activeTab(this.$route.meta[this.routeMetaKey] || this.homeName);
-            if (!this.loadedTabs.includes(this.tabName)) {
-                this.loadedTabs.push(this.tabName);
+            if (!this.loadedTabs.includes(tabName)) {
+                this.loadedTabs.push(tabName);
             }
 
-            var path = this.$route.path
-
-            var last = tabs.last(it => it.name == this.tabName);
+            this.activeTab(tabName);
+            var last = tabs.last(it => it.name == tabName);
 
             if (last) {
                 last.path = path;
             } else {
-                tabs.push(new TabItemData(this.tabName, path));
+                tabs.push(new TabItemData(tabName, path));
             }
             this.saveList(tabs);
         },
         saveList(tabs) {
-            localStorage.setJson(this.tabs_key, tabs);
+            localStorage.setJson(jv.tabs_key, tabs);
             this.list = tabs;
         },
         tab_leave(tab, oldActiveName) {

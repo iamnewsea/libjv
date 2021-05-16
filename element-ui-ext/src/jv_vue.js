@@ -1,6 +1,7 @@
 import jv from "libjv"
 
 (function () {
+    jv.tabs_key = "$tabs";
 
     jv.last_msgs = {};
     jv.showLastInfo = function () {
@@ -87,7 +88,7 @@ import jv from "libjv"
 
         var storeId = ref || "list";
         var key = "ext:" + storeId + ":" + route;
-        localStorage.patchJson(key, {lastRowId:lastRowId});
+        localStorage.patchJson(key, {lastRowId: lastRowId});
     }
 
 })();

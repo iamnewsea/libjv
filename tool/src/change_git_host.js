@@ -38,7 +38,7 @@ util.walkFile(path.resolve("."), async (filePath, isFile) => {
         var newGitPath = gitPath.replace(cmd.source, cmd.target);
 
         print(gitPath + " : " + gitPath + " --> " + newGitPath);
-        if (await util.readLine() != "y") return;
+        // if (await util.readLine() != "y") return;
         await util.execCmd(set_url_cmd.format({url: newGitPath}));
     }
 

@@ -33,3 +33,37 @@ vue cli 3.0 用法:
     "@vue/cli-plugin-eslint": "^4.1.1",
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^6.0.1",
+
+
+### tab-iframe 应用
+定义两个 vue:
+
+1. container.vue 
+```
+ <tabs />
+```
+
+tabs.vue
+```
+<tab-iframe ref="tab" v-menu:m1 style="flex: 1;display: flex;flex-direction: column;"></tab-iframe>
+```
+
+2. component.vue
+
+```
+"$route": {
+            immediate: true, deep: true, handler() {
+                var path = this.$route.path;
+                if (path == "/") return;
+                var url = BASE_URL.slice(0, -1) + path
+                if (url == top.location.pathname) return;
+                top.history.pushState('', '', url);
+                history.replaceState('', '', url);
+
+                //这里要触发 localState 的改变
+                // var tabs = localStorage.getJson(jv.tabs_key);
+                var tabName = this.$route.meta.tab || "首页";
+                top.jv.tabIframe.setTab(tabName,path)
+            }
+        }
+```

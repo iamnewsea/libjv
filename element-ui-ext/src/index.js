@@ -25,7 +25,6 @@ import "./jv_vue"
 
 
 import "./base.scss"
-import "./ext.scss"
 import "./menu.scss"
 
 import Col from "../packages/col"

@@ -1,13 +1,11 @@
 <template>
-
-    <el-tabs type="card" v-model="tabName"
+    <el-tabs ref="tabs" type="card" v-model="tabName"
              v-bind="[$attrs]"
-             style="flex: 1;display: flex;flex-direction: column;"
              class="iframe-tab"
              @tab-click="tab_change"
              @tab-remove="tab_remove"
              :before-leave="tab_leave"
-             v-if="list.length" v-menu:m1
+             v-if="list.length"
     >
         <el-tab-pane v-for="tab in list" :name="tab.name" :label="tab.name + ' '"
                      :key="tab.path" :closable="tab.name != homeName">
@@ -28,6 +26,13 @@ jv.getIframeUrl = function (path) {
     json["_com_"] = true;
     return jv.param(json, true);
 }
+jv.exit_fullscreen = function () {
+    var iframe = document.querySelector("iframe.fullscreen");
+    if (iframe) {
+        iframe.classList.remove("fullscreen");
+        document.body.classList.remove("fullscreen")
+    }
+}
 
 class TabItemData {
     name = ""
@@ -40,30 +45,32 @@ class TabItemData {
         this.path = path || root;
     }
 
-    root_com() {
+    get root_com() {
         return jv.getIframeUrl(this.root);
     }
 
-    path_com() {
+    get path_com() {
         return jv.getIframeUrl(this.path);
     }
 }
 
 export default {
+    name: "tab-iframe",
     data() {
         return {
             loadedTabs: [],
             tabName: "",
             list: [],
-            tabs_key: "$tabs",
-            homeName: "首页",
-            homePath: "/"
         };
     },
     props: {
         value: {
             type: String, default: () => ""
         },
+        tabs_key: {type: String, default: () => "$tabs"},
+        homeName: {type: String, default: () => "首页"},
+        homePath: {type: String, default: () => "/"},
+        routeMetaKey: {type: String, default: () => "tab"}
     },
     watch: {
         "$route": {
@@ -94,39 +101,53 @@ export default {
         },
         reloadTab(tabName) {
             this.activeTab(tabName);
-            var target = this.$refs.m1.target;
-            var contents_div = target.closest(".el-tabs").querySelector(".el-tabs__content")
-            var content_iframe = contents_div.children[target.indexOfParent].querySelector("iframe");
+            var index = this.list.map(it => it.name).indexOf(tabName);
+            var content = this.$refs.tabs.$el.querySelector(".el-tabs__content");
+            var content_iframe = content.children[index].children[0];
             content_iframe.src = content_iframe.src;
         },
         fullscreen(tabName) {
             this.activeTab(tabName);
-            var target = this.$refs.m1.target;
-            var contents_div = target.closest(".el-tabs").querySelector(".el-tabs__content")
-            var content_iframe = contents_div.children[target.indexOfParent].querySelector("iframe");
+            var ori_full = document.querySelector("iframe.fullscreen");
+            if (ori_full) {
+                ori_full.classList.remove("fullscreen");
+            }
+            var index = this.list.map(it => it.name).indexOf(tabName);
+            var content = this.$refs.tabs.$el.querySelector(".el-tabs__content");
+            var content_iframe = content.children[index].children[0];
             content_iframe.classList.add("fullscreen");
             document.body.classList.add("fullscreen");
-            document.body.querySelector(".fullscreen-div").style.animation = "loading 1s"
+
+            var full_div = document.body.querySelector(".fullscreen-div");
+            if (!full_div) {
+                document.addEventListener("keydown", (e) => {
+                    if (e.key == "F4") {
+                        jv.exit_fullscreen();
+                    }
+                })
+
+                full_div = document.createElement("div");
+                document.body.appendChild(full_div);
+                full_div.addEventListener("click", jv.exit_fullscreen)
+                full_div.classList.add("fullscreen-div")
+            }
+            full_div.style.animation = "loading 1s"
         },
         toHomeTab(tabName) {
-            // var target = this.$refs.m1.target;
-            // var tabName = target.innerText.trim();
             this.activeTab(tabName)
             var tab = this.list.filter(it => it.name == tabName)[0];
             tab.path = tab.root;
-            tab.path_com = tab.root_com;
             this.saveList(this.list);
         },
-        init(homeName, homePath, routeMetaKey) {
-            this.homeName = homeName;
-            this.homePath = homePath;
-
+        init() {
             var tabs = localStorage.getJson(this.tabs_key);
             if (!tabs) {
-                tabs = [new TabItemData(homeName, homePath)]
+                tabs = [new TabItemData(this.homeName, this.homePath)]
+            } else {
+                tabs = tabs.map(it => new TabItemData(it.name, it.root, it.path));
             }
 
-            this.activeTab(this.$route.meta[routeMetaKey || "tab"] || homeName);
+            this.activeTab(this.$route.meta[this.routeMetaKey] || this.homeName);
             if (!this.loadedTabs.includes(this.tabName)) {
                 this.loadedTabs.push(this.tabName);
             }
@@ -152,7 +173,9 @@ export default {
             }
 
             var item = this.list.last(it => it.name == tab);
-
+            if (!item) {
+                return;
+            }
             top.history.pushState('', '', BASE_URL.slice(0, -1) + item.path);
         },
         tab_change(tab, ev) {
@@ -175,23 +198,13 @@ export default {
     }
 }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
 .tab-view {
     height: 100%;
 
     .iframe-tab {
         height: 100% !important;
     }
-}
-
-iframe.fullscreen {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: white;
-    z-index: 1999;
 }
 
 .move-enter-active, .move-leave-active {

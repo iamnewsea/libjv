@@ -71,3 +71,60 @@ legend {
   margin-top: -200px;
   opacity: 0;
 }
+
+input.chk-error, .chk-error input {
+  background-color: #f4dfeb4d;
+  border: dashed 1px deeppink;
+}
+
+.chk-msg {
+  color: red;
+  padding: 1px 0 5px;
+}
+
+
+
+
+.fullscreen-div {
+  display: none;
+  position: fixed;
+  top: -10px;
+  left: 50vw;
+  margin-left: -10px;
+  z-index: 3999;
+  background: wheat;
+  width: 20px;
+  text-align: center;
+  height: 20px;
+  line-height: 20px;
+  border-radius: 20px;
+  padding: 0;
+  cursor: default;
+}
+
+.fullscreen-div:hover {
+  width: 120px;
+  padding: 6px 8px;
+  top: 2px;
+  right: 2px;
+  margin-left: -60px;
+}
+
+.fullscreen-div:hover:before {
+  content: "F4退出全屏";
+}
+
+html body.fullscreen .fullscreen-div {
+  display: block;
+}
+
+iframe.fullscreen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: white;
+  z-index: 1999;
+}
+

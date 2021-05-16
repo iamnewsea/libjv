@@ -1,15 +1,15 @@
-import jv from "libjv";
+var jv = require("libjv");
+var util = require("./util")
 
 var path = require('path');
 var program = require('commander');
-var exec = require('child_process').exec;
+
 const fs = require('./async_file');
 
 var print = function (msg) {
     if (!msg) return;
     process.stdout.write("[" + (new Date().toDateString()) + "]" + msg + "\n");
 }
-print(path.resolve("."))
 
 var cmd = program
     .usage('<--source 源> <--target 目标>')
@@ -20,24 +20,28 @@ var cmd = program
 var get_url_cmd = "git ls-remote --get-url origin"
 var set_url_cmd = "git remote set-url origin {url}"
 
-if(!cmd.source || !cmd.target){
+if (!cmd.source || !cmd.target) {
     cmd.outputHelp();
     process.exit(-1);
 }
 
-(async function(){
-    var list = await fs.readdirAsync(".");
-    list.forEach(async it=>{
-        var fullPath = path.resolve(it);
-        var stat = await fs.statAsync(fullPath);
-        if( stat.isDirectory() == false){
-            return;
-        }
-        process.chdir(fullPath);
-        await exec(get_url_cmd);
-    })
+util.walkFile(path.resolve("."), async (filePath, isFile) => {
+    if (isFile) return false;
+    if (filePath.endsWith("node_modules")) return false;
+    if (filePath.endsWith(".git")) return false;
+    print(filePath);
 
-})();
 
+    if (fs.existsSync(filePath + path.sep + ".git")) {
+        process.chdir(filePath);
+        var gitPath = await util.execCmd(get_url_cmd);
+        var newGitPath = gitPath.replace(cmd.source, cmd.target);
+
+        print(gitPath + " : " + gitPath + " --> " + newGitPath);
+        // if (await util.readLine() != "y") return;
+        await util.execCmd(set_url_cmd.format({url: newGitPath}));
+    }
+
+})
 
 

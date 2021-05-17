@@ -70,7 +70,7 @@ export default {
     },
     props: {
         value: {
-            type: String, default: () => ""
+            type: String, default: () => null
         },
         homeName: {type: String, default: () => "首页"},
         homePath: {type: String, default: () => "/"},
@@ -86,7 +86,15 @@ export default {
             deep: true,
             immediate: true,
             handler(val) {
+                if (val === null) {
+                    return;
+                }
                 this.tabName = val;
+            }
+        },
+        tabName(v) {
+            if (v !== null) {
+                this.$emit("input", v);
             }
         }
     },
@@ -104,7 +112,6 @@ export default {
         },
         activeTab(tabName) {
             this.tabName = tabName;
-            this.$emit("input", tabName);
         },
         reloadTab(tabName) {
             this.activeTab(tabName);

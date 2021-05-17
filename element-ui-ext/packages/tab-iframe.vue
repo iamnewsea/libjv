@@ -93,9 +93,10 @@ export default {
             }
         },
         tabName(v) {
-            if (v !== null) {
-                this.$emit("input", v);
+            if (v === null) {
+                return;
             }
+            this.$emit("input", v);
         }
     },
     created() {

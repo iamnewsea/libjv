@@ -71,7 +71,7 @@
                         break;
                 }
             })
-        }, enumerable: false
+        }, enumerable: false,configurable:true,writable:true
     });
 
 
@@ -133,7 +133,7 @@
                 }
             }
             return ret;
-        }, enumerable: false
+        }, enumerable: false,configurable:true,writable:true
     });
 
 
@@ -153,7 +153,7 @@
                 position++;
             }
             return ret;
-        }, enumerable: false
+        }, enumerable: false,configurable:true,writable:true
     });
 
     /* 保留小数位 , 使用 Math.round 方法。  .toFixed是银行家算法。
@@ -163,7 +163,7 @@
         value(dotLength = 2) {
             var n = Math.pow(10, dotLength);
             return Math.round(this * n) / n;
-        }, enumerable: false
+        }, enumerable: false,configurable:true,writable:true
     });
 
 })()

@@ -21,13 +21,13 @@
                 }
             }
             return this.size;
-        }, enumerable: false
+        }, enumerable: false,configurable:true,writable:true
     });
 
     Object.defineProperty(Set.prototype, "length", {
         get() {
             return this.size;
-        }, enumerable: false
+        }, enumerable: false,configurable:true
     });
 
 })();

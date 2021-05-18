@@ -64,7 +64,7 @@ jv.initVue = (setting) => {
     Object.defineProperty(vueProtype, "$resetData", {
         value(data) {
             return Object.assign(this.$data, this.$options.data(this), data)
-        }, enumerable: false
+        }, enumerable: false,configurable:true,writable:true
     });
 
     /**
@@ -73,7 +73,7 @@ jv.initVue = (setting) => {
     Object.defineProperty(vueProtype, "chk_item", {
         value(chk, chk_msg) {
             return jv.chk_vue_item(this, chk, chk_msg)
-        }, enumerable: false
+        }, enumerable: false,configurable:true,writable:true
     });
 
     Object.defineProperty(HTMLElement.prototype, "chk_item", {
@@ -88,13 +88,13 @@ jv.initVue = (setting) => {
     Object.defineProperty(vueProtype, "chk", {
         value(setting) {
             return jv.chk_vue(this, setting);
-        }, enumerable: false
+        }, enumerable: false,configurable:true,writable:true
     });
 
     Object.defineProperty(HTMLElement.prototype, "chk", {
         value(setting) {
             return jv.chk_html(this, setting)
-        }, enumerable: false
+        }, enumerable: false,configurable:true,writable:true
     });
 
     /**
@@ -123,8 +123,7 @@ jv.initVue = (setting) => {
             }
 
             return {};
-
-        }, enumerable: false
+        }, enumerable: false,configurable:true,writable:true
     });
 
     /**
@@ -136,7 +135,7 @@ jv.initVue = (setting) => {
         value() {
             var model = this.$vnode.data.model;
             return model && model.expression || "";
-        }, enumerable: false
+        }, enumerable: false,configurable:true,writable:true
     });
     /**
      * 通过表过式，查询绑定指定Expression的Dom,性能差
@@ -187,7 +186,7 @@ jv.initVue = (setting) => {
                 return recusion_vue(__vue__, findExp);
             }
             return recusion_html(this, findExp);
-        }, enumerable: false
+        }, enumerable: false,configurable:true,writable:true
     });
 
     /**
@@ -208,7 +207,7 @@ jv.initVue = (setting) => {
                 }
             }
             return true;
-        }, enumerable: false
+        }, enumerable: false,configurable:true,writable:true
     });
 
     /**
@@ -226,7 +225,7 @@ jv.initVue = (setting) => {
                 }
                 cur = cur.$parent;
             }
-        }, enumerable: false
+        }, enumerable: false,configurable:true,writable:true
     });
 
     /**
@@ -245,7 +244,7 @@ jv.initVue = (setting) => {
                 }
                 cur = cur.parentNode;
             }
-        }, enumerable: false
+        }, enumerable: false,configurable:true,writable:true
     });
 
     //----------------------------------- axios

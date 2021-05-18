@@ -36,7 +36,7 @@
                 }
             }
             return ret;
-        }, enumerable: false
+        }, enumerable: false,configurable:true
     });
 
     var primitives = ["object", "array", "function", "map", "set", "math", "date", "regexp", "string", "number", "boolean", "symbol", "undefined", "null"];
@@ -50,7 +50,7 @@
                 return type;
             }
             return false;
-        }, enumerable: false
+        }, enumerable: false,configurable:true
     });
 
 //判断类型
@@ -64,7 +64,7 @@
                 return false;
             }
             return type;
-        }, enumerable: false
+        }, enumerable: false,configurable:true
     });
 
 //大于等于 and 小于等于
@@ -79,7 +79,7 @@
             if (this < start) return false;
             if (this > end) return false;
             return true;
-        }, enumerable: false
+        }, enumerable: false,configurable:true
     });
 
     //移除Json的指定Keys。返回对象
@@ -91,7 +91,7 @@
                 }
             });
             return this;
-        }, enumerable: false
+        }, enumerable: false,configurable:true,writable:true
     });
 
     /**

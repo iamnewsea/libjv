@@ -43,7 +43,7 @@
     Object.defineProperty(Date.prototype, "toDateString", {
         value(format, timezone) {
             return this.valueOf().toDateString(format, timezone);
-        }, enumerable: false
+        }, enumerable: false,configurable:true,writable:true
     });
 
 
@@ -51,7 +51,7 @@
         value(days) {
             if (!days) return this;
             return new Date(this.valueOf() + days * 86400000);
-        }, enumerable: false
+        }, enumerable: false,configurable:true,writable:true
     });
 
 //获取时间的毫秒数 , 可以设置当前时间的毫秒数， 只影响时间， 不影响日期
@@ -71,7 +71,7 @@
 
             this.setUTCHours(hours, minutes, secondes);
         },
-        enumerable: false
+        enumerable: false,configurable:true
     });
 
 
@@ -80,7 +80,7 @@
         get() {
             var ret = (this.valueOf() - new Date(this.getUTCFullYear() + "/01/01").valueOf()) / 86400000;
             return parseInt(ret) + 1;
-        }, enumerable: false
+        }, enumerable: false,configurable:true
     });
 
 })()

@@ -239,8 +239,7 @@ jv.JvEnum = function JvEnum(typeName, json, keyCallback) {
 
                 return v.remark || v.name || "";
             },
-            enumerable: false,
-            configurable: true
+            enumerable: false,configurable:true
         });
     };
 }
@@ -570,8 +569,7 @@ jv.fillRes = (obj, key, args) => {
 
                     return stringValue;
                 },
-                enumerable: false,
-                configurable: true
+                enumerable: false,configurable:true
             });
 
             // target[key1 + "_res"] = stringValue;

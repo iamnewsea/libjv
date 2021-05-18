@@ -1,7 +1,7 @@
 var cheerio = require('cheerio');
 var path = require("path");
 var fs = require("fs");
-
+var jv = require("libjv")
 module.exports = function (source) {
     var res_tag = process.env.VUE_APP_Inline_Res_Tag || "inline-res"
 
@@ -58,10 +58,17 @@ module.exports = function (source) {
 
     var ret = $("p-inline-res-loader-container").html()
 
-    console.log("")
-    console.log(filePath)
-    console.log("----------")
-    console.log(ret);
-    console.log("----------")
+    if (!jv.inlineResLoadered) {
+        jv.inlineResLoadered = [];
+    }
+
+    if (jv.inlineResLoadered.includes(filePath) == false) {
+        jv.inlineResLoadered.push(filePath);
+        console.log("")
+        console.log(filePath)
+        console.log("----------")
+        console.log(ret);
+        console.log("----------")
+    }
     return ret;
 }

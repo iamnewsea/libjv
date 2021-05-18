@@ -1,6 +1,6 @@
 var cheerio = require('cheerio');
-var jv = require('libjv');
 var path = require("path");
+var fs = require("fs");
 
 module.exports = function (source) {
     var res_tag = process.env.VUE_APP_Inline_Res_Tag || "inline-res"
@@ -13,27 +13,54 @@ module.exports = function (source) {
         return source;
     }
 
-
     var $ = cheerio.load("<p-inline-res-loader-container>" + source + "</p-inline-res-loader-container>", {
         xmlMode: true,
         decodeEntities: false,
         recognizeSelfClosing: true
     });
-    console.log($.html())
-    $(res_tag).each((index, it) => {
-        var $it = $(it);
-        var src = $it.attr("src");
-        var fullSrcPath = path.join(filePath, src);
 
-        var attrs = Object.keys(it.attribs).filter(it => it != "src");
+    var getFileContent = function (res) {
+        var $res = $(res);
+        var src = $res.attr("src");
+        if (!src) {
+            return "<template></template>"
+        }
 
+        var fullSrcPath = path.join(filePath, "../", src);
+        return fs.readFileSync(fullSrcPath, 'utf-8');
+    }
 
-        var content = fullSrcPath + ":" + JSON.stringify(attrs)
+    $(res_tag).each((index, res) => {
+        var attrs_keys = Object.keys(res.attribs).filter(it => it != "src");
+        // .map(it => {
+        //     return it + "=" + res.attribs[it];
+        // }) ;
 
-        var contentNode = $("<p-inline-res-loader-container>" + content + "</p-inline-res-loader-container>")[0].children[0]
-        it.parent.children.splice(index, 1, contentNode);
+        var $content = cheerio.load("<p-inline-res-loader-container>" + getFileContent(res) + "</p-inline-res-loader-container>");
+        var template = $content("template")[0];
+        if (template && template.children.length) {
+//有Bug，需要先 html() 一下。
+            $content("p-inline-res-loader-container > template").html();
+            Array.from($content("p-inline-res-loader-container > template").children()).forEach(root => {
+                attrs_keys.forEach(key => {
+                    root.attribs[key] = res.attribs[key];
+                })
+            });
+
+            $(res).replaceWith($content("p-inline-res-loader-container >template")[0].children);
+        }
+
+        $content("p-inline-res-loader-container >*:not(template)").each((_index, _item) => {
+            $("p-inline-res-loader-container").append(_item);
+        });
     })
 
 
-    return $("p-inline-res-loader-container").html()
+    var ret =  $("p-inline-res-loader-container").html()
+
+    console.log(filePath)
+    console.log("----------")
+    console.log(ret);
+    console.log("----------")
+    return ret;
 }

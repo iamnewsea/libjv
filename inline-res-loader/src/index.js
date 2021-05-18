@@ -56,8 +56,9 @@ module.exports = function (source) {
     })
 
 
-    var ret =  $("p-inline-res-loader-container").html()
+    var ret = $("p-inline-res-loader-container").html()
 
+    console.log("")
     console.log(filePath)
     console.log("----------")
     console.log(ret);

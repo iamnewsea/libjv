@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "libjv": "^0.10.38",
-    "spark-md5": "^3.0.0"
+    "spark-md5": "^3.0.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

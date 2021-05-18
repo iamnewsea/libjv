@@ -5,8 +5,9 @@ module.exports = function (source) {
     var lang = process.env.VUE_APP_Lang || "";
     if (!lang) return source;
 
+    var filePath = this.resourcePath;
     if (langs.includes(lang) == false) {
-        throw new Error("不存在的语言代码 " + lang)
+        throw new Error( filePath + " 不存在的语言代码 " + lang)
     }
 
     var removeLangs = langs.filter(it => it != lang);

@@ -79,7 +79,7 @@ import jv from "./libjv"
             return value + " 不在枚举范围" + chk_body;
         },
         ":": function (value, chk_body, data) {
-            return eval("(value,data) => {" + chk_body + "}").apply(this, value, data);
+            return eval("(value,data) => {" + chk_body + "}").call(this, value, data);
         },
         "@": function (value, chk_body, data) {
             if (!(chk_body in this)) {

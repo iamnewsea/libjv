@@ -223,32 +223,18 @@ export default {
 }
 </script>
 <style lang="scss">
-.tab-view {
-    height: 100%;
-
-    .iframe-tab {
-        height: 100% !important;
-    }
-}
-
-.move-enter-active, .move-leave-active {
-    transition: opacity 1s;
-}
-
-.move-enter, .move-leave {
-    opacity: 0;
-}
-
-.el-tabs__header {
-    margin: 0;
-}
 
 /deep/ .el-tabs__item .el-icon-close {
     margin-right: -10px;
     margin-left: 10px;
 }
+.iframe-tab{
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
 
-/deep/ .iframe-tab .el-tabs__content {
+.iframe-tab /deep/ .el-tabs__content {
     flex: 1;
     display: flex;
     flex-direction: column;

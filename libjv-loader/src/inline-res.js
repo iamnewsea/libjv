@@ -2,6 +2,7 @@ var cheerio = require('cheerio');
 var path = require("path");
 var fs = require("fs");
 var jv = require("libjv")
+
 module.exports = function (source) {
     var res_tag = process.env.VUE_APP_Inline_Res_Tag || "inline-res"
 

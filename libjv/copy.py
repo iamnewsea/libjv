@@ -6,7 +6,9 @@ import sys
 import shutil
 from sys import argv
 
-base_path=os.path.abspath( os.path.join( __file__ ,"../" ) )
+base_path=os.path.abspath(os.path.dirname(__file__))
+base_path_short_name = os.path.basename(base_path)
+
 
 def rm(path):
     if  os.path.exists(  path) :
@@ -21,12 +23,14 @@ def cp(fromPath,toPath):
     print(fromPath + " ---> " + toPath)
 
 def mycp(source,toPath):
-    cp( os.path.join(source,"lib"), os.path.join(toPath ,"libjv/lib"))
-    cp( os.path.join(source,"src"), os.path.join(toPath ,"libjv/src"))
-    shutil.copyfile( os.path.join( source,"package.json"), os.path.join(toPath ,"libjv/package.json"))
+
+    cp( os.path.join(source,"lib"), os.path.join(toPath ,base_path_short_name, "lib"))
+    cp( os.path.join(source,"src"), os.path.join(toPath ,base_path_short_name, "src"))
+    shutil.copyfile( os.path.join( source,"package.json"), os.path.join(toPath ,base_path_short_name, "package.json"))
 
 if __name__=='__main__':
     target = os.path.abspath( argv[1] )
+
 
     print("源地址："+ base_path + " ---> 目标地址：" + target)
     print("-----------------------------------")

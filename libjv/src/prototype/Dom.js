@@ -308,22 +308,31 @@
     }
 
     Storage.prototype.getItem = function (key) {
-        return ori_storage_getItem.call(this,this.getNsKey(key));
+        return ori_storage_getItem.call(this, this.getNsKey(key));
     }
-    Storage.prototype.setItem = function (key,value) {
-        return ori_storage_setItem.call(this,this.getNsKey(key),value);
+    Storage.prototype.setItem = function (key, value) {
+        return ori_storage_setItem.call(this, this.getNsKey(key), value);
     }
 
     Storage.prototype.removeItem = function (key) {
-        return ori_storage_removeItem.call(this,this.getNsKey(key));
+        return ori_storage_removeItem.call(this, this.getNsKey(key));
     }
 
     Storage.prototype.key = function (index) {
-        var key = ori_storage_key.call(this,index);
+        var key = ori_storage_key.call(this, index);
         if (this.namespace && key.startsWith(this.namespace + ":")) {
             return key.slice(this.namespace.length + 1);
         }
         return key;
+    }
+
+    Storage.prototype.keys = function () {
+        var ret = Object.keys(this);
+        if (this.namespace) {
+            var len = this.namespace.length;
+            ret = ret.filter(it => it.startsWith(this.namespace + ":")).map(it => it.slice(len + 1));
+        }
+        return ret;
     }
 
     Object.defineProperty(Storage.prototype, "getJson", {

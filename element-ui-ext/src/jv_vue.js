@@ -12,7 +12,7 @@ import jv from "libjv"
     jv.alert = function (msg, title, opt) {
         jv.last_msgs.alert = [msg, title, opt];
 
-        jv.main.$alert(msg, title || "提示", Object.assign({
+        jv.Vue.prototype.$alert(msg, title || "提示", Object.assign({
             type: "info",
             dangerouslyUseHTMLString: true
         }, opt));
@@ -21,7 +21,7 @@ import jv from "libjv"
     jv.info = function (msg, title, opt) {
         jv.last_msgs.info = [msg, title, opt];
 
-        return jv.main.$notify(Object.assign({
+        return jv.Vue.prototype.$notify(Object.assign({
             title: title || '消息',
             message: msg,
             type: 'success',
@@ -31,7 +31,7 @@ import jv from "libjv"
 
     jv.warn = function (msg, title, opt) {
         jv.last_msgs.warn = [msg, title, opt];
-        return jv.main.$notify(Object.assign({
+        return jv.Vue.prototype.$notify(Object.assign({
             title: title || '提示',
             message: msg,
             type: 'warning',
@@ -53,7 +53,7 @@ import jv from "libjv"
         }
         console.error(msg2);
 
-        var ret = jv.main.$notify(Object.assign({
+        var ret = jv.Vue.prototype.$notify(Object.assign({
             title: title || '错误',
             message: msg,
             type: 'error',
@@ -65,7 +65,7 @@ import jv from "libjv"
 
     jv.confirm = function (msg, buttons, opt) {
         var msgs = (buttons || "").split(",");
-        return jv.main.$confirm(msg, '提示', Object.assign({
+        return jv.Vue.prototype.$confirm(msg, '提示', Object.assign({
             confirmButtonText: msgs[0] || '确定',
             cancelButtonText: msgs[1] || '取消',
             type: 'warning'
@@ -73,7 +73,7 @@ import jv from "libjv"
     };
 
     jv.prompt = function (msg, title, opt) {
-        return jv.main.$prompt(msg, title || '提示', Object.assign({
+        return jv.Vue.prototype.$prompt(msg, title || '提示', Object.assign({
             confirmButtonText: '确定',
             cancelButtonText: '取消'
         }, opt));

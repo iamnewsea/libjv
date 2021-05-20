@@ -7,6 +7,9 @@ import jv from "./file-upload"
  ajaxJavaBooleanKey ：默认为true , 是否处理 Java Boolean的Key，如：接口返回 admin:true , 转化为： isAdmin: true
  ajaxResType ： 默认为true , 系统默认对 boolean,date添加 _res 额外键，设置这个字段，会忽略指定的类型。该值是逗号分隔的字符串，有如下值：boolean,date
  ajaxErrorMsg: 默认为 true,系统默认认为 res.data.msg 是错误消息，弹窗提示
+
+ VUE_APP_Server_Host 表示axios服务器主机头
+ VUE_APP_User_System 表示用户体系，localStorage用它做前缀。
  */
 jv.initVue = (setting) => {
     window.jv = jv;
@@ -40,7 +43,7 @@ jv.initVue = (setting) => {
         }
     });
 
-
+    window.localStorage.namespace = window.User_System;
     vueProtype.Server_Host = window.Server_Host;
 
 

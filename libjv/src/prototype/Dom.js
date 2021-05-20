@@ -302,9 +302,9 @@
         ori_storage_key = Storage.prototype.key;
 
     Storage.prototype.getNsKey = function (key) {
-        if (!this.namespace) return key;
-        if (key.startsWith(this.namespace + ":")) return key;
-        return this.namespace + ":" + key;
+        if (!jv.User_System) return key;
+        if (key.startsWith(jv.User_System + ":")) return key;
+        return jv.User_System + ":" + key;
     }
 
     Storage.prototype.getItem = function (key) {
@@ -320,17 +320,17 @@
 
     Storage.prototype.key = function (index) {
         var key = ori_storage_key.call(this, index);
-        if (this.namespace && key.startsWith(this.namespace + ":")) {
-            return key.slice(this.namespace.length + 1);
+        if (jv.User_System && key.startsWith(jv.User_System + ":")) {
+            return key.slice(jv.User_System.length + 1);
         }
         return key;
     }
 
     Storage.prototype.keys = function () {
         var ret = Object.keys(this);
-        if (this.namespace) {
-            var len = this.namespace.length;
-            ret = ret.filter(it => it.startsWith(this.namespace + ":")).map(it => it.slice(len + 1));
+        if (jv.User_System) {
+            var len = jv.User_System.length;
+            ret = ret.filter(it => it.startsWith(jv.User_System + ":")).map(it => it.slice(len + 1));
         }
         return ret;
     }

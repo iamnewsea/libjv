@@ -43,7 +43,7 @@ jv.initVue = (setting) => {
         }
     });
 
-    window.localStorage.namespace = window.User_System;
+    jv.User_System = window.User_System;
     vueProtype.Server_Host = window.Server_Host;
 
 

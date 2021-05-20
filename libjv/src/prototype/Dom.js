@@ -14,13 +14,13 @@
         Object.defineProperty(Node.prototype, "addEventListener", {
             value(event, fn) {
                 return this.attachEvent("on" + event, fn);
-            }, enumerable: false,configurable:true,writable:true
+            }, enumerable: false, configurable: true, writable: true
         });
 
         Object.defineProperty(Node.prototype, "removeEventListener", {
             value(event, fn) {
                 return this.detachEvent("on" + event, fn);
-            }, enumerable: false,configurable:true,writable:true
+            }, enumerable: false, configurable: true, writable: true
         });
     }
 
@@ -30,7 +30,7 @@
                 e.currentTarget.removeEventListener(e.type, fn);
                 return callback(e);
             }, false);
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     document.cookieJson = (() => {
@@ -79,13 +79,13 @@
     Object.defineProperty(Location.prototype, "fullUrl", {
         get() {
             return location.href.slice(0, (0 - location.hash.length) || undefined);
-        }, enumerable: false,configurable:true
+        }, enumerable: false, configurable: true
     });
 
     Object.defineProperty(Location.prototype, "json", {
         get() {
             return jv.query2Json(location.search);
-        }, enumerable: false,configurable:true
+        }, enumerable: false, configurable: true
     });
 
     Object.defineProperty(Location.prototype, "hashJson", {
@@ -96,7 +96,7 @@
                 return jv.query2Json(hash.slice(hash_search_index));
             }
             return {};
-        }, enumerable: false,configurable:true
+        }, enumerable: false, configurable: true
     });
 
 
@@ -132,7 +132,7 @@
             }
             return {};
         }
-        , enumerable: false,configurable:true,writable:true
+        , enumerable: false, configurable: true, writable: true
     });
 
 
@@ -155,7 +155,7 @@
                 this.fireEvent("on" + event.type, event)
                 return event;
             }
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     /**
@@ -168,7 +168,7 @@
                 return [...p.wbs(), this];
             }
             return [this];
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     if (!Element.prototype.closest) {
@@ -185,7 +185,7 @@
                     el = el.parentNode;
                 }
                 return el;
-            }, enumerable: false,configurable:true,writable:true
+            }, enumerable: false, configurable: true, writable: true
         });
     }
 
@@ -196,7 +196,7 @@
                 this.scrollLeft = this.scrollLeft + offset_x;
                 this.scrollTop = this.scrollTop + offset_y;
                 return;
-            }, enumerable: false,configurable:true,writable:true
+            }, enumerable: false, configurable: true, writable: true
         });
     }
     if (!Element.prototype.scrollTo) {
@@ -206,7 +206,7 @@
                 this.scrollLeft = x;
                 this.scrollTop = y;
                 return;
-            }, enumerable: false,configurable:true,writable:true
+            }, enumerable: false, configurable: true, writable: true
         });
     }
 // //冒泡提示
@@ -248,7 +248,7 @@
                 }
             }
             return -1;
-        }, enumerable: false,configurable:true
+        }, enumerable: false, configurable: true
     });
 
 // targetElement.after(newElement) 返回newElement
@@ -262,7 +262,7 @@
             } else {
                 parent.insertBefore(newElement, this.nextSibling);
             }
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     /**
@@ -291,10 +291,40 @@
             }
 
             return viewDom;
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
 
+    //重写Storage方法，添加 namespace。
+    var ori_storage_getItem = Storage.prototype.getItem,
+        ori_storage_setItem = Storage.prototype.setItem,
+        ori_storage_removeItem = Storage.prototype.removeItem,
+        ori_storage_key = Storage.prototype.key;
+
+    Storage.prototype.getNsKey = function (key) {
+        if (!this.namespace) return key;
+        if (key.startsWith(this.namespace + ":")) return key;
+        return this.namespace + ":" + key;
+    }
+
+    Storage.prototype.getItem = function (key) {
+        return ori_storage_getItem.call(this,this.getNsKey(key));
+    }
+    Storage.prototype.setItem = function (key,value) {
+        return ori_storage_setItem.call(this,this.getNsKey(key),value);
+    }
+
+    Storage.prototype.removeItem = function (key) {
+        return ori_storage_removeItem.call(this,this.getNsKey(key));
+    }
+
+    Storage.prototype.key = function (index) {
+        var key = ori_storage_key.call(this,index);
+        if (this.namespace && key.startsWith(this.namespace + ":")) {
+            return key.slice(this.namespace.length + 1);
+        }
+        return key;
+    }
 
     Object.defineProperty(Storage.prototype, "getJson", {
         value(key) {
@@ -303,7 +333,7 @@
             var value = this.getItem(url);
             if (!value) return null;
             return JSON.parse(value);
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     })
 
     Object.defineProperty(Storage.prototype, "setJson", {
@@ -314,7 +344,7 @@
                 return this.removeItem(url);
             }
             this.setItem(url, JSON.stringify(json))
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     })
 
     /*在原来Json基础上修改Json*/
@@ -327,7 +357,7 @@
 
             var value2 = Object.assign({}, this.getJson(url), json)
             this.setItem(url, JSON.stringify(value2));
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     })
 
     //只读化.
@@ -351,7 +381,7 @@
                 it.classList.add("nonEdit");
             })
 
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
 })();

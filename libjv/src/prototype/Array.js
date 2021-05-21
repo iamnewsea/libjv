@@ -40,7 +40,7 @@
                 return it.valueOf().toDateString(null, "local");
             });
         }
-        , enumerable: false,configurable:true,writable:true
+        , enumerable: false, configurable: true, writable: true
     });
 
     Object.defineProperty(Array.prototype, "IndexOf", {
@@ -55,7 +55,7 @@
                 if (filter(item, i)) return i;
             }
             return -1;
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     /**
@@ -73,7 +73,7 @@
                 if (filter(item, i)) return i;
             }
             return -1;
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     Object.defineProperty(Array.prototype, "last", {
@@ -88,7 +88,7 @@
                 if (filter(item, i)) return item;
             }
             return null;
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     //增强型ForEach，函数返回 false 退出循环。
@@ -97,7 +97,7 @@
     Object.defineProperty(Array.prototype, "ForEach", {
         value(filter, trueAction, falseAction) {
             return this.forEachIndexed(filter, trueAction, falseAction)
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     Object.defineProperty(Array.prototype, "forEachIndexed", {
@@ -118,7 +118,7 @@
                 }
             }
             return true;
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
 
@@ -136,7 +136,7 @@
             }
 
             this.push(val);
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     /**
@@ -154,21 +154,18 @@
             });
 
             return ret;
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
-//使用 splice 方法，使数据变化有效。参数可以是array,set。
+    //使用 splice 方法，使数据变化有效。参数可以是array,set。
     Object.defineProperty(Array.prototype, "pushAll", {
         value(ary) {
             if (!ary) {
                 ary = [];
             }
-            if (ary.Type == "set") {
-                ary = Array.from(ary);
-            }
-            this.splice.apply(this, [this.length, 0].concat(ary));
+            this.push(...ary);
             return this;
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
 //交换两项的位置
@@ -176,7 +173,7 @@
         value(index1, index2) {
             this[index1] = this.splice(index2, 1, this[index1])[0];
             return this;
-        },enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
 
@@ -185,7 +182,7 @@
         Object.defineProperty(Array.prototype, "includes", {
             value(find) {
                 return this.indexOf(find) >= 0;
-            }, enumerable: false,configurable:true,writable:true
+            }, enumerable: false, configurable: true, writable: true
         });
     }
 
@@ -208,7 +205,7 @@
                 }
             }
             return true;
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
 //集合减法，用 filter .
@@ -228,7 +225,7 @@
                 }
             }
             return ret;
-        },enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
     /**
      * 获取两个数组交集,返回 Set 类型
@@ -248,7 +245,7 @@
                 }
             }
             return ret;
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     /**
@@ -263,7 +260,7 @@
                 });
             });
             return ret;
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     /**
@@ -294,7 +291,7 @@
                 }
             }
             return max_item;
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
 
@@ -326,21 +323,21 @@
                 }
             }
             return max_item;
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     Object.defineProperty(Array.prototype, "sum", {
         value(emptyValue) {
             if (!this.length) return emptyValue || 0;
             return this.reduce((t, i) => t + i);
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     Object.defineProperty(Array.prototype, "removeAt", {
         value(index) {
             this.splice(index, 1);
             return this;
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     /**
@@ -368,7 +365,7 @@
                 this.splice(index, 1);
             });
             return this;
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
 })()

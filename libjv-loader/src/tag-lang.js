@@ -1,4 +1,8 @@
 module.exports = function (source) {
+    if(this.query.tagLang !== true){
+        return source;
+    }
+
     var langs = (process.env.VUE_APP_All_Langs || "").split(",").filter(it => it).map(it => it.trim())
     if (!langs.length) return source;
 

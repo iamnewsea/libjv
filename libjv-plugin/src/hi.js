@@ -5,7 +5,7 @@ var jv = require("libjv")
 module.exports = function (compilation, options) {
     var package_json_path = compilation.options.context + path.sep + "package.json";
 
-    return fs.existsAsync(package_json_path).then(v => {
+    return fs.existsPromise(package_json_path).then(v => {
         if (v == false) {
             return;
         }

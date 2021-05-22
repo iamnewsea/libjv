@@ -4,7 +4,8 @@
 'use strict';
 
 const fs = require('fs');
-const suffix = 'Async';
+//Cannot promisify an API that has normal methods with 'Async'-suffix
+const suffix = 'Promise';
 const keys = [
     'access',
     'readFile',

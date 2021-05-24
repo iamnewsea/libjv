@@ -2,6 +2,7 @@
     <el-tabs ref="tabs" type="card" v-model="tabName"
              v-bind="[$attrs]"
              class="iframe-tab"
+             :before-leave="tab_leave"
              @tab-remove="tab_remove"
              v-if="list.length"
     >
@@ -95,7 +96,6 @@ export default {
             if (v === null) {
                 return;
             }
-            this.$emit("input", v);
 
             var tabs = localStorage.getJson(jv.tabs_key);
             if (!tabs) {
@@ -174,12 +174,12 @@ export default {
             var tabName = jv.getRouteMetaTabName() || this.homeName;
             this.setTab(tabName, this.$route.path);
         },
-        fresh() {
+        reload(tabName) {
             var tabs = localStorage.getJson(jv.tabs_key);
             tabs = tabs.map(it => new TabItemData(it.name, it.root, it.path));
 
             this.list = tabs;
-            this.activeTab(jv.getRouteMetaTabName() || this.homeName);
+            this.activeTab(tabName);
         },
         /**
          * 获取tabs数据

@@ -74,7 +74,6 @@ export default {
         },
         homeName: {type: String, default: () => "首页"},
         homePath: {type: String, default: () => "/"},
-        routeMetaKey: {type: String, default: () => "tab"}
     },
     watch: {
         "$route": {
@@ -172,7 +171,7 @@ export default {
                 tabs = [new TabItemData(this.homeName, this.homePath)]
             }
 
-            var tabName = this.$route.meta[this.routeMetaKey] || this.homeName;
+            var tabName = jv.getRouteMetaTabName() || this.homeName;
             this.setTab(tabName, this.$route.path);
         },
         /**

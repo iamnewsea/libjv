@@ -178,8 +178,8 @@ export default {
             var tabs = localStorage.getJson(jv.tabs_key);
             tabs = tabs.map(it => new TabItemData(it.name, it.root, it.path));
 
-            this.activeTab(jv.getRouteMetaTabName() || this.homeName);
             this.list = tabs;
+            this.activeTab(jv.getRouteMetaTabName() || this.homeName);
         },
         /**
          * 获取tabs数据

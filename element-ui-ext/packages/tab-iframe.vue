@@ -2,9 +2,7 @@
     <el-tabs ref="tabs" type="card" v-model="tabName"
              v-bind="[$attrs]"
              class="iframe-tab"
-             @tab-click="tab_change"
              @tab-remove="tab_remove"
-             :before-leave="tab_leave"
              v-if="list.length"
     >
         <el-tab-pane v-for="tab in list" :name="tab.name" :label="tab.name + ' '"
@@ -59,6 +57,8 @@ class TabItemData {
     }
 }
 
+jv.TabItemData = TabItemData;
+
 export default {
     name: "tab-iframe",
     data() {
@@ -97,6 +97,16 @@ export default {
                 return;
             }
             this.$emit("input", v);
+
+            var tabs = localStorage.getJson(jv.tabs_key);
+            if (!tabs) {
+                tabs = [new TabItemData(this.homeName, this.homePath)]
+            } else {
+                tabs = tabs.map(it => new TabItemData(it.name, it.root, it.path));
+            }
+            var item = tabs.last(it => it.name == v);
+            history.pushState('', '', BASE_URL.slice(0, -1) + item.path);
+            this.$emit("change", item);
         }
     },
     created() {
@@ -202,9 +212,6 @@ export default {
             }
             top.history.pushState('', '', BASE_URL.slice(0, -1) + item.path);
         },
-        tab_change(tab, ev) {
-
-        },
         tab_remove(tab) {
             var tabs = this.list;
             if (!tabs.length) {
@@ -228,7 +235,8 @@ export default {
     margin-right: -10px;
     margin-left: 10px;
 }
-.iframe-tab{
+
+.iframe-tab {
     flex: 1;
     display: flex;
     flex-direction: column;

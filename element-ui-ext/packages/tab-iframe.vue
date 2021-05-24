@@ -175,6 +175,13 @@ export default {
             var tabName = this.$route.meta[this.routeMetaKey] || this.homeName;
             this.setTab(tabName, this.$route.path);
         },
+        /**
+         * 获取tabs数据
+         * @returns [TabItemData]
+         */
+        getTabs() {
+            return (localStorage.getJson(jv.tabs_key) || []).map(it => new TabItemData(it.name, it.root, it.path));
+        },
         setTab(tabName, path) {
             var tabs = localStorage.getJson(jv.tabs_key);
             if (!tabs) {

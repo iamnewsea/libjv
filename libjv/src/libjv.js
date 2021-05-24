@@ -28,26 +28,6 @@ jv.noop = () => {
 jv.enum = {};
 
 
-/**
- *
- * @param eventName
- * @param evDetail 必须是 {detail: 数据 }
- * @returns {CustomEvent<any>}
- */
-jv.createEvent = (eventName, evDetail) => {
-    if (jv.inBrowser) {
-        var chkEvent;
-        if (document.createEvent) {
-            chkEvent = document.createEvent("CustomEvent");
-            chkEvent.initCustomEvent(eventName, true, true, evDetail);
-        } else {
-            chkEvent = new CustomEvent(eventName, evDetail);
-        }
-        return chkEvent;
-    }
-};
-
-
 jv.info = console.info;
 jv.error = console.error;
 jv.warn = console.warn;
@@ -94,36 +74,6 @@ jv.sleep = (time) => {
     })
 };
 
-/**
- * 深覆盖。
- * Object.assign({},{a:{a1:1}}, { a: {b1:1}} ) => 结果 {a:{b1:1}}, a.a1会丢失。
- * @param objs
- */
-// jv.extend = (target, ...sources) => {
-//     target = target || {};
-//
-//     sources.forEach(source => {
-//         let descriptors = Object.keys(source).reduce((descriptors, key) => {
-//             var value = source[key];
-//             if( value === null || value === 0 || value === "" || typeof(value) === "undefined"){
-//                 return descriptors;
-//             }
-//             descriptors[key] = Object.getOwnPropertyDescriptor(source, key);
-//             return descriptors;
-//         }, {});
-//
-//         // Object.assign 默认也会拷贝可枚举的Symbols
-//         Object.getOwnPropertySymbols(source).forEach(sym => {
-//             let descriptor = Object.getOwnPropertyDescriptor(source, sym);
-//             if (descriptor.enumerable) {
-//                 descriptors[sym] = descriptor;
-//             }
-//         });
-//         Object.defineProperties(target, descriptors);
-//     });
-//     return target;
-// };
-
 
 jv.getUrlHost = (url) => {
     var r;
@@ -144,45 +94,6 @@ jv.getUrlHost = (url) => {
 
 //缓存在内存的数据
 jv.cache = {};
-// jv.getCacheData = function(url){
-//     return
-// };
-//
-// jv.setCacheData = function(url,value){
-//
-// };
-
-// /**
-//  * jv.cache.get("/info/getCitys").then(res=> this.citys_data = res.data.data);
-//  * @type {{get: (function(*=, *)), set: (function(*, *))}}
-//  */
-// jv.cache = {
-//   get(url, postData, resultFunc) {
-//     if (!url) return null;
-//
-//     var ret = jv.cache_db[url];
-//     if (ret) {
-//       resultFunc(ret);
-//       return  ;
-//     }
-//
-//     jv.ajax.post(url).then(res=>{
-//       var json = res.data.data;
-//       if(json) {
-//         jv.cache.set(url,json);
-//         resultFunc(json);
-//       }
-//     });
-//   },
-//   set(url, value) {
-//     if (value === null) {
-//       return delete jv.cache_db[url];
-//     }
-//     jv.cache_db[url] = value;
-//     return value;
-//   }
-// };
-
 
 /**
  * 定义枚举类型
@@ -275,54 +186,6 @@ jv.enumAllSet = function (enumType, enumValue) {
 };
 
 
-/**
- * meta标签
- * @param where
- * @param attrs
- */
-jv.meta = (where, attrs) => {
-    if (!attrs || !where) return;
-    var metas = Array.from(document.head.children).filter(it => it.tagName == "META");
-    Object.keys(where).forEach(key => {
-        metas = metas.filter(it => it[key] == where[key]);
-    });
-
-    var meta = metas[0];
-    if (!meta) {
-        meta = document.createElement("META");
-        Object.keys(where).forEach(key => {
-            meta.setAttribute(key, where[key]);
-        });
-        document.head.appendChild(meta);
-    }
-
-    Object.keys(attrs).forEach(key => {
-        meta.setAttribute(key, attrs[key]);
-    });
-};
-
-/**
- * 窗口变化事件回调，延时 150ms 触发一次,
- * 应该放到 App.vue created 方法中执行。保证在DOMContentLoadedgk事件后。
- */
-jv.resize = (callback, time) => {
-    if (!callback) return;
-
-    var timerId = 0;
-    time = time || 150;
-
-    var recalc = () => {
-        if (timerId) {
-            clearTimeout(timerId);
-        }
-        timerId = setTimeout(callback, time);
-    };
-
-    var resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize';
-    window.addEventListener(resizeEvt, recalc, false);
-    callback();
-    return recalc;
-};
 
 /**
  * isNaN 函数，参数是字符串会返回 true,不准。
@@ -397,61 +260,6 @@ jv.asInt = (value) => {
         return parseInt(value);
     }
     return 0;
-}
-
-// Object.defineProperty(JvEnum.prototype, "getData", {
-//     value(key) {
-//         if (!jv.isNull(key)) {
-//             return this.list.filter(it => it.name == key)[0] || {};
-//         }
-//         return this.list;
-//     }, enumerable: false
-// });
-jv.initDomResize = function (element) {
-    var bind_resize = function (e) {
-        e.target.frameElement.observer.forEach(function (it) {
-            it(e);
-        })
-    };
-
-    var observerDom = Array.from(element.children).last(it => it.observer);
-    if (observerDom) {
-        //判断是否有事件
-        observerDom.contentWindow.removeEventListener('resize', bind_resize);
-        observerDom.contentWindow.addEventListener('resize', bind_resize);
-        return observerDom;
-    }
-    const maxLeft = 3.35544e+07,
-        maxTop = 3.35544e+07;
-
-
-    observerDom = document.createElement('iframe');
-    observerDom.observer = [];
-    observerDom.style.cssText = `position:absolute;width:100%;height:100%;left:${-maxLeft}px;top:${-maxTop}px;overflow:hidden`;
-    element.appendChild(observerDom);
-    observerDom.contentWindow.removeEventListener('resize', bind_resize);
-    observerDom.contentWindow.addEventListener('resize', bind_resize);
-
-    return observerDom;
-}
-//
-jv.domResize = function (element, callback) {
-    /**
-     * 监听dom元素尺寸是否发生了变化
-     * @param {HTMLElement} element
-     * @param {function} callback
-     */
-
-    var observerDom = jv.initDomResize(element);
-
-    if (!observerDom.observer.includes(callback)) {
-        observerDom.observer.push(callback);
-    }
-}
-
-jv.removeDomResizes = function (element) {
-    var dom = jv.initDomResize(element);
-    dom.parentElement.removeChild(dom);
 }
 
 /**
@@ -531,16 +339,9 @@ jv.fillRes = (obj, key, args) => {
         if (!target) {
             return;
         }
-
-
         if (!must && (key1 + "_res") in target) {
             return;
         }
-
-        // if (jv.isNull(value)) {
-        //     target[key1 + "_res"] = "";
-        //     return;
-        // }
 
         var value = target[key1];
 
@@ -571,29 +372,8 @@ jv.fillRes = (obj, key, args) => {
                 },
                 enumerable: false,configurable:true
             });
-
-            // target[key1 + "_res"] = stringValue;
-
-            //暂不处理 Java 的 boolean 字段。
-            // if (key1.startsWith("is")) {
-            //     var key2 = key1.slice(2);
-            //     if (key2) {
-            //         key2 = key2[0].toLowerCase() + key2.slice(1);
-            //         target[key2] = value;
-            //         target[key2 + "_res"] = stringValue;
-            //     }
-            // }
             return true;
         }
-        // else if (!ignoreDate && (type == "string")) {
-        //     if (value.isDateFormat()) {
-        //         target[key1 + "_res"] = value;
-        //         return true;
-        //     } else if (value.isDateTimeFormat()) {
-        //         target[key1 + "_res"] = Date.from(value).toDateString(args1, "local");
-        //         return true;
-        //     }
-        // }
     };
 
 
@@ -676,52 +456,6 @@ jv.fromHumanSize = (value) => {
 
     return parseInt(value * Math.pow(2, j));
 }
-
-/**
- * 代理对象，避免 toJSON 递归调用。
- * @param json
- * @returns {*}
- */
-// jv.proxy = (json) => {
-//     return new Proxy(json || {}, {
-//         get: function (target, key) {
-//             if (key in target == false) {
-//                 if (key.Type == "symbol") {
-//                     return null;
-//                 }
-//                 console.log("jv.proxy, 在对象：", JSON.stringify(target), ",找不到字段: ", key.toString());
-//             }
-//
-//             return target[key];
-//         }
-//     });
-// };
-
-/**
- * 修复Java布尔类的字段名称。使用 isUdd 字段
- */
-// jv.fixJavaBoolField = (json) => {
-//     jv.recursionJson(json, (target) => {
-//         Object.keys(target).forEach(key1 => {
-//             var value = target[key1];
-//
-//             if (value !== false && value !== true) {
-//                 return;
-//             }
-//
-//             //转为 isUpper 形式。
-//             if (key1.length > 2 && (key1.slice(0, 2) == "is" && key1.charCodeAt(2).Between(65, 90))) {
-//
-//             } else {
-//                 var key2 = "is" + key1[0].toUpperCase() + key1.slice(1)
-//                 if (key2 in target == false) {
-//                     target[key2] = value;
-//                     delete target[key1];
-//                 }
-//             }
-//         });
-//     });
-// };
 
 
 /*如果两个对象是数组, 使用refDataEquals比较内容, 不比较顺序.
@@ -825,12 +559,6 @@ jv.dataEquals = (a, b, objectEqualField) => {
 jv.isPlainObject = (obj) => {
     if (!obj) return false;
     return obj.ObjectType;
-    // Detect obvious negatives
-    // Use toString instead of jQuery.type to catch host objects
-    // if (!obj || ({}).toString.call(obj) !== "[object Object]") {
-    //     return false;
-    // }
-    // return true;
 };
 
 
@@ -1028,106 +756,6 @@ jv.param = (obj, withHost) => {
     return [host, ary.join("&")].filter(it => it).join("?")
 };
 
-jv.getOrPutDiv = (divId, attributes, styles) => {
-    var ret = document.getElementById(divId);
-    if (ret) return ret;
-    ret = document.createElement("div")
-    ret.id = divId;
-    if (attributes) {
-        Object.keys(attributes).forEach(key => {
-            ret.setAttribute(key, attributes[key]);
-        })
-    }
-    if (styles) {
-        Object.keys(styles).forEach(key => {
-            ret.style[key] = styles[key]
-        })
-    }
-    document.body.appendChild(ret)
-    return ret;
-}
-
-//通过 iframe 打开
-jv.downloadFile = url => {
-    if (!url) return;
-    if (!url.includes("?")) {
-        url += "?"
-    }
-    var json = jv.query2Json(url);
-    if (!("_" in json)) {
-        json["_"] = jv.random()
-    }
-
-    if (!("iniframe" in json)) {
-        json["iniframe"] = "true";
-    }
-    url = jv.param(json, true);
-    console.log("jv.downloadFile:" + url);
-    var div = jv.getOrPutDiv("download_div", {}, {display: "none"})
-    div.innerHTML = "";
-    div.innerHTML = "<iframe src=\"" + url + "\" />";
-}
-
-//通过 a 打开。
-jv.open = (url, target) => {
-    if (!url) {
-        return;
-    }
-    var link = jv.getOrPutDiv("open_a", {}, {display: "none"})
-    if (target) {
-        link.setAttribute("target", target);
-    }
-    link.setAttribute("href", url);
-    link.trigger(new MouseEvent("click", {view: window, bubbles: true, cancelable: true}));
-}
-
-// class UrlCls {
-//     constructor(fullUrl){
-//
-//     }
-// }
-//
-// jv.url = (fullUrl) => {
-//     var parts = fullUrl.split("?"),
-//     path = parts[0],
-//     queryHash = parts[1] || "",
-//     queryHashParts = queryHash.split("#"),
-//     query = queryHashParts[0],
-//     hash = queryHashParts[1];
-//
-//     var getJson = (query)=>{
-//         var ret  = {};
-//         query.split("?").last().split("&").forEach((it) => {
-//             var sects = it.split("=");
-//             if (sects.length == 2) {
-//                 var key = sects[0];
-//                 var value = decodeURIComponent(sects[1]);
-//                 if (key in ret) {
-//                     var oriValue = ret[key];
-//                     if (oriValue.Type == "array") {
-//                         oriValue.push(value);
-//                     } else {
-//                         oriValue = [oriValue];
-//                         oriValue.push(value);
-//                     }
-//                     ret[key] = oriValue;
-//                 } else {
-//                     ret[key] = value;
-//                 }
-//             }
-//         });
-//         return ret;
-//     }
-//
-//     this
-//
-//     return {
-//         getPath :()=> path,
-//         getQueryJson:()=> getJson(query),
-//         getHashJson:()=> getJson(hash)
-//     }
-// }
-
 /**
  * query 必须包含? 截取问号后面的部分。
  * @param query
@@ -1209,22 +837,5 @@ jv.setEvalExpression = (obj, path, value) => {
     }
 }
 
-/**
- * 从 container 向下，遍历 $children，根据 $el == dom 查找 dom所属的 vnode
- * @param container
- * @param dom
- */
-jv.findVNode = (container, dom) => {
-    if (container.$el === dom) {
-        return container;
-    }
-    var ret;
-    for (var item of container.$children) {
-        ret = jv.findVNode(item, dom);
-        if (ret) {
-            return ret;
-        }
-    }
-};
 
 export default jv;

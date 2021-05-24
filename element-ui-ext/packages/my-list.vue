@@ -27,6 +27,7 @@
                   @row-dblclick="dbClick"
                   @row-click="tableRowClick"
                   @rowKey="rowKey"
+                  :emptyText="emptyText"
                   ref="table"
         >
             <slot></slot>
@@ -37,54 +38,6 @@
         </el-pagination>
     </div>
 </template>
-<style scoped>
-.buttons-container {
-    min-width: auto;
-    max-width: unset;
-    width: auto;
-    flex: 1;
-    display: flex;
-    justify-content: space-between;
-}
-
-.buttons {
-    min-width: auto;
-    max-width: unset;
-    width: auto;
-    flex: 1;
-    display: flex;
-}
-
-.buttons > * {
-    margin-right: 12px;
-}
-
-.buttons > *:last-child {
-    margin-right: 0;
-}
-
-</style>
-<style>
-
-.last-row .link {
-    font-weight: bold;
-}
-
-.el-cell-index {
-    cursor: default;
-}
-
-.el-cell-index .cell div {
-    text-align: center;
-}
-
-.check-row .el-cell-index .cell div {
-    color: white;
-    background-color: #df5000;
-    border-radius: 30px;
-    padding: 2px 4px;
-}
-</style>
 <script type="text/ecmascript-6">
 export default {
     name: "my-list",
@@ -122,7 +75,8 @@ export default {
             query2: {}, // 嵌入的query
             pageNumber: 1,
             lastRowId: "",
-            tableData: []
+            tableData: [],
+            serverError: false
         }
     },
     mounted() {
@@ -138,17 +92,22 @@ export default {
         this.loadData();
     },
     computed: {
+        emptyText() {
+            return this.serverError ? "服务器错误" : this.$attrs.emptyText;
+        },
         rowKey() {
             return this.$attrs.rowKey || 'id';
         },
         attrs() {
-            return Object.assign({
+            var ret = Object.assign({
                 border: true,
                 stripe: true,
                 "row-class-name": ({row, rowIndex}) => {
                     return jv.evalExpression(row, this.rowKey) == this.lastRowId ? 'last-row' : ''
                 }
             }, this.$attrs);
+            delete ret.emptyText;
+            return ret;
         }
     },
     watch: {
@@ -249,6 +208,7 @@ export default {
                 return;
             }
 
+            this.serverError = false;
             this.loading = true;
             if (this.url) {
                 this.$http.post(this.url, para).then(res => {
@@ -267,6 +227,9 @@ export default {
                     });
 
                     this.$emit("input", this.tableData);
+                    this.loading = false;
+                }).catch(() => {
+                    this.serverError = true;
                     this.loading = false;
                 });
             }
@@ -302,6 +265,8 @@ export default {
             if (para_ret === false) {
                 return;
             }
+
+            this.serverError = false;
             this.loading = true;
             this.$http.post(this.url, para).then(res => {
                 this.$emit("loaded", res, para);
@@ -324,6 +289,9 @@ export default {
                 this.$emit("input", this.tableData);
                 this.loading = false;
 
+            }).catch(() => {
+                this.serverError = true;
+                this.loading = false;
             });
         },
         data_setted() {
@@ -377,3 +345,52 @@ export default {
  *  this.$refs.list.setLastRowId(row.school.id);
  */
 </script>
+
+<style scoped>
+.buttons-container {
+    min-width: auto;
+    max-width: unset;
+    width: auto;
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+}
+
+.buttons {
+    min-width: auto;
+    max-width: unset;
+    width: auto;
+    flex: 1;
+    display: flex;
+}
+
+.buttons > * {
+    margin-right: 12px;
+}
+
+.buttons > *:last-child {
+    margin-right: 0;
+}
+
+</style>
+<style>
+
+.last-row .link {
+    font-weight: bold;
+}
+
+.el-cell-index {
+    cursor: default;
+}
+
+.el-cell-index .cell div {
+    text-align: center;
+}
+
+.check-row .el-cell-index .cell div {
+    color: white;
+    background-color: #df5000;
+    border-radius: 30px;
+    padding: 2px 4px;
+}
+</style>

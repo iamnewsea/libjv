@@ -1,38 +1,23 @@
-import jv from "./file-upload"
+import jv from "./jv-dom"
 
 /**
  * jv.initVue({vue:Vue,axios:axios,router:router});
  * @param setting
  * @returns {value|boolean|*}
  ajaxJavaBooleanKey ：默认为true , 是否处理 Java Boolean的Key，如：接口返回 admin:true , 转化为： isAdmin: true
- ajaxResType ： 默认为true , 系统默认对 boolean,date添加 _res 额外键，设置这个字段，会忽略指定的类型。该值是逗号分隔的字符串，有如下值：boolean,date
+ ajaxResType ： 默认为 true , 系统默认对 boolean,date添加 _res 额外键，设置这个字段，会忽略指定的类型。该值是逗号分隔的字符串，有如下值：boolean,date
  ajaxErrorMsg: 默认为 true,系统默认认为 res.data.msg 是错误消息，弹窗提示
 
  VUE_APP_Server_Host 表示axios服务器主机头
  VUE_APP_User_System 表示用户体系，localStorage用它做前缀。
  */
-jv.initVue = (setting) => {
-    window.jv = jv;
-    var {vue, axios, router, ajaxJavaBooleanKey, ajaxResType, ajaxErrorMsg, elementUI} = setting;
+var initEnvVue = function (vue) {
     jv.Vue = vue;
-    //关闭环境给出的提示.
-    // vue.config.productionTip = false;
     var vueProtype = vue.prototype;
     vueProtype.jv = jv;
-    vueProtype.$http = axios;
 
     var envs = process.env;
     window.BASE_URL = envs.BASE_URL;
-
-    if (jv.isNull(ajaxJavaBooleanKey)) {
-        ajaxJavaBooleanKey = true;
-    }
-    if (jv.isNull(ajaxResType)) {
-        ajaxResType = true;
-    }
-    if (jv.isNull(ajaxErrorMsg)) {
-        ajaxErrorMsg = true;
-    }
 
     // jv.initVue_setting = {ajaxJavaBooleanKey, ajaxResType, ajaxErrorMsg};
 
@@ -45,22 +30,6 @@ jv.initVue = (setting) => {
 
     jv.User_System = window.User_System;
     vueProtype.Server_Host = window.Server_Host;
-
-
-    //接受 postMessage,弹出错误消息。
-    window.addEventListener('message', (e) => {
-        //两个属性： event,arguments
-        if (e.data.event == "error") {
-            jv.error.apply(jv, e.data.arguments);
-        }
-    }, false);
-
-    //创建简单的 local store
-    /*    Object.defineProperty(vueProtype, "$my_store", {
-            get() {
-                return localStorage.my_store;
-            }, enumerable: false
-        });*/
 
 
     //重置数据
@@ -250,16 +219,7 @@ jv.initVue = (setting) => {
         }, enumerable: false, configurable: true, writable: true
     });
 
-    //----------------------------------- axios
-    //代理 post
-
     vue.mixin({
-        // data() {
-        //     return {
-        //         //轻量化，控制 vue_jv.an_version (data 里属性不能以 $,_ 开头。)
-        //         vue_jv: {}
-        //     }
-        // },
         updated: function () {
             //对所有 .kv [chk] 添加 must 样式。
             if (this.$el && this.$el.querySelectorAll) {
@@ -284,10 +244,37 @@ jv.initVue = (setting) => {
     });
 
 
+    /** PrerenderSPAPlugin 插件，需要手动触发完成事件
+     *  但是，在实际项目中，会有多次Ajax调用，在所有Ajax调用完成后再触发事件进行渲染。
+     *  定义一个 SpaAjaxEnum 枚举，每次回发完成后进行设置，
+     *  this.$done("SpaAjaxEnum枚举值")
+     */
+    jv.vue_spa_render_event = "render-event";
+    jv.vue_spa_enum = "SpaAjaxEnum";
+
+    vueProtype.$done = function (spa_enum, value) {
+        if (!value) {
+            value = spa_enum;
+            spa_enum = jv.vue_spa_enum;
+        }
+
+        if (!value) {
+            return;
+        }
+
+        if (!jv.enumAllSet(spa_enum, value)) return;
+
+        this.$nextTick(() => {
+            setTimeout(() => {
+                document.dispatchEvent(new Event(jv.vue_spa_render_event));
+            }, 200)
+        });
+    };
+
+}
+
+var initEnvAxios = function (axios) {
     jv.ajax = axios;
-    axios.defaults.javaBooleanKey = ajaxJavaBooleanKey;
-    axios.defaults.resType = ajaxResType;
-    axios.defaults.errorMsg = ajaxErrorMsg;
 
     axios.defaults.baseURL = window.Server_Host;
     axios.defaults.withCredentials = true;
@@ -422,46 +409,17 @@ jv.initVue = (setting) => {
         document.write(msg);
         return Promise.reject(error);
     });
+}
 
 
-    /** PrerenderSPAPlugin 插件，需要手动触发完成事件
-     *  但是，在实际项目中，会有多次Ajax调用，在所有Ajax调用完成后再触发事件进行渲染。
-     *  定义一个 SpaAjaxEnum 枚举，每次回发完成后进行设置，
-     *  this.$done("SpaAjaxEnum枚举值")
-     */
-    jv.vue_spa_render_event = "render-event";
-    jv.vue_spa_enum = "SpaAjaxEnum";
-
-    vueProtype.$done = function (spa_enum, value) {
-        if (!value) {
-            value = spa_enum;
-            spa_enum = jv.vue_spa_enum;
-        }
-
-        if (!value) {
-            return;
-        }
-
-        if (!jv.enumAllSet(spa_enum, value)) return;
-
-        this.$nextTick(() => {
-            setTimeout(() => {
-                document.dispatchEvent(new Event(jv.vue_spa_render_event));
-            }, 200)
-        });
-    };
-
-
-    //elementUI
-    jv.initElementUI(elementUI);
-};
-
-jv.initElementUI = function (ELEMENT) {
+var initElementUI = function (ELEMENT) {
     if (!ELEMENT) return;
 
     ELEMENT.Button.props.size.default = "mini"
     ELEMENT.Input.props.size.default = "small"
     ELEMENT.Table.props.rowKey.default = "id";
+    ELEMENT.Table.props.rowKey.default = "id";
+    ELEMENT.TableColumn.props.showOverflowTooltip.default = true
 
     //设置 Element-ui 属性的默认值
     ELEMENT.Dialog.props.closeOnClickModal.default = false
@@ -508,113 +466,45 @@ jv.initElementUI = function (ELEMENT) {
     }
 }
 
+
+jv.getRouteMetaTabName = function () {
+    var route = jv.main.$route;
+    if (!route) return "";
+    return (route.meta.tab || "").format(Object.assign({}, route.params, route.query));
+}
+
+var initEnvRouter = function (router) {
+
+}
+
+jv.initVue = (setting) => {
+    window.jv = jv;
+    var {vue, axios, router, elementUI} = setting;
+
+    //接受 postMessage,弹出错误消息。
+    window.addEventListener('message', (e) => {
+        //两个属性： event,arguments
+        if (e.data.event == "error") {
+            jv.error.apply(jv, e.data.arguments);
+        }
+    }, false);
+
+    vue.prototype.$http = axios;
+
+    initEnvVue(vue);
+    //axios 可以添加以下属性: javaBooleanKey resType errorMsg;
+    //如: axios.defaults.errorMsg = true;
+    initEnvAxios(axios);
+    initElementUI(elementUI);
+    initEnvRouter(router || vue.prototype.$router);
+};
+
+
 jv.getIdFromUrl = function (url) {
     return url.replace(/\//g, "-").replace(/[^0-9a-zA-Z]/g, "");
 };
 
 //----------------------router
-/**
- * 添加外部的 script 标签
- */
-jv.addScriptFile = (fileName, attributes) => {
-    if (!fileName) return Promise.reject();
-
-    var id = jv.getIdFromUrl(fileName);
-
-    var script = document.getElementById(id);
-    if (script) {
-        return Promise.resolve();
-    }
-    attributes = attributes || {};
-    if (!attributes.type) {
-        attributes.type = "text/javascript";
-    }
-    attributes.id = id;
-
-    var self = this;
-    return new Promise((r, e) => {
-        script = document.createElement("script");
-
-        script.onload = script.onreadystatechange = function () {
-            if (!this.readyState     //这是FF的判断语句，因为ff下没有readyState这人值，IE的readyState肯定有值
-                || this.readyState == 'loaded' || this.readyState == 'complete'   // 这是IE的判断语句
-            ) {
-                r.call(self, fileName);
-            }
-        };
-
-        Object.keys(attributes).forEach(it => {
-            script.setAttribute(it, attributes[it]);
-        });
-
-        script.src = fileName;
-        document.head.appendChild(script);
-    });
-};
-
-/**
- * 添加 link css的文件引用。
- */
-jv.addLinkCssFile = (fileName, attributes) => {
-    if (!fileName) return;
-
-    var id = jv.getIdFromUrl(fileName);
-
-    var link = document.getElementById(id);
-    if (link) {
-        return;
-    }
-
-    link = document.createElement("link");
-
-    attributes = attributes || {};
-
-    if (!attributes.type) {
-        attributes.type = "text/css";
-    }
-    if (!attributes.rel) {
-        attributes.rel = "stylesheet";
-    }
-    attributes.id = id;
-
-    Object.keys(attributes).forEach(it => {
-        link.setAttribute(it, attributes[it]);
-    });
-
-    link.href = fileName;
-    document.head.appendChild(link);
-};
-
-//添加 style 标签
-jv.addStyleDom = (id, cssContent, attributes) => {
-    if (!cssContent) return;
-
-
-    var style = id && document.getElementById(id);
-    if (!style) {
-        style = document.createElement("style");
-        document.head.appendChild(style);
-    }
-    attributes = attributes || {};
-
-    if (!attributes.type) {
-        attributes.type = "text/css";
-    }
-
-    if (id) {
-        attributes.id = id;
-    }
-
-    Object.keys(attributes).forEach(it => {
-        style.setAttribute(it, attributes[it]);
-    });
-
-    if (style.styleSheet) {
-        style.styleSheet.cssText = cssContent;
-    } else {
-        style.innerHTML = cssContent;
-    }
-};
 
 
 export default jv;

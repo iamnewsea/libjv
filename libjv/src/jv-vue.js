@@ -1,4 +1,4 @@
-import jv from "./libjv_dom"
+import jv from "./jv-dom"
 
 /**
  * jv.initVue({vue:Vue,axios:axios,router:router});
@@ -15,7 +15,6 @@ var initEnvVue = function (vue) {
     jv.Vue = vue;
     var vueProtype = vue.prototype;
     vueProtype.jv = jv;
-    vueProtype.$http = axios;
 
     var envs = process.env;
     window.BASE_URL = envs.BASE_URL;
@@ -490,12 +489,14 @@ jv.initVue = (setting) => {
         }
     }, false);
 
+    vue.prototype.$http = axios;
+
     initEnvVue(vue);
     //axios 可以添加以下属性: javaBooleanKey resType errorMsg;
     //如: axios.defaults.errorMsg = true;
     initEnvAxios(axios);
     initElementUI(elementUI);
-    initEnvRouter(router || vue.prototype.$route);
+    initEnvRouter(router || vue.prototype.$router);
 };
 
 

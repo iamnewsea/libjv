@@ -297,3 +297,6 @@ jv.addStyleDom = (id, cssContent, attributes) => {
         style.innerHTML = cssContent;
     }
 };
+
+
+export default jv;

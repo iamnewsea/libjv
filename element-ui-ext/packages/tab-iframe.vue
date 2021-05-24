@@ -174,6 +174,13 @@ export default {
             var tabName = jv.getRouteMetaTabName() || this.homeName;
             this.setTab(tabName, this.$route.path);
         },
+        fresh() {
+            var tabs = localStorage.getJson(jv.tabs_key);
+            tabs = tabs.map(it => new TabItemData(it.name, it.root, it.path));
+
+            this.activeTab(jv.getRouteMetaTabName() || this.homeName);
+            this.list = tabs;
+        },
         /**
          * 获取tabs数据
          * @returns [TabItemData]

@@ -20,46 +20,6 @@
 
 //$router.push ，刷新URL，不刷新页面。
 
-jv.getIframeUrl = function (path) {
-    var json = jv.query2Json(BASE_URL.slice(0, -1) + path);
-    json["_com_"] = true;
-    return jv.param(json, true);
-}
-jv.exit_fullscreen = function () {
-    var iframe = document.querySelector("iframe.fullscreen");
-    if (iframe) {
-        iframe.classList.remove("fullscreen");
-        document.body.classList.remove("fullscreen")
-    }
-
-    top.document.body.classList.remove("fullscreen")
-    if (window.frameElement) {
-        window.frameElement.classList.remove("fullscreen");
-    }
-}
-
-class TabItemData {
-    name = ""
-    root = ""
-    path = ""
-
-    constructor(name, root, path) {
-        this.name = name;
-        this.root = root;
-        this.path = path || root;
-    }
-
-    get root_com() {
-        return jv.getIframeUrl(this.root);
-    }
-
-    get path_com() {
-        return jv.getIframeUrl(this.path);
-    }
-}
-
-jv.TabItemData = TabItemData;
-
 export default {
     name: "tab-iframe",
     data() {
@@ -99,9 +59,9 @@ export default {
 
             var tabs = localStorage.getJson(jv.tabs_key);
             if (!tabs) {
-                tabs = [new TabItemData(this.homeName, this.homePath)]
+                tabs = [new jv.TabItemData(this.homeName, this.homePath)]
             } else {
-                tabs = tabs.map(it => new TabItemData(it.name, it.root, it.path));
+                tabs = tabs.map(it => new jv.TabItemData(it.name, it.root, it.path));
             }
             var item = tabs.last(it => it.name == v);
             history.pushState('', '', BASE_URL.slice(0, -1) + item.path);
@@ -168,7 +128,7 @@ export default {
         init() {
             var tabs = localStorage.getJson(jv.tabs_key);
             if (!tabs) {
-                tabs = [new TabItemData(this.homeName, this.homePath)]
+                tabs = [new jv.TabItemData(this.homeName, this.homePath)]
             }
 
             var tabName = jv.getRouteMetaTabName() || this.homeName;
@@ -176,7 +136,7 @@ export default {
         },
         reload(tabName) {
             var tabs = localStorage.getJson(jv.tabs_key);
-            tabs = tabs.map(it => new TabItemData(it.name, it.root, it.path));
+            tabs = tabs.map(it => new jv.TabItemData(it.name, it.root, it.path));
 
             this.list = tabs;
             this.activeTab(tabName);
@@ -186,14 +146,14 @@ export default {
          * @returns [TabItemData]
          */
         getTabs() {
-            return (localStorage.getJson(jv.tabs_key) || []).map(it => new TabItemData(it.name, it.root, it.path));
+            return (localStorage.getJson(jv.tabs_key) || []).map(it => new jv.TabItemData(it.name, it.root, it.path));
         },
         setTab(tabName, path) {
             var tabs = localStorage.getJson(jv.tabs_key);
             if (!tabs) {
-                tabs = [new TabItemData(this.homeName, this.homePath)]
+                tabs = [new jv.TabItemData(this.homeName, this.homePath)]
             } else {
-                tabs = tabs.map(it => new TabItemData(it.name, it.root, it.path));
+                tabs = tabs.map(it => new jv.TabItemData(it.name, it.root, it.path));
             }
 
             if (!this.loadedTabs.includes(tabName)) {
@@ -206,7 +166,7 @@ export default {
             if (last) {
                 last.path = path;
             } else {
-                tabs.push(new TabItemData(tabName, path));
+                tabs.push(new jv.TabItemData(tabName, path));
             }
             this.saveList(tabs);
         },

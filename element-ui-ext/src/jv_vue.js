@@ -3,6 +3,47 @@ import jv from "libjv"
 (function () {
     jv.tabs_key = "$tabs";
 
+    class TabItemData {
+        name = ""
+        root = ""
+        path = ""
+
+        constructor(name, root, path) {
+            this.name = name;
+            this.root = root;
+            this.path = path || root;
+        }
+
+        get root_com() {
+            return jv.getIframeUrl(this.root);
+        }
+
+        get path_com() {
+            return jv.getIframeUrl(this.path);
+        }
+    }
+
+    jv.TabItemData = TabItemData;
+
+    jv.getIframeUrl = function (path) {
+        var json = jv.query2Json(BASE_URL.slice(0, -1) + path);
+        json["_com_"] = true;
+        return jv.param(json, true);
+    }
+    jv.exit_fullscreen = function () {
+        var iframe = document.querySelector("iframe.fullscreen");
+        if (iframe) {
+            iframe.classList.remove("fullscreen");
+            document.body.classList.remove("fullscreen")
+        }
+
+        top.document.body.classList.remove("fullscreen")
+        if (window.frameElement) {
+            window.frameElement.classList.remove("fullscreen");
+        }
+    }
+
+
     jv.last_msgs = {};
     jv.showLastInfo = function () {
         if (!jv.last_msgs.info) return;

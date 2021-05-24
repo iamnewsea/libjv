@@ -462,6 +462,8 @@ jv.initElementUI = function (ELEMENT) {
     ELEMENT.Button.props.size.default = "mini"
     ELEMENT.Input.props.size.default = "small"
     ELEMENT.Table.props.rowKey.default = "id";
+    ELEMENT.Table.props.rowKey.default = "id";
+    ELEMENT.TableColumn.props.showOverflowTooltip.default = true
 
     //设置 Element-ui 属性的默认值
     ELEMENT.Dialog.props.closeOnClickModal.default = false

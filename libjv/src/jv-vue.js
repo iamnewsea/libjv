@@ -467,8 +467,8 @@ var initElementUI = function (ELEMENT) {
 }
 
 
-jv.getRouteMetaTabName = function () {
-    var route = jv.main.$route;
+jv.getRouteMetaTabName = function (route) {
+    route = route || jv.main.$route;
     if (!route) return "";
     return (route.meta.tab || "").format(Object.assign({}, route.params, route.query));
 }

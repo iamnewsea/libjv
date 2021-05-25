@@ -1,5 +1,5 @@
 <template>
-    <my-list v-bind="$attrs" v-model="tableData" :noQueryPart="true">
+    <my-list v-bind="attrs" v-model="tableData" :noQueryPart="true">
         <el-table-column type="index" clign="center" width="50"></el-table-column>
 
         <slot></slot>
@@ -40,6 +40,7 @@
 }
 </style>
 <script type="text/ecmascript-6">
+
 export default {
     name: "input-table",
     inheritAttrs: false,
@@ -73,6 +74,15 @@ export default {
         //     type: [String, Array], default: () => ""
         // }
     },
+    computed: {
+        attrs() {
+            var ret = this.$attrs;
+            if (("draggable" in ret) == false) {
+                ret.draggable = true;
+            }
+            return ret;
+        }
+    },
     data() {
         return {
             tableData: {data: []},
@@ -88,8 +98,8 @@ export default {
             }
         },
         "tableData.data": {
-            immediate: true, deep: true, handler(val) {
-                this.$emit("input", this.tableData.data)
+            immediate: true, deep: true, handler(data) {
+                this.$emit("input", data)
             }
         }
         // fields: {

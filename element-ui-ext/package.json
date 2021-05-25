@@ -10,7 +10,8 @@
     "build": "vue-cli-service build --target lib --name element-ui-ext --dest lib src/index.js",
     "prepublishOnly": "yarn build"
   },
-  "dependencies": {},
+  "dependencies": {
+  },
   "peerDependencies": {
     "core-js": "^3.6.0"
   },
@@ -26,7 +27,8 @@
     "sass-loader": "^10.1.0",
     "vue": "^2.6.10",
     "vue-cropperjs": "^4.1.0",
-    "vue-template-compiler": "^2.6.10"
+    "vue-template-compiler": "^2.6.10",
+    "sortablejs": "^1.13.0"
   },
   "main": "lib/element-ui-ext.umd.js",
   "repository": {

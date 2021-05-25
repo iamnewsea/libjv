@@ -1,42 +1,47 @@
 <template>
-    <div class="list-items">
+    <div class="input-list">
         <template v-if="readOnly">
             <el-tag v-for="(item,index) in items" :key="index">{{ getDisplay(item) }}</el-tag>
         </template>
-        <el-input v-else v-for="(item,index) in items"
-                  :key="index"
-                  v-model="valueField? items[index][valueField] : items[index]"
-                  @change="change(index)"
-        >
-            <template slot="prepend">
-                <slot name="prepend"></slot>
-            </template>
-            <template slot="append">
-                <slot name="append"></slot>
-                <!--                <el-button v-if="canMoveDown && (index !== (items.length -1))" icon="el-icon-bottom"-->
-                <!--                           @click="movedown_click(index)"></el-button>-->
-                <!--                <el-button v-if="canMoveUp && index" icon="el-icon-up" @click="moveup_click(index)"></el-button>-->
+        <div class="list-items">
+            <el-input v-else v-for="(item,index) in items"
+                      class="input-list-item"
+                      :key="index"
+                      v-model="valueField? items[index][valueField] : items[index]"
+                      @change="change(index)"
+            >
+                <template slot="prepend">
+                    <slot name="prepend"></slot>
+                </template>
+                <template slot="append">
+                    <slot name="append"></slot>
+                    <!--                <el-button v-if="canMoveDown && (index !== (items.length -1))" icon="el-icon-bottom"-->
+                    <!--                           @click="movedown_click(index)"></el-button>-->
+                    <!--                <el-button v-if="canMoveUp && index" icon="el-icon-up" @click="moveup_click(index)"></el-button>-->
 
-                <el-button icon="el-icon-delete" @click="remove_click(index)"></el-button>
-            </template>
-        </el-input>
+                    <el-button icon="el-icon-delete" @click="remove_click(index)"></el-button>
+                </template>
+            </el-input>
+        </div>
         <el-button @click="add_click">增加</el-button>
     </div>
 </template>
 <style scoped>
-.list-items > div {
-    margin-bottom: 8px;
-}
-
-.list-items > span {
+.input-list > span {
     margin-right: 8px;
 }
 
-.list-items > span:last-child {
+.input-list > span:last-child {
     margin-right: auto;
+}
+
+.list-items > div {
+    margin-bottom: 8px;
 }
 </style>
 <script type="text/ecmascript-6">
+import Sortable from 'sortablejs'
+
 export default {
     name: "input-list",
     inheritAttrs: false,
@@ -70,7 +75,8 @@ export default {
         return {
             items: [],
             valueField: "",
-            displayField: ""
+            displayField: "",
+            sortable: null
         }
     },
     watch: {
@@ -93,8 +99,23 @@ export default {
         }
     },
     mounted() {
+        this.rowDrop();
     },
     methods: {
+        // 行拖拽
+        rowDrop() {
+            // 此时找到的元素是要拖拽元素的父容器
+            const tbody = this.$el.querySelector('.list-items');
+            const _this = this;
+            this.sortable = Sortable.create(tbody, {
+                //  指定父元素下可被拖拽的子元素
+                handle: ".input-list-item",
+                onEnd({newIndex, oldIndex}) {
+                    const currRow = _this.tableData.data.splice(oldIndex, 1)[0];
+                    _this.tableData.data.splice(newIndex, 0, currRow);
+                }
+            });
+        },
         getDisplay(item) {
             if (!this.displayField) {
                 return item;

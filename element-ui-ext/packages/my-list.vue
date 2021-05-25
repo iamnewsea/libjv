@@ -39,6 +39,8 @@
     </div>
 </template>
 <script type="text/ecmascript-6">
+import Sortable from 'sortablejs'
+
 export default {
     name: "my-list",
     inheritAttrs: false,
@@ -66,6 +68,9 @@ export default {
             type: Object, default() {
                 return {};
             }
+        },
+        draggable: {
+            type: [Boolean, String], default: () => false
         }
     },
     data() {
@@ -76,7 +81,8 @@ export default {
             pageNumber: 1,
             lastRowId: "",
             tableData: [],
-            serverError: false
+            serverError: false,
+            sortable: null
         }
     },
     mounted() {
@@ -90,6 +96,9 @@ export default {
             this.query2 = Object.assign({}, this.query2, this.query, store.query);
         }
         this.loadData();
+
+
+        this.rowDrop();
     },
     computed: {
         emptyText() {
@@ -118,9 +127,8 @@ export default {
 
                 this.data_setted();
 
-                if (v.data) {
-                    this.tableData = v.data;
-                }
+                this.tableData = v.data || [];
+
                 if (v.total) {
                     this.total = v.total;
                 }
@@ -135,11 +143,35 @@ export default {
             immediate: false, handler(v) {
                 this.loadData();
             }
+        },
+        draggable(v) {
+            if (v) {
+                this.rowDrop()
+            } else {
+                this.sortable && this.sortable.destroy();
+            }
         }
     },
     methods: {
+        // 行拖拽
+        rowDrop() {
+            if (!this.draggable) return;
+            if (!this.$el) return;
+            // 此时找到的元素是要拖拽元素的父容器
+            const tbody = this.$el.querySelector('.el-table__body-wrapper tbody');
+            const _this = this;
+            this.sortable = Sortable.create(tbody, {
+                //  指定父元素下可被拖拽的子元素
+                handle: this.draggable.Type == "string" ? this.draggable : "tr>td:first-child",
+                onEnd({newIndex, oldIndex}) {
+                    const currRow = _this.tableData.splice(oldIndex, 1)[0];
+                    _this.tableData.splice(newIndex, 0, currRow);
+                }
+            });
+        },
+
         getData() {
-            return this.tableData;
+            return {data: this.tableData, total: this.total};
         },
         getSelectionIds() {
             return this.$refs.table.store.states.selection.map(it => it[this.rowKey]);

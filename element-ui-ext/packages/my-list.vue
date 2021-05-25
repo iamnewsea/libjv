@@ -114,6 +114,7 @@ export default {
         value: {
             deep: true, immediate: true, handler(v) {
                 if (!v) return;
+                if (this.url) return;
 
                 this.data_setted();
 
@@ -185,7 +186,7 @@ export default {
             if (!row) return;
             Object.assign(row, data);
 
-            this.$emit("input", this.tableData);
+            this.$emit("input", {data: this.tableData, total: this.total});
         },
         getQuery() {
             let para = Object.assign({}, this.query2);
@@ -226,7 +227,7 @@ export default {
                         return it;
                     });
 
-                    this.$emit("input", this.tableData);
+                    this.$emit("input", {data: this.tableData, total: this.total});
                     this.loading = false;
                 }).catch(() => {
                     this.serverError = true;
@@ -286,7 +287,7 @@ export default {
                     localStorage.patchJson(key, storeData);
                 }
 
-                this.$emit("input", this.tableData);
+                this.$emit("input", {data: this.tableData, total: this.total});
                 this.loading = false;
 
             }).catch(() => {

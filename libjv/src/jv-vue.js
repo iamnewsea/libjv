@@ -302,12 +302,19 @@ var initEnvAxios = function (axios) {
 
         console.log("ajax:" + (new Date()).valueOf().toDateString() + " [" + config.method + "] " + config.baseURL + config.url);
 
-
-        if (!config.javaBooleanKey) return config;
         if (!config.data) return config;
         var type = config.data.Type;
         if (!config.data.ObjectType && !["array", "set"].includes(type)) return config;
 
+        let isBooleanStyle = config.isBooleanStyle;
+        if( jv.isNull(isBooleanStyle)){
+            isBooleanStyle = true;
+        }
+
+        if (isBooleanStyle) {
+
+
+        }
         //处理Java的布尔类型
         // jv.recursionJson(config.data, (target) => {
         //     Object.keys(target).forEach(key1 => {
@@ -339,9 +346,15 @@ var initEnvAxios = function (axios) {
     axios.interceptors.response.use((response) => {
         if (!response) return;
 
+        var msgIsError = response.config.msgIsError;
+
+        if (jv.isNull(msgIsError)) {
+            msgIsError = true;
+        }
+
         // Do something with response data
         var json = response.body = response.data;
-        if (response.config.errorMsg && json && json.msg) {
+        if (msgIsError && json && json.msg) {
             jv.error(json.msg);
             return Promise.reject({config: response.config, request: response.request, response, message: json.msg});
         }
@@ -358,7 +371,13 @@ var initEnvAxios = function (axios) {
         //     jv.fixJavaBoolField(json);
         // }
 
-        if (response.config.resType) {
+        var needRes = response.config.needRes;
+
+        if (jv.isNull(needRes)) {
+            needRes = true;
+        }
+
+        if (needRes) {
             jv.fillRes(json);
         }
 

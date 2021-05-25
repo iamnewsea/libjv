@@ -1,6 +1,6 @@
 {
   "name": "element-ui-ext",
-  "version": "0.10.39",
+  "version": "0.10.40",
   "description": "基于element-ui的vue扩展",
   "author": "于新海 <13466396863@163.com>",
   "scripts": {
@@ -10,8 +10,7 @@
     "build": "vue-cli-service build --target lib --name element-ui-ext --dest lib src/index.js",
     "prepublishOnly": "yarn build"
   },
-  "dependencies": {
-  },
+  "dependencies": {},
   "peerDependencies": {
     "core-js": "^3.6.0"
   },
@@ -25,10 +24,10 @@
     "libjv": "latest",
     "node-sass": "^4.14.1",
     "sass-loader": "^10.1.0",
+    "sortablejs": "^1.13.0",
     "vue": "^2.6.10",
     "vue-cropperjs": "^4.1.0",
-    "vue-template-compiler": "^2.6.10",
-    "sortablejs": "^1.13.0"
+    "vue-template-compiler": "^2.6.10"
   },
   "main": "lib/element-ui-ext.umd.js",
   "repository": {

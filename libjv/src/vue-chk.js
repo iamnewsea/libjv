@@ -302,12 +302,12 @@ import jv from "./libjv"
 
         //如果开头是?表示可空.
         if (chk[0] == '?') {
-            if (value === "" || value === 0) {
+            if (value === "") {
                 return ret;
             }
             chk = chk.slice(1).trim();
         } else {
-            if (value === "" || value === 0) {
+            if (value === "") {
                 ret.result = false;
                 ret.msg = "必填项"
                 return ret;

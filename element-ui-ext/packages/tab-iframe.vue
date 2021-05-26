@@ -20,6 +20,8 @@
 
 //$router.push ，刷新URL，不刷新页面。
 
+import jv from "../../libjv/src";
+
 export default {
     name: "tab-iframe",
     data() {
@@ -132,7 +134,9 @@ export default {
             }
 
             var tabName = jv.getRouteMetaTabName() || this.homeName;
-            this.setTab(tabName, this.$route.path);
+
+            //去除以 _开头及结尾的key
+            this.setTab(tabName, jv.getUrlWithout_(this.$route.fullPath));
         },
         reload(tabName) {
             var tabs = localStorage.getJson(jv.tabs_key);

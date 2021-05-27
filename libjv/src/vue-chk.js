@@ -68,9 +68,7 @@ import jv from "./libjv"
         },
         //*号必填
         "*": function (value, chk_body) {
-            // if (value === 0) return;
-            // if (value === false) return;
-            return jv.hasValue(value) ? "" : "必填项";
+            return (value === "" || jv.isNull(value) || jv.isNaN(value)) ? "必填项" : "";
         },
         "enum": function (value, chk_body) {
             if (chk_body.slice(1, -1).split(",").map(it => it.trim()).includes(value)) {
@@ -307,7 +305,7 @@ import jv from "./libjv"
             }
             chk = chk.slice(1).trim();
         } else {
-            if (value === "") {
+            if (value === "" || jv.isNull(value) || jv.isNaN(value)) {
                 ret.result = false;
                 ret.msg = "必填项"
                 return ret;

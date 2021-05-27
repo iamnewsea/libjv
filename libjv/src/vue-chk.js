@@ -68,8 +68,8 @@ import jv from "./libjv"
         },
         //*号必填
         "*": function (value, chk_body) {
-            if (value === 0) return;
-            if (value === false) return;
+            // if (value === 0) return;
+            // if (value === false) return;
             return jv.hasValue(value) ? "" : "必填项";
         },
         "enum": function (value, chk_body) {

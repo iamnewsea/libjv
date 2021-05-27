@@ -493,7 +493,7 @@ jv.getRouteMetaTabName = function (route) {
 }
 
 var initEnvRouter = function (router) {
-
+    jv.router = router;
 }
 
 jv.initVue = (setting) => {

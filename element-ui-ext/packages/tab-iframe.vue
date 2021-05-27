@@ -20,8 +20,6 @@
 
 //$router.push ，刷新URL，不刷新页面。
 
-import jv from "../../libjv/src";
-
 export default {
     name: "tab-iframe",
     data() {

@@ -307,7 +307,7 @@ var initEnvAxios = function (axios) {
         if (!config.data.ObjectType && !["array", "set"].includes(type)) return config;
 
         let isBooleanStyle = config.isBooleanStyle;
-        if( jv.isNull(isBooleanStyle)){
+        if (jv.isNull(isBooleanStyle)) {
             isBooleanStyle = true;
         }
 
@@ -345,18 +345,22 @@ var initEnvAxios = function (axios) {
 
     axios.interceptors.response.use((response) => {
         if (!response) return;
+        response.body = response.data;
 
-        var msgIsError = response.config.msgIsError;
-
+        var msgIsError = (response.config && response.config.msgIsError);
         if (jv.isNull(msgIsError)) {
             msgIsError = true;
         }
 
-        // Do something with response data
-        var json = response.body = response.data;
+        var json = response.data;
         if (msgIsError && json && json.msg) {
             jv.error(json.msg);
-            return Promise.reject({config: response.config, request: response.request, response, message: json.msg});
+            return Promise.reject({
+                config: response.config,
+                request: response.request,
+                response,
+                message: json.msg
+            });
         }
 
         var type = json.Type;
@@ -371,27 +375,33 @@ var initEnvAxios = function (axios) {
         //     jv.fixJavaBoolField(json);
         // }
 
-        var needRes = response.config.needRes;
+        var fillRes = response.config.fillRes;
 
-        if (jv.isNull(needRes)) {
-            needRes = true;
+        if (jv.isNull(fillRes)) {
+            fillRes = true;
         }
 
-        if (needRes) {
+        if (fillRes) {
             jv.fillRes(json);
         }
 
         return response;
     }, (error) => {
-        //运行时错误
-        if (error instanceof Error) {
+        if (!error.isAxiosError) {
+            //js执行错误
+            if (error instanceof Error) {
+                console.log(error);
+                if (error.message) {
+                    jv.error(error.message);
+                    return Promise.reject(error);
+                }
+            }
+
             return Promise.reject(error);
         }
-        if (error.config && !error.config.errorMsg) {
-            return Promise.reject(error);
-        }
+
+        var resp = error.response, msg = "";
         //如果网络有返回
-        var resp = error.response;
         if (resp) {
             var status = resp.status;
             if (status == 401) {
@@ -406,26 +416,29 @@ var initEnvAxios = function (axios) {
                 return Promise.reject(error);
             }
 
+            var msgIsError = (error.config && error.config.msgIsError);
+            if (jv.isNull(msgIsError)) {
+                msgIsError = true;
+            }
+
             var data = resp.data;
             /*{"timestamp":1502603323197,"status":500,"error":"Internal Server Error","exception":"java.lang.Exception","message":"更新条件为空，不允许更新","path":"/sys/synchroMenuAndPermiss"}*/
-            var errorMsg = (data && (data.msg || data.message)) || "系统错误:" + JSON.stringify(data);
+            msg = data && (msgIsError && data.msg) || data.message || "系统错误:" + JSON.stringify(data);
+            console.error(msg);
+            jv.error(msg.slice(0, 250));
+        } else {
+            //网络没有返回， 网络连接问题。
+            if (error.config) {
+                msg += "<div>"
+                    + ((error.config.url.startsWith("http://") || error.config.url.startsWith("https://")) ? "" : error.config.baseURL)
+                    + error.config.url + "</div>";
+            }
+            msg += " 网络连接失败,请检查网络再试。";
 
-            jv.error(errorMsg.slice(0, 100));
-            return Promise.reject(error);
+            console.error(msg);
+            document.write(msg);
         }
 
-        //网络没有返回， 网络连接问题。
-        var msg = "";
-
-        if (error.config) {
-            msg += "<div>"
-                + ((error.config.url.startsWith("http://") || error.config.url.startsWith("https://")) ? "" : error.config.baseURL)
-                + error.config.url + "</div>";
-        }
-        msg += (error.message || "网络连接失败,请检查网络再试。");
-
-        console.error(msg);
-        document.write(msg);
         return Promise.reject(error);
     });
 }

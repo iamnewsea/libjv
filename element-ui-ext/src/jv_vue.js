@@ -30,13 +30,26 @@ import jv from "libjv"
         json["_com_"] = true;
         return jv.param(json, true);
     }
+
     jv.exit_fullscreen = function () {
+        //退出浏览器全屏
+        try {
+            var exit = document.exitFullscreen || document.webkitExitFullscreen || document.mozCancelFullScreen || document.msExitFullscreen
+            if (exit) {
+                exit().catch(e=>{});
+            }
+        } catch (e) {
+
+        }
+
+        //容器执行的脚本
         var iframe = document.querySelector("iframe.fullscreen");
         if (iframe) {
             iframe.classList.remove("fullscreen");
             document.body.classList.remove("fullscreen")
         }
 
+        // iframe 内执行的脚本
         top.document.body.classList.remove("fullscreen")
         if (window.frameElement) {
             window.frameElement.classList.remove("fullscreen");

@@ -92,30 +92,45 @@ export default {
         },
         fullscreen(tabName) {
             this.activeTab(tabName);
+
+            //移除其它全屏iframe
             var ori_full = document.querySelector("iframe.fullscreen");
             if (ori_full) {
                 ori_full.classList.remove("fullscreen");
             }
+
+            var element = document.documentElement;
+            var fullscreenCmd = element.requestFullscreen || element.webkitRequestFullscreen || element.mozRequestFullScreen || element.msRequestFullscreen;
+            if (fullscreenCmd) {
+                fullscreenCmd.call(element);
+            }
+
+            //找对应tab的iframe
             var index = this.list.map(it => it.name).indexOf(tabName);
             var content = this.$refs.tabs.$el.querySelector(".el-tabs__content");
             var content_iframe = content.children[index].children[0];
+
+            //设置 iframe 全屏样式,并设置容器页面全屏样式
             content_iframe.classList.add("fullscreen");
             document.body.classList.add("fullscreen");
 
+            //渲染退出全屏按钮,它是渲染到容器页面上的.
             var full_div = document.body.querySelector(".fullscreen-div");
             if (!full_div) {
-                document.addEventListener("keydown", (e) => {
-                    if (e.key == "F4") {
-                        jv.exit_fullscreen();
-                    }
-                })
-
                 full_div = document.createElement("div");
                 document.body.appendChild(full_div);
                 full_div.addEventListener("click", jv.exit_fullscreen)
                 full_div.classList.add("fullscreen-div")
             }
             full_div.style.animation = "loading 1s"
+
+            //激活浏览器的全屏
+            setTimeout(() => {
+                document.once('fullscreenchange', jv.exit_fullscreen);
+                document.once('webkitfullscreenchange', jv.exit_fullscreen);
+                document.once('mozfullscreenchange', jv.exit_fullscreen);
+                document.once('MSFullscreenChange', jv.exit_fullscreen);
+            }, 100)
         },
         toHomeTab(tabName) {
             this.activeTab(tabName)

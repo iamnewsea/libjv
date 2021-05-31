@@ -71,7 +71,6 @@ jv.resize = (callback, time) => {
 };
 
 
-
 jv.initDomResize = function (element) {
     var bind_resize = function (e) {
         e.target.frameElement.observer.forEach(function (it) {
@@ -175,7 +174,6 @@ jv.open = (url, target) => {
 }
 
 
-
 /**
  * 从 container 向下，遍历 $children，根据 $el == dom 查找 dom所属的 vnode
  * @param container
@@ -198,15 +196,17 @@ jv.findVNode = (container, dom) => {
 /**
  * 添加外部的 script 标签
  */
-jv.addScriptFile = (fileName, attributes) => {
-    if (!fileName) return Promise.reject();
+jv.addScriptFile = (fileName, attributes, content) => {
+    if (!fileName && !content) return Promise.reject();
 
-    var id = jv.getIdFromUrl(fileName);
-
-    var script = document.getElementById(id);
-    if (script) {
-        return Promise.resolve();
+    if (fileName) {
+        var id = jv.getIdFromUrl(fileName);
+        var script = document.getElementById(id);
+        if (script) {
+            return Promise.resolve();
+        }
     }
+
     attributes = attributes || {};
     if (!attributes.type) {
         attributes.type = "text/javascript";
@@ -217,20 +217,31 @@ jv.addScriptFile = (fileName, attributes) => {
     return new Promise((r, e) => {
         script = document.createElement("script");
 
-        script.onload = script.onreadystatechange = function () {
-            if (!this.readyState     //这是FF的判断语句，因为ff下没有readyState这人值，IE的readyState肯定有值
-                || this.readyState == 'loaded' || this.readyState == 'complete'   // 这是IE的判断语句
-            ) {
-                r.call(self, fileName);
-            }
-        };
+        if (fileName) {
+            script.onload = script.onreadystatechange = function () {
+                if (!this.readyState     //这是FF的判断语句，因为ff下没有readyState这人值，IE的readyState肯定有值
+                    || this.readyState == 'loaded' || this.readyState == 'complete'   // 这是IE的判断语句
+                ) {
+                    r.call(self, fileName, attributes);
+                }
+            };
+        }
 
         Object.keys(attributes).forEach(it => {
             script.setAttribute(it, attributes[it]);
         });
 
-        script.src = fileName;
+        if (fileName) {
+            script.src = fileName;
+        }
+        if (content) {
+            script.text = content;
+        }
         document.head.appendChild(script);
+
+        if (!fileName) {
+            r.call(self, fileName, attributes);
+        }
     });
 };
 

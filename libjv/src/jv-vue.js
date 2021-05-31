@@ -262,15 +262,16 @@ var initEnvVue = function (vue) {
             return;
         }
 
-        if (!jv.enumAllSet(spa_enum, value)) return;
-
-        this.$nextTick(() => {
-            setTimeout(() => {
-                document.dispatchEvent(new Event(jv.vue_spa_render_event));
-            }, 200)
+        this._ajax_done_enum_set = this._ajax_done_enum_set || jv.testEnumDone(spa_enum,()=>{
+            this.$nextTick(() => {
+                setTimeout(() => {
+                    document.dispatchEvent(new Event(jv.vue_spa_render_event));
+                }, 200)
+            });
         });
-    };
 
+        this._ajax_done_enum_set.set(value);
+    };
 }
 
 var initEnvAxios = function (axios) {

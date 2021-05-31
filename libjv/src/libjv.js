@@ -150,41 +150,65 @@ jv.JvEnum = function JvEnum(typeName, json, keyCallback) {
 
                 return v.remark || v.name || "";
             },
-            enumerable: false,configurable:true
+            enumerable: false, configurable: true
         });
     };
 }
+/**
+ * 判断所有枚举项是否完全被设置过。
+ * var p = jv.testEnumDone("SexEnum",callback);
+ *
+ * 方法1： p.set("Male");
+ * 方法2： p.set("Female");
+ * 全部设置后， 自动调用 callback
+ *
+ * @param enumType
+ * @returns {{set: function(*)}}
+ */
+jv.testEnumDone = function (enumType, done) {
+    return Object.assign({
+        setted: [],
+        set: function (enumValue) {
+            var enum_items = jv.enum[this.enumType].getData().map(it => it.name);
+            if (enum_items.includes(enumValue)) {
+                this.setted.push(enumValue);
+            }
 
+            if (this.setted.length == enum_items.length) {
+                this.done();
+            }
+        }
+    }, {enumType: enumType, done: done});
+}
 
 /**
  * 判断所有枚举项是否完全被设置过。
  */
-jv.enumAllSet = function (enumType, enumValue) {
-    if (!enumValue) {
-        return;
-    }
-
-    if (!(enumType in jv.enum)) {
-        throw new Error("找不到枚举： jv.enum." + enumType)
-        return;
-    }
-    var key = "_" + enumType + "_",
-        set = jv.cache[key];
-
-    if (!set) {
-        set = new Set();
-        jv.cache[key] = set;
-    }
-
-    var enum_items = jv.enum[enumType].getData().map(it => it.name);
-
-    if (enum_items.includes(enumValue)) {
-        set.push(enumValue);
-    }
-
-    return set.length == enum_items.length;
-};
-
+// jv.enumAllSet = function (enumType, enumValue) {
+//     if (!enumValue) {
+//         return;
+//     }
+//
+//     if (!(enumType in jv.enum)) {
+//         throw new Error("找不到枚举： jv.enum." + enumType)
+//         return;
+//     }
+//     var key = "_" + enumType + "_",
+//         set = jv.cache[key];
+//
+//     if (!set) {
+//         set = new Set();
+//         jv.cache[key] = set;
+//     }
+//
+//     var enum_items = jv.enum[enumType].getData().map(it => it.name);
+//
+//     if (enum_items.includes(enumValue)) {
+//         set.push(enumValue);
+//     }
+//
+//     return set.length == enum_items.length;
+// };
 
 
 /**
@@ -370,7 +394,7 @@ jv.fillRes = (obj, key, args) => {
 
                     return stringValue;
                 },
-                enumerable: false,configurable:true
+                enumerable: false, configurable: true
             });
             return true;
         }
@@ -731,12 +755,12 @@ let param_jmap = (obj) => {
  * @param url
  * @private
  */
-jv.getUrlWithout_ = url =>{
-    var queryJson= jv.query2Json(url);
-    Object.keys(queryJson).filter(it=>it.startsWith("_") && it.endsWith("_")).forEach(it=>{
+jv.getUrlWithout_ = url => {
+    var queryJson = jv.query2Json(url);
+    Object.keys(queryJson).filter(it => it.startsWith("_") && it.endsWith("_")).forEach(it => {
         delete queryJson[it];
     })
-    return jv.param(queryJson,true);
+    return jv.param(queryJson, true);
 }
 
 /**

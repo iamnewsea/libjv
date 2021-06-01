@@ -24,6 +24,7 @@
         <el-table :data="tableData"
                   v-loading="url && loading"
                   v-bind="[attrs]"
+                  class="my-list"
                   @row-dblclick="dbClick"
                   @row-click="tableRowClick"
                   @rowKey="rowKey"
@@ -379,51 +380,52 @@ export default {
  */
 </script>
 
-<style scoped>
-.buttons-container {
-    min-width: auto;
-    max-width: unset;
-    width: auto;
-    flex: 1;
-    display: flex;
-    justify-content: space-between;
-}
+<style lang="scss">
+.my-list {
+    .buttons-container {
+        min-width: auto;
+        max-width: unset;
+        width: auto;
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+    }
 
-.buttons {
-    min-width: auto;
-    max-width: unset;
-    width: auto;
-    flex: 1;
-    display: flex;
-}
+    .buttons {
+        min-width: auto;
+        max-width: unset;
+        width: auto;
+        flex: 1;
+        display: flex;
 
-.buttons > * {
-    margin-right: 12px;
-}
+        & > * {
+            margin-right: 12px;
+        }
 
-.buttons > *:last-child {
-    margin-right: 0;
-}
+        & > *:last-child {
+            margin-right: 0;
+        }
 
-</style>
-<style>
+    }
 
-.last-row .link {
-    font-weight: bold;
-}
 
-.el-cell-index {
-    cursor: default;
-}
+    .last-row .link {
+        font-weight: bold;
+    }
 
-.el-cell-index .cell div {
-    text-align: center;
-}
+    .el-cell-index {
+        cursor: default;
 
-.check-row .el-cell-index .cell div {
-    color: white;
-    background-color: #df5000;
-    border-radius: 30px;
-    padding: 2px 4px;
+        .cell div {
+            text-align: center;
+        }
+    }
+
+    .check-row .el-cell-index .cell div {
+        color: white;
+        background-color: #df5000;
+        border-radius: 30px;
+        padding: 2px 4px;
+    }
 }
 </style>

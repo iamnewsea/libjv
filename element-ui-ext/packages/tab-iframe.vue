@@ -220,8 +220,7 @@ export default {
 }
 </script>
 <style lang="scss">
-
-/deep/ .el-tabs__item .el-icon-close {
+.el-tabs__item .el-icon-close {
     margin-right: -10px;
     margin-left: 10px;
 }
@@ -230,16 +229,16 @@ export default {
     flex: 1;
     display: flex;
     flex-direction: column;
+
+    .el-tabs__content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 0;
+    }
 }
 
-.iframe-tab /deep/ .el-tabs__content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-}
-
-/deep/ .el-tab-pane {
+.el-tab-pane {
     flex: 1;
     display: flex;
     flex-direction: column;

@@ -26,17 +26,19 @@
         <el-button @click="add_click">增加</el-button>
     </div>
 </template>
-<style scoped>
-.input-list > span {
-    margin-right: 8px;
-}
+<style lang="scss">
+.input-list{
+    & > span {
+        margin-right: 8px;
+    }
 
-.input-list > span:last-child {
-    margin-right: auto;
-}
+    & > span:last-child {
+        margin-right: auto;
+    }
 
-.list-items > div {
-    margin-bottom: 8px;
+    & > div {
+        margin-bottom: 8px;
+    }
 }
 </style>
 <script type="text/ecmascript-6">

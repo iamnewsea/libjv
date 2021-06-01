@@ -81,8 +81,6 @@ export default {
 <style lang="scss">
 .my-text {
     display: inline-block;
-
-
 }
 
 .my-text-dlg {
@@ -96,7 +94,7 @@ export default {
     }
 
 
-    /deep/ textarea {
+    textarea {
         height: 65vh;
     }
 }

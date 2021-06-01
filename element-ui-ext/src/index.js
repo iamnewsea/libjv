@@ -31,7 +31,7 @@ import Col from "../packages/col"
 import Row from "../packages/row"
 
 const js_components = [
-    Col, Row
+    // Col, Row
 ]
 js_components.forEach(component => {
     component.install = function (Vue) {

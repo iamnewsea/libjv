@@ -29,7 +29,7 @@
     "npm": ">= 5.0.0"
   },
   "dependencies": {
-    "libjv": "^0.10.38",
+    "libjv": "latest",
     "spark-md5": "^3.0.1",
     "cheerio": "^1.0.0-rc.9"
   },

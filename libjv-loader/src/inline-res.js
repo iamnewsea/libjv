@@ -7,7 +7,7 @@ module.exports = function (source) {
     if(this.query.inlineRes !== true){
         return source;
     }
-    var res_tag = process.env.VUE_APP_Inline_Res_Tag || "inline-res"
+    var res_tag = process.env.VUE_APP_INLINE_RES_TAG || "inline-res"
 
     if (source.includes("<" + res_tag) == false) {
         return source;

@@ -3,10 +3,10 @@ module.exports = function (source) {
         return source;
     }
 
-    var langs = (process.env.VUE_APP_All_Langs || "").split(",").filter(it => it).map(it => it.trim())
+    var langs = (process.env.VUE_APP_ALL_LANGS || "").split(",").filter(it => it).map(it => it.trim())
     if (!langs.length) return source;
 
-    var lang = process.env.VUE_APP_Lang || "";
+    var lang = process.env.VUE_APP_LANG || "";
 
     if (!lang) return source;
 

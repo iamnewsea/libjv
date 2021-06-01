@@ -92,7 +92,7 @@ https://github.com/krasimir/webpack-library-starter
 import Vue from 'vue';
 import axios from 'axios'
 
-window.Server_Host = "http://apis.lwljuyang.cn/api-activity";
+window.SERVER_HOST = "http://apis.lwljuyang.cn/api-activity";
 
 axios.interceptors.response.use((response) => {
     //第一个拦截器

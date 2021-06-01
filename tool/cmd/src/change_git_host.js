@@ -49,7 +49,7 @@ util.walkFile(path_abs, async (filePath, isFile) => {
         gitPath = gitPath.replaceAll("\n", "")
         if (!gitPath.includes(cmd.source)) {
             if (gitPath.includes(cmd.target)) {
-                print(gitPath + " 已经设置了")
+                // print(gitPath + " 已经设置了")
             } else {
                 print("跳过 " + gitPath)
             }

@@ -4,7 +4,8 @@
   "description": "多语言编译loader",
   "scripts": {
     "build": "babel -d lib/ src/",
-    "prepublishOnly": "yarn build"
+    "prepublishOnly": "yarn build",
+    "c": "node src/change_git_host.js  --path D:\\code\\nancal --source http://192.168.5.216:3000 --target=http://103.10.86.227:8001/"
   },
   "main": "lib/index.js",
   "files": [

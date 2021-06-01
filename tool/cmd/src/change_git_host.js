@@ -13,8 +13,10 @@ var print = function (msg) {
 
 var cmd = program
     .usage('<--source 源> <--target 目标>')
-    .option('--source <源文件夹>', "")
-    .option('--target <源文件夹>', "")
+    .option('--path <文件夹>', "")
+    .option('--source <源Host>', "")
+    .option('--target <目标Host>', "")
+    .option('--deep <深度>', "")
     .parse(process.argv);
 
 var get_url_cmd = "git ls-remote --get-url origin"
@@ -25,17 +27,30 @@ if (!cmd.source || !cmd.target) {
     process.exit(-1);
 }
 
-util.walkFile(path.resolve("."), async (filePath, isFile) => {
+if (!cmd.deep) {
+    cmd.deep = 2;
+}
+
+var path_abs = path.resolve(cmd.path);
+
+debugger;
+util.walkFile(path_abs, async (filePath, isFile) => {
     if (isFile) return false;
     if (filePath.endsWith("node_modules")) return false;
     if (filePath.endsWith(".git")) return false;
-    print(filePath);
 
+    var deep = filePath.slice(path_abs.length).trimWith(path.sep).split(path.sep).length;
+
+    if( deep > cmd.deep) return false;
 
     if (fs.existsSync(filePath + path.sep + ".git")) {
         process.chdir(filePath);
         var gitPath = await util.execCmd(get_url_cmd);
-        var newGitPath = gitPath.replace(cmd.source, cmd.target);
+        if( !gitPath.includes(cmd.source)){
+            return;
+        }
+
+        var newGitPath = gitPath.replaceAll(cmd.source, cmd.target);
 
         print(gitPath + " : " + gitPath + " --> " + newGitPath);
         // if (await util.readLine() != "y") return;

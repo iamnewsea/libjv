@@ -21,14 +21,19 @@ function readLine() {
     })
 }
 
+//返回 false 终止遍历， 返回 null 终止子文件夹。
 let walkFile = async function (filePath, handleFile, isFile) {
-    if (await handleFile(filePath, isFile || false) === false) return false;
+    var ret = await handleFile(filePath, isFile || false);
+    if (ret === false) return false;
+    if (ret === null) return null;
     let files = fs.readdirSync(filePath);
     for (let item of files) {
         let tmpPath = filePath + path.sep + item;
         let stats = await fs.statSync(tmpPath);
         if (stats.isDirectory()) {
-            await walkFile(tmpPath, handleFile, false);
+            ret = await walkFile(tmpPath, handleFile, false);
+            if (ret === false) return false;
+            if (ret === null) continue;
         } else {
             if (await handleFile(tmpPath, true) === false) return false;
         }

@@ -58,7 +58,7 @@ export default {
         url: {
             type: String, default: () => ""
         },
-        //初始化query
+        //仅做初始化query,优先级最低
         query: {
             type: Object, default() {
                 return {};
@@ -94,11 +94,11 @@ export default {
             this.total = store.total || 0;
             this.pageNumber = store.pageNumber || 1;
             this.lastRowId = store.lastRowId || "";
-            this.query2 = Object.assign({}, this.query2, this.query, store.query);
+            this.query2 = Object.assign({}, this.query, this.query2, store.query);
+        } else {
+            this.query2 = Object.assign({}, this.query, this.query2);
         }
         this.loadData();
-
-
         this.rowDrop();
     },
     computed: {
@@ -137,7 +137,7 @@ export default {
         },
         query: {
             deep: true, handler(v) {
-                this.query2 = Object.assign({}, this.query2, this.query);
+                this.query2 = this.getStoredQuery();
             }
         },
         url: {
@@ -179,9 +179,13 @@ export default {
         },
         //获取保存的查询条件
         getStoredQuery() {
-            var storeId = this.$vnode.data.ref || "list";
-            var key = "ext:" + storeId + ":" + this.$route.fullPath;
-            return (localStorage.getJson(key) || {}).query;
+            var storeJson;
+            if (this.store) {
+                var storeId = this.$vnode.data.ref || "list";
+                var key = "ext:" + storeId + ":" + this.$route.fullPath;
+                storeJson = (localStorage.getJson(key) || {}).query
+            }
+            return Object.assign({}, this.query, this.query2, storeJson);
         },
         setTotal(total) {
             this.total = total;
@@ -190,6 +194,8 @@ export default {
             this.pageNumber = pageNumber;
         },
         setLastRowId(lastRowId) {
+            if (!this.store) return;
+
             this.lastRowId = lastRowId;
             var storeId = this.$vnode.data.ref || "list";
             var key = "ext:" + storeId + ":" + this.$route.fullPath;
@@ -220,11 +226,6 @@ export default {
             Object.assign(row, data);
 
             this.$emit("input", {data: this.tableData, total: this.total});
-        },
-        getQuery() {
-            let para = Object.assign({}, this.query2);
-            this.$emit("param", para);
-            return para;
         },
         //仅刷新数据,用于更新后，更新某一条。
         updateById(id, key) {

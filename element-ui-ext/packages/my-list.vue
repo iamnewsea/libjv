@@ -136,7 +136,7 @@ export default {
             }
         },
         query: {
-            deep: true, handler(v) {
+            deep: true, immediate: true, handler(v) {
                 this.query2 = this.getStoredQuery();
             }
         },

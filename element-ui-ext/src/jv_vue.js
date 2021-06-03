@@ -2,6 +2,11 @@ import jv from "libjv"
 
 (function () {
     jv.tabs_key = "$tabs";
+    jv.getIframeUrl = function (path) {
+        var json = jv.query2Json(BASE_URL.slice(0, -1) + path);
+        json["_com_"] = true;
+        return jv.param(json, true);
+    }
 
     class TabItemData {
         name = ""
@@ -24,12 +29,6 @@ import jv from "libjv"
     }
 
     jv.TabItemData = TabItemData;
-
-    jv.getIframeUrl = function (path) {
-        var json = jv.query2Json(BASE_URL.slice(0, -1) + path);
-        json["_com_"] = true;
-        return jv.param(json, true);
-    }
 
     jv.exit_fullscreen = function () {
         //退出浏览器全屏

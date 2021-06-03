@@ -32,6 +32,22 @@ var initEnvVue = function (vue) {
     vueProtype.SERVER_HOST = window.SERVER_HOST;
 
 
+    Object.defineProperty(jv.Vue.prototype, "$loadQuery", {
+        value(queryKey) {
+            var key = "query:" + this.$route.fullPath;
+            this[queryKey] = Object.assign({}, this[queryKey], localStorage.getJson(key));
+        }, enumerable: false, configurable: true, writable: true
+    });
+
+    Object.defineProperty(jv.Vue.prototype, "$saveQuery", {
+        value(queryKey) {
+            var key = "query:" + this.$route.fullPath;
+            localStorage.setJson(key, Object.assign({}, this[queryKey], localStorage.getJson(key)));
+
+        }, enumerable: false, configurable: true, writable: true
+    });
+
+
     //重置数据
     Object.defineProperty(vueProtype, "$resetData", {
         value(data) {
@@ -509,8 +525,20 @@ var initEnvRouter = function (router) {
     jv.router = router;
 }
 
+Object.defineProperty(jv.prototype, "token", {
+    get() {
+        return window.localStorage.getItem('token') || "";
+    },
+    set(value) {
+        window.localStorage.setItem('token', value || "");
+    },
+    enumerable: false
+});
+
+
 jv.initVue = (setting) => {
     window.jv = jv;
+
     var {vue, axios, router, elementUI} = setting;
 
     //接受 postMessage,弹出错误消息。

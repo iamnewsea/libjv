@@ -38,12 +38,11 @@ util.walkFile(path_abs, async (filePath, isFile) => {
     if (fs.existsSync(filePath + path.sep + ".git")) {
         process.chdir(filePath);
 
-        print(filePath + ".");
+        print("获取:" + filePath);
 
         try {
             await util.execCmd(git_fetch_cmd);
-        }
-        catch(e){
+        } catch (e) {
             print(e.message)
             return null
         }

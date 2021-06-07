@@ -104,8 +104,12 @@ export default {
             type: Number, default: () => 0
         },
         fileType: {
-            type: String, default: () => "img"
-        }, //上传的要求
+            type: String, default: () => ""
+        },
+        exts: {
+            type: [String, Array], default: () => []
+        },
+        //上传的要求
         maxSize: {
             type: String, default: () => "5M"
         },
@@ -132,7 +136,8 @@ export default {
             myValue: [],
             fileAttr: {},
             // imageRemark: "", //添加时使用.添加的图片文字
-            scales_value: this.scales
+            scales_value: [],
+            exts_value: []
         };
     },
     mounted() {
@@ -191,6 +196,21 @@ export default {
         value: {
             immediate: true, depth: true, handler(v) {
                 this.setMyValue(v);
+            }
+        },
+        exts: {
+            immediate: true, handler(value) {
+                if (typeof (value) == "string") {
+                    if (!value) {
+                        this.exts_value = [];
+                    } else {
+                        this.exts_value = value.split(",");
+                    }
+                } else if (!value) {
+                    this.exts_value = [];
+                } else {
+                    this.exts_value = value;
+                }
             }
         },
         scales: {
@@ -326,22 +346,44 @@ export default {
                 return;
             }
 
-            if (this.fileType != "*") {
-                var errorFileType = Array.from(files).some((rawFile, index) => {
-                    var fileName = rawFile.name;
-                    var chkItem = jv.getFileType(fileName);
+
+            var errorFileType = Array.from(files).some((rawFile, index) => {
+                var fileName = rawFile.name;
+                var chkItem = jv.getFileType(fileName);
+
+                if ((this.fileType || '*') != "*") {
                     if (chkItem.type != this.fileType) {
                         var needType = (jv.fileTypes[this.fileType] || {}).remark || this.fileType;
-                        jv.error(`第 ${index + 1} 个文件类型 ${chkItem.remark || chkItem.ext} 不允许，需要 ${needType} 类型！`);
+                        jv.error(`第 ${index + 1} 个文件 ${chkItem.remark || chkItem.ext} 不允许，需要 ${needType} 类型！`);
                         return true;
                     }
-                });
-
-                if (errorFileType) {
-                    this.clear_value();
-                    return;
                 }
+
+                if (this.exts_value.length) {
+                    if (!this.exts_value.includes(chkItem.ext)) {
+                        var needType = this.exts_value.join(",");
+                        jv.error(`第 ${index + 1} 个文件 ${chkItem.remark || chkItem.ext} 不允许，需要 ${needType} 类型！`);
+                        return true;
+                    }
+                }
+            });
+
+            if (errorFileType) {
+                this.clear_value();
+                return;
             }
+
+            var result = true;
+            this.$emit("change",files,val=>{
+                if( val === false){
+                    result = false;
+                }
+            })
+
+            if(result === false){
+                return;
+            }
+
 
             Promise.all(Array.from(files).map(file => this.uploadFile(file)))
                 .finally(() => {

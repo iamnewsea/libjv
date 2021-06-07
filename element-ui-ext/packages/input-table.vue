@@ -5,7 +5,7 @@
         <slot></slot>
         <el-table-column align="center" width="68">
             <template slot="header" slot-scope="scope">
-                <el-button
+                <el-button v-if="canAdd"
                     type="primary"
                     plain
                     icon="el-icon-plus"
@@ -34,31 +34,13 @@ export default {
         readOnly: {
             type: Boolean, default: () => false
         },
-        // defaultSort: {
-        //     type: String, default: () => ""
-        // },
-        // //ascending, descending
-        // order: {
-        //     type: String, default: () => ""
-        // },
-        // canMoveDown: {
-        //     type: Boolean, default() {
-        //         return false
-        //     }
-        // },
-        // canMoveUp: {
-        //     type: Boolean, default() {
-        //         return false
-        //     }
-        // },
+        canAdd: {
+            type: Boolean, default: () => true
+        },
         //列表数据
         value: {
             type: Array, default: () => []
-        },
-        // [{title,field,width}]
-        // fields: {
-        //     type: [String, Array], default: () => ""
-        // }
+        }
     },
     computed: {
         attrs() {

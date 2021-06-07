@@ -78,7 +78,7 @@
 </template>
 <script>
 export default {
-    name: "Upload",
+    name: "upload",
     props: {
         value: {
             type: [Array, Object], default: () => []

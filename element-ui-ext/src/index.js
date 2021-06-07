@@ -83,7 +83,16 @@ if (typeof window !== 'undefined' && window.Vue) {
 // module.exports = components_export;
 // module.exports.default = module.exports;
 
-export default install
-// export default {install}
+
+import packageJson from "../package.json"
+var ret = {
+    version: packageJson.version,
+    install
+};
+
+components.forEach(it => {
+    ret[it.name] = it;
+})
+export default ret;
 
 

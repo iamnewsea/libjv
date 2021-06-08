@@ -32,14 +32,14 @@ var initEnvVue = function (vue) {
     vueProtype.SERVER_HOST = window.SERVER_HOST;
 
 
-    Object.defineProperty(jv.Vue.prototype, "$loadQuery", {
+    Object.defineProperty(vueProtype, "$loadQuery", {
         value(queryKey) {
             var key = "query:" + this.$route.fullPath;
             this[queryKey] = Object.assign({}, this[queryKey], localStorage.getJson(key));
         }, enumerable: false, configurable: true, writable: true
     });
 
-    Object.defineProperty(jv.Vue.prototype, "$saveQuery", {
+    Object.defineProperty(vueProtype, "$saveQuery", {
         value(queryKey) {
             var key = "query:" + this.$route.fullPath;
             localStorage.setJson(key, Object.assign({}, this[queryKey], localStorage.getJson(key)));

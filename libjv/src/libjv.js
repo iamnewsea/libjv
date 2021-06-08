@@ -104,10 +104,25 @@ jv.cache = {};
 jv.JvEnum = function JvEnum(typeName, json, keyCallback) {
     this.typeName = typeName;
     keyCallback = keyCallback || (it => it);
-    var index = 0;
-    this.list = Object.keys(json).map(key => {
-        return {name: keyCallback(key), index: index++, remark: json[key]}
-    });
+
+    var type = json.Type;
+    if (["object", "map"].includes(type)) {
+        var index = 0;
+        this.list = Object.keys(json).map(key => {
+            return {name: keyCallback(key), index: index++, remark: json[key]}
+        });
+    } else {
+        var index = 0;
+        this.list = json.map(it => {
+            if (!("index" in it)) {
+                it.index = index++
+            }
+            return it;
+        })
+    }
+
+
+    this.list.sort((a, b) => a.index - b.index)
 
     this.getData = (key) => {
         if (jv.isNull(key)) {
@@ -326,15 +341,6 @@ jv.recursionJson = (json, eachJsonItemCallback, deepth, parent) => {
  */
 jv.defEnum = (typeName, json, keyCallback) => {
     if (!json) return;
-    var type = json.Type;
-    if (["array", "set"].includes(type)) {
-        var json2 = {};
-        json.forEach(it => {
-            json2[it] = it;
-        });
-
-        json = json2;
-    }
     jv.enum[typeName] = new jv.JvEnum(typeName, json, keyCallback);
 };
 

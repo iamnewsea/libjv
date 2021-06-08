@@ -101,7 +101,9 @@ export default {
             this.$emit("input", this.tableData.data)
         },
         add_click() {
-            this.tableData.data.push({});
+            var item = {};
+            this.$emit("add", item);
+            this.tableData.data.push(item);
             this.$emit("input", this.tableData.data);
         }
     }

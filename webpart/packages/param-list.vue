@@ -2,7 +2,9 @@
     <input-table
         style="width:100%"
         defaultSort="group"
-        v-model="info.properties"
+        v-model="data"
+        default-expand-all
+        :tree-props="{children: 'items',hasChildren: 'hasChildren'}"
         @add="it=>it.type = {}"
     >
         <el-table-column type="expand">

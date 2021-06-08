@@ -161,6 +161,10 @@ export default {
     methods: {
         // 行拖拽
         rowDrop() {
+            if (this.$attrs["tree-props"].children) {
+                this.sortable && this.sortable.destroy();
+                return;
+            }
             if (!this.draggable) return;
             if (!this.$el) return;
             // 此时找到的元素是要拖拽元素的父容器

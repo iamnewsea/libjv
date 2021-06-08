@@ -1,9 +1,9 @@
 <template>
-    <my-list v-bind="attrs" v-model="tableData" :noQueryPart="true" class="input-table">
+    <my-list v-bind="attrs" v-model="tableData" :noQueryPart="true" class="input-table" noQueryPart>
         <el-table-column type="index" clign="center" width="50"></el-table-column>
 
         <slot></slot>
-        <el-table-column align="center" width="68">
+        <el-table-column align="center" width="68" v-if="!readOnly">
             <template slot="header" slot-scope="scope">
                 <el-button v-if="canAdd"
                     type="primary"
@@ -20,10 +20,6 @@
                 </el-button>
             </template>
         </el-table-column>
-
-        <template slot="query-button">
-            <div></div>
-        </template>
     </my-list>
 </template>
 <script type="text/ecmascript-6">

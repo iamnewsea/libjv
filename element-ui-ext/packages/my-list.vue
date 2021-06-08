@@ -3,20 +3,20 @@
         <div class="query" v-if="!noQueryPart">
             <!-- 通过 slot 传递 query 用法： <template #query="scope"> <input v-model="scope.query.name" /> </template> -->
             <slot name="query" v-bind:query="query2"></slot>
-            <slot name="buttons">
-                <div class="buttons-container">
-                    <div class="buttons">
-                        <slot name="query-button">
-                            <el-button size="mini" icon="el-icon-search" @click="loadData(1)" type="primary">查询
-                            </el-button>
-                        </slot>
-                        <slot name="button">
-                        </slot>
-                    </div>
 
-                    <slot name="right-buttons"></slot>
+            <div class="buttons-container">
+                <div class="buttons">
+                    <el-button v-if="!noQueryButton" size="mini" icon="el-icon-search" @click="loadData(1)"
+                               type="primary">查询
+                    </el-button>
+
+                    <slot name="button">
+                    </slot>
                 </div>
-            </slot>
+
+                <slot name="right-button"></slot>
+            </div>
+
         </div>
 
         <slot name="head"></slot>
@@ -49,9 +49,14 @@ export default {
         noQueryPart: {
             type: Boolean, default: () => false
         },
+        noQueryButton: {
+            type: Boolean, default: () => false
+        },
+        //是否存储
         store: {
             type: Boolean, default: () => true
-        }, //是否存储 页码，总页数,lastRowId
+        },
+        //是否存储 页码，总页数,lastRowId
         pageSize: {
             type: Number, default: () => 10
         },

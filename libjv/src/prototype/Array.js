@@ -43,6 +43,9 @@
         , enumerable: false, configurable: true, writable: true
     });
 
+    /**
+     * 参数可以是回调。
+     */
     Object.defineProperty(Array.prototype, "IndexOf", {
         value(filter) {
             if (!this.length) return -1;
@@ -326,6 +329,9 @@
         }, enumerable: false, configurable: true, writable: true
     });
 
+    /**
+     * 求和。
+     */
     Object.defineProperty(Array.prototype, "sum", {
         value(emptyValue) {
             if (!this.length) return emptyValue || 0;

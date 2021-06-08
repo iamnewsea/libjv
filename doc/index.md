@@ -1,35 +1,24 @@
 # 概述
 
-### .yarnrc 
-使用 .yarnrc 设置代理内容项：
-```
-# 发私服配置
-registry "http://saas-dev.nancal.com:31016/repository/npm-hosted/"
-# 发到npmjs,取消 registry
+## 使用yarn
+推荐使用 `yarn` 做包管理。`.yarnrc` 中定义了 yarn 镜像。注意：`registry` 在安装和发版时是不一样的。
 
-# yarn安装时，指定淘宝或私服
-# registry "https://registry.npm.taobao.org"
-# registry "http://saas-dev.nancal.com:31016/repository/npm-group/"
+如果发布到 `cnpm` ，使用 `cnpm sync libjv` 进行同步。
 
-sass_binary_site "https://npm.taobao.org/mirrors/node-sass/"
-puppeteer_download_host "https://npm.taobao.org/mirrors"
-phantomjs_cdnurl "http://cnpmjs.org/downloads"
-electron_mirror "https://npm.taobao.org/mirrors/electron/"
-sqlite3_binary_host_mirror "https://foxgis.oss-cn-shanghai.aliyuncs.com/"
-profiler_binary_host_mirror "https://npm.taobao.org/mirrors/node-inspector/"
-chromedriver_cdnurl "https://cdn.npm.taobao.org/dist/chromedriver"
-```
-
-如果发到私服，设置:
+#### 如果发到私服:
 > registry "http://saas-dev.nancal.com:31016/repository/npm-hosted/"
 
-如果使用私服，设置为:
-> registry "https://registry.npm.taobao.org"
-
-或
+#### 如果使用私服:
+> registry "https://registry.npm.taobao.org"  
+或  
 > registry "http://saas-dev.nancal.com:31016/repository/npm-group/"
+
 ### 版本：
 npm包版本只支持三级版本号： 主版本.次版本.修订版本
 
 
+# 项目环境变量
 
+定义 `VUE_APP_USER_SYSTEM` 变量，表示对 LocalStorage 的 key 添加统一的前缀。  
+定义 `VUE_APP_SERVER_HOST` 变量，表示 Axios 请求头。  
+`jv.main` : Vue项的容器组件。部分需要当前路由的jv函数需要它。

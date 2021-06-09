@@ -37,6 +37,7 @@ jv.initVue 初始化Vue环境，该方法的作用如下：
     ELEMENT.Table.props.rowKey.default = "id";
     ELEMENT.Table.props.rowKey.default = "id";
     ELEMENT.Dialog.props.closeOnClickModal.default = false
+    ELEMENT.Dialog.props.destroyOnClose.default = true
     ELEMENT.Dialog.props.top.default = "";
 
     设置弹出框动态居中。

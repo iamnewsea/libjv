@@ -70,19 +70,20 @@ jv.resize = (callback, time) => {
     return recalc;
 };
 
-
-jv.initDomResize = function (element) {
-    var bind_resize = function (e) {
-        e.target.frameElement.observer.forEach(function (it) {
-            it(e);
-        })
-    };
-
+jv.dlg_iframe_page_url = "dlg-iframe.html"
+/**
+ * 把 div 移到 body 另一个位置后， iframe 设置的 observerDom.contentWindow.document.body 内容丢失。
+ * @param element
+ * @param callback
+ * @returns {HTMLIFrameElement|*}
+ */
+jv.domResize = function (element, callback) {
     var observerDom = Array.from(element.children).last(it => it.observer);
     if (observerDom) {
-        //判断是否有事件
-        observerDom.contentWindow.removeEventListener('resize', bind_resize);
-        observerDom.contentWindow.addEventListener('resize', bind_resize);
+        if (!observerDom.observer.includes(callback)) {
+            observerDom.observer.push(callback);
+        }
+        observerDom.src = window.BASE_URL + jv.dlg_iframe_page_url
         return observerDom;
     }
     const maxLeft = 3.35544e+07,
@@ -90,32 +91,19 @@ jv.initDomResize = function (element) {
 
 
     observerDom = document.createElement('iframe');
-    observerDom.observer = [];
+    observerDom.src = window.BASE_URL + jv.dlg_iframe_page_url;
+    observerDom.observer = [callback];
     observerDom.style.cssText = `position:absolute;width:100%;height:100%;left:${-maxLeft}px;top:${-maxTop}px;overflow:hidden`;
     element.appendChild(observerDom);
-    observerDom.contentWindow.removeEventListener('resize', bind_resize);
-    observerDom.contentWindow.addEventListener('resize', bind_resize);
 
     return observerDom;
 }
-//
-jv.domResize = function (element, callback) {
-    /**
-     * 监听dom元素尺寸是否发生了变化
-     * @param {HTMLElement} element
-     * @param {function} callback
-     */
-
-    var observerDom = jv.initDomResize(element);
-
-    if (!observerDom.observer.includes(callback)) {
-        observerDom.observer.push(callback);
-    }
-}
 
 jv.removeDomResizes = function (element) {
-    var dom = jv.initDomResize(element);
-    dom.parentElement.removeChild(dom);
+    var observerDom = Array.from(element.children).last(it => it.observer);
+    if (observerDom) {
+        element.removeChild(observerDom);
+    }
 }
 
 

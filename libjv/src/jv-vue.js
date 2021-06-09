@@ -471,6 +471,7 @@ var initElementUI = function (ELEMENT) {
 
     //设置 Element-ui 属性的默认值
     ELEMENT.Dialog.props.closeOnClickModal.default = false
+    ELEMENT.Dialog.props.destroyOnClose.default = true
     ELEMENT.Dialog.props.top.default = "";
     ELEMENT.Dialog.methods.setResizeDlg = function (el) {
         var self = this;

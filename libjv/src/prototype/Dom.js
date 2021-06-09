@@ -158,6 +158,19 @@
         }, enumerable: false, configurable: true, writable: true
     });
 
+    window.trigger = function(event){
+        if (["click", "dblclick", "mouseup", "mousedown"].includes(event)) {
+            event = new MouseEvent(event, {view: window, bubbles: true, cancelable: true})
+        }
+        if (this.dispatchEvent) {
+            this.dispatchEvent(event);
+            return event;
+        } else {
+            this.fireEvent("on" + event.type, event)
+            return event;
+        }
+    }
+
     /**
      * 获取从根元素到该元素的所有路径
      */

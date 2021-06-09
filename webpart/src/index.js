@@ -2,10 +2,11 @@
 
 
 import dataType from '../packages/data-type';
+import paramList from '../packages/param-list';
 import "./base.scss"
 
 const components = [
-    dataType
+    dataType, paramList
 ];
 
 const install = function (Vue, opts = {}) {
@@ -21,6 +22,7 @@ if (typeof window !== 'undefined' && window.Vue) {
 
 
 import packageJson from "../package.json"
+
 var ret = {
     version: packageJson.version,
     install

@@ -44,5 +44,9 @@ jv.defEnum("ComponentPropertyFormatTypeEnum",
         {"name": "Url", "remark": "网址格式"}
     ]);
 
-
+jv.defEnum("ComponentPropertyObjectTypeEnum",
+    [
+        {"name": "input", "remark": "输入框" },
+        { "name": "column", "remark": "列" }
+    ]);
 export default  jv;

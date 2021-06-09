@@ -488,7 +488,7 @@ jv.fromHumanSize = (value) => {
 }
 
 
-/*如果两个对象是数组, 使用refDataEquals比较内容, 不比较顺序.
+/*如果两个对象是数组, 使用refDataEquals比较内容, 比较数组中的顺序.
 
 如果两个对象是对象，则比较每个属性的值，依然使用 refDataEquals比较。
 如果对象的值是 null 或 undefined,则忽略 key 的比较
@@ -525,8 +525,10 @@ jv.dataEquals = (a, b, objectEqualField) => {
             return false;
         }
 
-        if (a.intersect(b, (_a, _b) => jv.dataEquals(_a, _b, objectEqualField)).length != a_length) {
-            return false;
+        for (var i = 0; i < a_length; i++) {
+            if (jv.dataEquals(a[i], b[i]) == false) {
+                return false;
+            }
         }
         return true;
     }

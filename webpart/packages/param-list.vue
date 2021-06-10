@@ -9,7 +9,7 @@
             readOnly
             :tree-props="{children: children,hasChildren: 'hasChildren'}"
         >
-            <el-table-column align="center" label="属性名">
+            <el-table-column align="center" label="属性名" min-width="120px;">
                 <template slot-scope="scope">
                     <el-input
                         v-if="parentIsArray(scope) == false"
@@ -21,7 +21,7 @@
                     <div v-else style="display: inline-flex">{{ children }}</div>
                 </template>
             </el-table-column>
-            <el-table-column align="center" label="属性中文名">
+            <el-table-column align="center" label="属性中文名" min-width="120px;">
                 <template slot-scope="scope">
                     <el-input
                         v-if="parentIsArray(scope) == false"
@@ -33,12 +33,13 @@
                 </template>
             </el-table-column>
 
-            <el-table-column align="center" label="数据类型">
+            <el-table-column align="center" label="数据类型" min-width="180px;">
                 <template slot-scope="scope">
                     <div>
                         <selector
                             enum="ComponentPropertyTypeEnum"
                             v-model="scope.row.type"
+                            style="min-width:80px;"
                             class="sect"
                             chk="*"
                             chkmsg="输入数据类型"
@@ -46,14 +47,19 @@
                         />
 
                         <selector enum="ComponentPropertyFormatTypeEnum" v-model="scope.row.format"
-                                  v-if="scope.row.type == 'Text'"></selector>
+                                  v-if="scope.row.type == 'Text'" style="min-width:80px;margin-left:4px;"></selector>
 
-<!--                        <selector enum="ComponentPropertyObjectTypeEnum" v-model="objectType"-->
-<!--                                  v-if="scope.row.type == 'Object'"></selector>-->
+                        <el-checkbox v-model="scope.row.object_is_any" @change="type_change(scope)"
+                                     v-if="scope.row.type == 'Object'" style="margin-left:4px;">任意对象
+                        </el-checkbox>
                     </div>
                 </template>
             </el-table-column>
-
+            <el-table-column align="center" label="必填" width="120">
+                <template slot-scope="scope">
+                    <el-checkbox v-model="scope.must">必填</el-checkbox>
+                </template>
+            </el-table-column>
             <el-table-column align="center" label="默认值" width="120">
                 <template slot-scope="scope">
                     <el-input v-model="scope.row.value" v-if="parentIsArray(scope) == false"/>
@@ -81,7 +87,8 @@
 
                 <template slot-scope="scope">
                     <el-button icon="el-icon-setting" plain circle @click="config_click(scope)" size="small"
-                               type="primary" style="padding: 5px;font-size:16px;">
+                               type="primary" style="padding: 5px;font-size:16px;"
+                    >
                     </el-button>
 
                     <el-button icon="el-icon-delete" plain circle @click="remove_click(scope)" size="small"
@@ -89,7 +96,7 @@
                     </el-button>
 
                     <el-button type="primary"
-                               v-if="scope.row.type == 'Object'"
+                               v-if="scope.row.type == 'Object' && !scope.row.object_is_any"
                                icon="el-icon-plus"
                                plain circle style="padding: 5px;font-size:16px;"
                                @click="add_click(scope)"
@@ -107,13 +114,12 @@
             <kv label="枚举数据" v-if="config_row.type == 'Radio' || config_row.type == 'Check'">
                 <input-list v-model="config_row.enumData" fields=""></input-list>
             </kv>
-            <kv label="是否必填">
-                <selector :data="{true:'必填',false:'非必填'}" v-model="config_row.must"></selector>
-            </kv>
             <kv label="长度范围" v-if="config_row.type == 'Text'">
-                <el-input v-model="config_row.minLength"></el-input>
-                到
-                <el-input v-model="config_row.maxLength"></el-input>
+                <div>
+                    <el-input v-model="config_row.minLength" style="display: inline-block;width:120px;"></el-input>
+                    到
+                    <el-input v-model="config_row.maxLength" style="display: inline-block;width:120px;"></el-input>
+                </div>
             </kv>
             <kv label="验证">
                 <el-input v-model="config_row.chk"></el-input>
@@ -234,10 +240,15 @@ export default {
             if (parentRow == null) {
                 this.properties.removeItem(it => it.id == rowId);
             } else {
+                parentRow[this.children].removeItem(it => it.id == rowId);
+
+                if (parentRow.type == 'Object') {
+                    parentRow.object_is_any = true;
+                    return;
+                }
                 if (!parentRow[this.children].length) {
                     parentRow.type = "";
                 }
-                parentRow[this.children].removeItem(it => it.id == rowId);
             }
 
             this.reRender();
@@ -252,6 +263,10 @@ export default {
                     scope.row[this.children].push(item);
                 }
             } else if (scope.row.type == 'Object') {
+                if (scope.row.object_is_any) {
+                    delete scope.row[this.children];
+                    return;
+                }
                 scope.row[this.children] = [];
 
                 if (!scope.row[this.children].length) {

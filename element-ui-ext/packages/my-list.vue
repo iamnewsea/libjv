@@ -161,7 +161,7 @@ export default {
     methods: {
         // 行拖拽
         rowDrop() {
-            if (this.$attrs["tree-props"].children) {
+            if (this.$attrs["tree-props"] && this.$attrs["tree-props"].children) {
                 this.sortable && this.sortable.destroy();
                 return;
             }

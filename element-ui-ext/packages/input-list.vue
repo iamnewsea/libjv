@@ -11,15 +11,13 @@
         </el-tag>
         <el-input
             class="input-new-tag"
-            v-if="inputVisible"
             v-model="inputValue"
             ref="saveTagInput"
             size="small"
+            style="width:200px;display: inline-block"
             @keyup.enter.native="handleInputConfirm"
-            @blur="handleInputConfirm"
         >
         </el-input>
-        <el-button v-else @click="showInput" v-if="!readOnly">增加</el-button>
     </div>
 </template>
 <style lang="scss">
@@ -71,7 +69,6 @@ export default {
     data() {
         return {
             dynamicTags: [],
-            inputVisible: false,
             inputValue: ''
         }
     },
@@ -110,21 +107,16 @@ export default {
         handleClose(tag) {
             this.dynamicTags.splice(this.dynamicTags.indexOf(tag), 1);
         },
-
-        showInput() {
-            this.inputVisible = true;
-            this.$nextTick(_ => {
-                this.$refs.saveTagInput.$refs.input.focus();
-            });
-        },
-
         handleInputConfirm() {
             let inputValue = this.inputValue;
             if (inputValue) {
                 this.dynamicTags.push(inputValue);
             }
-            this.inputVisible = false;
             this.inputValue = '';
+
+            this.$nextTick(_ => {
+                this.$refs.saveTagInput.$refs.input.focus();
+            });
         }
     }
 }

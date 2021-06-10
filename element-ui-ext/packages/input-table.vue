@@ -6,11 +6,11 @@
         <el-table-column align="center" width="68" v-if="!readOnly">
             <template slot="header" slot-scope="scope">
                 <el-button v-if="canAdd"
-                    type="primary"
-                    plain
-                    icon="el-icon-plus"
-                    round
-                    @click="add_click"
+                           type="primary"
+                           plain
+                           icon="el-icon-plus"
+                           round
+                           @click="add_click"
                 ></el-button>
             </template>
 
@@ -57,8 +57,8 @@ export default {
     watch: {
         value: {
             immediate: true, deep: true, handler(val) {
-                if (this.tableData.data == val) return;
-                this.tableData.data = val
+                if (jv.dataEquals(this.tableData.data, val)) return;
+                this.tableData = JSON.clone({data: val});
             }
         },
         "tableData.data": {

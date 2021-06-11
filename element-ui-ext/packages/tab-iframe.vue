@@ -64,7 +64,9 @@ export default {
                 tabs = tabs.map(it => new jv.TabItemData(it.name, it.root, it.path));
             }
             var item = tabs.last(it => it.name == v);
-            history.pushState('', '', BASE_URL.slice(0, -1) + item.path);
+
+            this.$router.push(item.path)
+            // history.pushState('', '', BASE_URL.slice(0, -1) + item.path);
             this.$emit("change", item);
         }
     },
@@ -83,12 +85,25 @@ export default {
         activeTab(tabName) {
             this.tabName = tabName;
         },
-        reloadTab(tabName) {
+        reloadByUrl(path) {
+            var tabs = this.$refs.tab.getTabs();
+            var tab = tabs.last(it => it.path == path);
+            if (!tab) {
+                return false;
+            }
+
+            var tabName = tab.name;
             this.activeTab(tabName);
+
             var index = this.list.map(it => it.name).indexOf(tabName);
             var content = this.$refs.tabs.$el.querySelector(".el-tabs__content");
             var content_iframe = content.children[index].children[0];
-            content_iframe.src = content_iframe.src;
+            if (content_iframe) {
+                content_iframe.src = content_iframe.src;
+            }
+
+            this.$router.push(path);
+            return true;
         },
         fullscreen(tabName) {
             this.activeTab(tabName);
@@ -186,6 +201,8 @@ export default {
                 tabs.push(new jv.TabItemData(tabName, path));
             }
             this.saveList(tabs);
+
+            this.$router.push(path);
         },
         saveList(tabs) {
             localStorage.setJson(jv.tabs_key, tabs);
@@ -200,7 +217,8 @@ export default {
             if (!item) {
                 return;
             }
-            top.history.pushState('', '', BASE_URL.slice(0, -1) + item.path);
+            this.$router.push(item.path);
+            // top.history.pushState('', '', BASE_URL.slice(0, -1) + item.path);
         },
         tab_remove(tab) {
             var tabs = this.list;

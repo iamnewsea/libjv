@@ -509,7 +509,7 @@ var initElementUI = function (ELEMENT) {
     ELEMENT.Dialog.watch.visible = function (val) {
         dlg_ori_visible.call(this, val);
 
-        if (val && this.appendToBody) {
+        if (val) {
             this.elChange(this.$el)
         }
     }

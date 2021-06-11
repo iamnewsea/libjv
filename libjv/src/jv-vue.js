@@ -531,9 +531,10 @@ var initEnvRouter = function (router) {
     }
 
     router.safePushRoute = function (path, change) {
-        if (this.app.$route.path != path) {
-            this.push(path);
-        }
+        if (this.app.$route.path == path) return;
+        if (this.history.pending && (this.history.pending.path == path)) return;
+
+        this.push(path);
     }
 }
 

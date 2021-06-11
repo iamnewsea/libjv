@@ -65,7 +65,7 @@ export default {
             }
             var item = tabs.last(it => it.name == v);
 
-            this.$router.push(item.path)
+            this.$router.safePushRoute(item.path)
             // history.pushState('', '', BASE_URL.slice(0, -1) + item.path);
             this.$emit("change", item);
         }
@@ -86,7 +86,7 @@ export default {
             this.tabName = tabName;
         },
         reloadByUrl(path) {
-            var tabs = this.$refs.tab.getTabs();
+            var tabs = this.getTabs();
             var tab = tabs.last(it => it.path == path);
             if (!tab) {
                 return false;
@@ -102,7 +102,7 @@ export default {
                 content_iframe.src = content_iframe.src;
             }
 
-            this.$router.push(path);
+            this.$router.safePushRoute(path);
             return true;
         },
         fullscreen(tabName) {
@@ -202,7 +202,7 @@ export default {
             }
             this.saveList(tabs);
 
-            this.$router.push(path);
+            this.$router.safePushRoute(path);
         },
         saveList(tabs) {
             localStorage.setJson(jv.tabs_key, tabs);
@@ -217,7 +217,9 @@ export default {
             if (!item) {
                 return;
             }
-            this.$router.push(item.path);
+
+            this.$router.safePushRoute(item.path);
+
             // top.history.pushState('', '', BASE_URL.slice(0, -1) + item.path);
         },
         tab_remove(tab) {

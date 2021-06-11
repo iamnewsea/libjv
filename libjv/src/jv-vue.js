@@ -278,7 +278,7 @@ var initEnvVue = function (vue) {
             return;
         }
 
-        this._ajax_done_enum_set = this._ajax_done_enum_set || jv.testEnumDone(spa_enum,()=>{
+        this._ajax_done_enum_set = this._ajax_done_enum_set || jv.testEnumDone(spa_enum, () => {
             this.$nextTick(() => {
                 setTimeout(() => {
                     document.dispatchEvent(new Event(jv.vue_spa_render_event));
@@ -524,6 +524,17 @@ jv.getRouteMetaTabName = function (route) {
 
 var initEnvRouter = function (router) {
     jv.router = router;
+
+    //给默认的 main
+    if (!jv.main) {
+        jv.main = router.app
+    }
+
+    router.safePushRoute = function (path, change) {
+        if (this.app.$route.path != path) {
+            this.push(path);
+        }
+    }
 }
 
 Object.defineProperty(jv.prototype, "token", {

@@ -2,7 +2,7 @@
     <div class="my-ref">
         <div @click="popClick">
             <span v-for="(item) in oriValue" :key="item.id" class="tag-product-name"
-                  :style="{minWidth: computeWidth(item.name && item.name.length)}">
+                  :style="{minWidth: computeWidth(item[displayField] && item[displayField].length)}">
 
 
               <el-tag @click.prevent.stop="popClick"
@@ -11,7 +11,7 @@
                       style="margin-right:18px;margin-bottom: 8px;">
     <!--              {{item.name}}-->
                 <slot name="display" v-bind:item="item">
-                  {{ item.name }}
+                  {{ item[displayField] }}
                 </slot>
               </el-tag>
             </span>
@@ -87,6 +87,9 @@ export default {
         // minNumber: {type: Number, default: 3},
         name: {
             type: String, default: () => ""
+        },
+        displayField: {
+            type: String, default: () => "name"
         },
         // 回传id
         id: {

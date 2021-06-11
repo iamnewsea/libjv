@@ -114,7 +114,11 @@ jv.JvEnum = function JvEnum(typeName, json, keyCallback) {
     } else {
         var index = 0;
         this.list = json.map(it => {
-            if (!("index" in it)) {
+            if (it.Type == "string") {
+                return {name: it, remark: it, index: index++}
+            }
+
+            if (jv.isNull(it.index)) {
                 it.index = index++
             }
             return it;

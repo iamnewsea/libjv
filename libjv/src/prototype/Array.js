@@ -195,16 +195,17 @@
      * @param action 参数:自己,父节点,自己在父节点的索引.每一项的回调. 如果返回false,则停止 , 如果返回 null,则停止子项.
      */
     Object.defineProperty(Array.prototype, "recursion", {
-        value(subCallback, action) {
-            var r;
+        value(subCallback, action, parents) {
+            parents = parents || [];
             for (var i = 0, len = this.length; i < len; i++) {
-                var item = this[i];
-                var r = action(item, i);
+                var item = this[i], p = parents.concat([item])
+                var r = action(item, i, p);
+
                 if (r === false) return false;
                 if (r === null) continue;
                 var subItems = subCallback(item);
                 if (subItems && subItems.length) {
-                    if (subItems.recursion(subCallback, action) === false) return false;
+                    if (subItems.recursion(subCallback, action, p) === false) return false;
                 }
             }
             return true;

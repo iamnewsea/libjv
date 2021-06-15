@@ -10,15 +10,15 @@
         <el-dialog title="编辑图片" :visible.sync="p.edit_show" @opened="edit_opened" @close="edit_closed"
                    :close-on-click-modal="false" top="auto" width="80%" :center="true">
             <div style="margin-bottom: 10px;display:flex;justify-content: space-between;">
-                <el-radio-group v-model="p.scale" size="medium" @change="Image_Scale_Change">
+                <el-radio-group v-model="scale" size="medium" @change="Image_Scale_Change">
                     <el-radio-button :label="s" v-for="s in p.scales" :key="s">{{ s }}裁剪</el-radio-button>
                 </el-radio-group>
-                <div>
-                    <el-button v-show="p.remark !== null" @click="image_remark_show=true;" type="info"
-                               icon="el-icon-edit">
-                        输入图片信息
-                    </el-button>
-                </div>
+                <!--                <div>-->
+                <!--                    <el-button v-show="p.remark !== null" @click="image_remark_show=true;" type="info"-->
+                <!--                               icon="el-icon-edit">-->
+                <!--                        输入图片信息-->
+                <!--                    </el-button>-->
+                <!--                </div>-->
                 <el-button style="text-align:right;" type="primary" size="small" @click="image_ok_click()"
                            icon="el-icon-check">确定
                 </el-button>
@@ -28,23 +28,26 @@
 
             <vue-cropper v-show="p.url"
                          ref="cropper"
-                         :aspect-ratio="p.scale_number"
+                         :aspect-ratio="scale_number"
                          :src="p.url"
-                         :key="p.url"
+                         :key="p.url + scale_number"
                          alt="图片"
+                         :scalable="false"
+                         :zoomable="false"
+                         :zoomOnTouch="false"
             ></vue-cropper>
 
         </el-dialog>
 
-        <el-dialog :visible.sync="image_remark_show" title="输入图片信息" top="auto" width="auto" :center="true">
-            <el-input
-                type="textarea"
-                class="img_text"
-                :autosize="{ minRows: 2, maxRows: 8}"
-                placeholder="请输入图片的文本内容"
-                v-model="p.remark">
-            </el-input>
-        </el-dialog>
+        <!--        <el-dialog :visible.sync="image_remark_show" title="输入图片信息" top="auto" width="auto" :center="true">-->
+        <!--            <el-input-->
+        <!--                type="textarea"-->
+        <!--                class="img_text"-->
+        <!--                :autosize="{ minRows: 2, maxRows: 8}"-->
+        <!--                placeholder="请输入图片的文本内容"-->
+        <!--                v-model="p.remark">-->
+        <!--            </el-input>-->
+        <!--        </el-dialog>-->
     </div>
 </template>
 <!--<style>-->
@@ -81,6 +84,9 @@
 <script>
 import VueCropper from 'vue-cropperjs';
 import 'cropperjs/dist/cropper.css';
+
+//https://www.yuque.com/roxas-unt9s/gpewy0/wgng0b
+
 // import "es-jcrop/js/Jcrop";
 /*
 参数对象{
@@ -111,18 +117,18 @@ export default {
     },
     data() {
         return {
+            scale: "",
+            scale_number: NaN,
             p: {
                 url: "",
                 type: "",
-                scale: "",
                 scales: [],
-                scale_number: NaN,
                 edit_show: false,
                 preview_show: false,
                 callback: function () {
                 }
             },
-            image_remark_show: false
+            // image_remark_show: false
         };
     },
     // updated(){
@@ -170,7 +176,7 @@ export default {
             Object.assign(self.p, p,
                 {
                     edit_show: true,
-                    scale: p.scale || p.scales[0]
+                    scales: p.scales
                 });
         };
     },
@@ -182,6 +188,7 @@ export default {
             }
         },
         p: {
+            immediate: true,
             deep: true, handler(value) {
                 if (value.url) {
                     // if (jv.edit__Image) {
@@ -190,39 +197,31 @@ export default {
                     // }
                 }
 
+                if (!this.p.scales.length) {
+                    this.scale = "";
+                    this.scale_number = NaN;
+                } else {
+                    this.scale = this.p.scales[0];
+                    var temp = this.scale.split(":")
+                    this.scale_number = parseInt(temp[0]) / parseInt(temp[1] || 1);
+                }
+
                 this.$nextTick(it => {
                     if (value.preview_show && value.type == 'video' && value.url) {
                         document.getElementById("video_dom").pause();
                     }
-
-                    this.Image_Scale_Change();
                 });
             }
         }
     },
     methods: {
         Image_Scale_Change() {
-            // if (!jv.edit__Image) return;
-            if (!this.p.scale) {
-                this.p.scale_number = NaN;
-                return;
+            if (this.scale) {
+                var temp = this.scale.split(":")
+                this.scale_number = parseInt(temp[0]) / parseInt(temp[1] || 1);
+            } else {
+                this.scale_number = NaN;
             }
-            var temp = this.p.scale.split(":")
-            this.p.scale_number = parseInt(temp[0]) / parseInt(temp[1] || 1);
-
-            // var image = document.getElementById("edit_image_dom");
-            // var ret = this.getSuitImageSize(image, scale);
-            // // jv.edit__Image.setOptions({
-            // //     setSelect: ret,
-            // //     animateTo: ret,
-            // //     aspectRatio: 0
-            // // });
-            //
-            // jv.edit__Image.setOptions({
-            //     setSelect: ret,
-            //     animateTo: ret,
-            //     aspectRatio: scale
-            // });
         },
         // previewImageLoaded(e) {
         //   // var image = e.target;

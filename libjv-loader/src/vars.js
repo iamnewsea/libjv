@@ -20,7 +20,7 @@ module.exports = function (source) {
     source = source.replace(/@([\w_]*)@/ig, (match, groupValue, startIndex) => {
         if (groupValue in vars) return vars[groupValue];
         if (groupValue in envs) return envs[groupValue]
-        return it;
+        return match;
     })
 
     return source;

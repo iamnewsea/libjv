@@ -12,7 +12,7 @@ module.exports = function (source) {
     }
 
     var envs = process.env
-    Object.keys(envs).filter(it => it.startsWith("VUE_APP_")).forEach(it => {
+    Object.keys(envs).filter(it => it.startsWith("VUE_APP_")).forEach(key => {
         var key2 = key.slice(8);
         vars[key2] = envs[key2];
     })

@@ -13,7 +13,7 @@ import jv from "./libjv"
 
 
     //如果返回字符串，则为验证消息， 另外返回布尔值，表示是否通过验证。
-    jv.chk_range = function (chk_type, chk_body, value) {
+    jv.chk_range = function (chk_type, value, chk_body) {
         chk_body = chk_body.trim();
 
         // (1,4]  表示 大于1 小于等于4
@@ -71,10 +71,25 @@ import jv from "./libjv"
             return (value === "" || jv.isNull(value) || jv.isNaN(value)) ? "必填项" : "";
         },
         "enum": function (value, chk_body) {
-            if (chk_body.slice(1, -1).split(",").map(it => it.trim()).includes(value)) {
-                return "";
+            if (!chk_body) return "";
+
+            if (chk_body[0] == '(' && chk_body[chk_body.length - 1] == ')') {
+                if (chk_body.slice(1, -1).split(",").map(it => it.trim()).includes(value)) {
+                    return "";
+                }
+                return value + " 不在枚举范围" + chk_body;
+            } else if (chk_body[0] == ':') {
+                var enumType = chk_body.slice(1);
+                if ((enumType in jv.enum) == false) {
+                    return "找不到枚举 jv.enum." + enumType;
+                }
+                var enumBody = jv.enum[enumType].getData().map(it => it.name)
+                if (enumBody.includes(value)) {
+                    return "";
+                }
+                return value + " 不在枚举范围" + enumBody.join(",");
             }
-            return value + " 不在枚举范围" + chk_body;
+            return "不识别的枚举类型 " + chk_body;
         },
         ":": function (value, chk_body, data) {
             return eval("(value,data) => {" + chk_body + "}").call(this, value, data);
@@ -320,8 +335,14 @@ import jv from "./libjv"
         if (chk_type_index < 0) {
             chk_type = chk;
         } else if (chk_type_index === 0) {
-            chk_type = chk[0];
-            chk_body = chk.slice(1).trim();
+            //特殊字符的，只能是一个，表示特殊类型
+            if (chk[0] in jv.chk_types) {
+                chk_type = chk[0];
+                chk_body = chk.slice(1).trim();
+            } else {
+                chk_type = "";
+                chk_body = chk;
+            }
         } else {
             chk_type = chk.slice(0, chk_type_index);
             chk_body = chk.slice(chk_type_index)
@@ -354,22 +375,24 @@ import jv from "./libjv"
         //     chk_body = chk.slice(chk_type.length).trim();
         // }
 
-        if (!(chk_type in jv.chk_types)) {
-            ret.result = false;
-            ret.detail = "[Error]不识别的类型" + chk_type;
-            return ret;
-        }
+        if (chk_type) {
+            if (!(chk_type in jv.chk_types)) {
+                ret.result = false;
+                ret.detail = "[Error]不识别的类型" + chk_type;
+                return ret;
+            }
 
-        ret.detail = jv.chk_types[chk_type].call(this, value, chk_body);
+            ret.detail = jv.chk_types[chk_type].call(this, value, chk_body);
 
-        if (ret.detail) {
-            ret.result = false;
-            return ret;
+            if (ret.detail) {
+                ret.result = false;
+                return ret;
+            }
         }
 
         if (chk_body) {
             // chk_body.split("&")
-            var r = jv.chk_range(chk_type, chk_body, value);
+            var r = jv.chk_range(chk_type, value, chk_body);
             if (r) {
                 ret.result = !r;
                 ret.detail = rang + r;

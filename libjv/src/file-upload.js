@@ -1,7 +1,12 @@
-import "spark-md5"
+// import "spark-md5"
 import jv from './vue-chk'
 
-jv.check_upload_url = "/sys/check_upload"
+
+//可以通过 设置 jv.check_upload_url = "" 取消检查
+// if (jv.isNull(jv.check_upload_url)) {
+//     jv.check_upload_url = "/sys/check_upload"
+// }
+
 jv.upload_url = "/sys/upload";
 
 jv.getFileMd5 = (file) => {
@@ -9,7 +14,6 @@ jv.getFileMd5 = (file) => {
         if (typeof (SparkMD5) == "undefined") {
             return resolve("");
         }
-
         var blobSlice = File.prototype.slice || File.prototype.mozSlice || File.prototype.webkitSlice,
             chunkSize = 2097152, // read in chunks of 2MB
             chunks = Math.ceil(file.size / chunkSize),
@@ -206,14 +210,13 @@ jv.doUploadFile = option => {
     //真正上传从 10% 开始。
     var doWork = file => {
         // file.name = file.name || fileName;
+        if (!jv.check_upload_url) {
+            return jv.uploadFileAjaxPost(file, fileName, axios, post_param, axiosConfig, process_callback)
+        }
 
         return jv.getFileMd5(file)
             .then(md5 => {
                 process_callback(5);
-
-                if (!md5 || !jv.check_upload_url) {
-                    return jv.uploadFileAjaxPost(file, fileName, axios, post_param, axiosConfig, process_callback)
-                }
 
                 var param = Object.assign({md5: md5}, post_param);
 

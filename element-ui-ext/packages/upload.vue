@@ -4,10 +4,10 @@
                v-if="!readOnly">
 
         <div class="el-upload" :class="'el-upload-' + index" v-for="(item,index) in myValue">
-            <div class="el-upload-preview" v-if="item.id && item.fullUrl"
+            <div class="el-upload-preview" v-if="item.id && item.url"
                  onmouseleave="this.classList.remove('deleting')">
                 <div v-bind="img_attrs" class="avatar-uploader-icon preview--img" @click="img_click(index)"
-                     :style="{backgroundImage: 'url(' + item.fullUrl + ')'}"
+                     :style="{backgroundImage: 'url(' + item.url + ')'}"
                      v-if="item.fileType=='img'"/>
 
                 <template v-else-if="item.fileType=='video'">
@@ -17,7 +17,7 @@
                          :style="{backgroundImage: 'url(' + (item.logo || poster) + ')'}"/>
 
                     <video v-bind="video_attrs" v-else
-                           :src="item.fullUrl"
+                           :src="item.url"
                            :poster="item.logo || poster"
                            class="avatar-uploader-icon"></video>
                 </template>
@@ -629,10 +629,10 @@ export default {
         }
         ,
         file_preview(index) {
-            jv.openPreview({type: this.myValue[index].fileType, h5: this.h5, url: this.myValue[index].fullUrl});
+            jv.openPreview({type: this.myValue[index].fileType, h5: this.h5, url: this.myValue[index].url});
         },
         file_download(index) {
-            jv.downloadFile(this.myValue[index].fullUrl)
+            jv.downloadFile(this.myValue[index].url)
         }
     }
 }

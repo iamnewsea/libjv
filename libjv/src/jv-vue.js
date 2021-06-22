@@ -11,6 +11,30 @@ import jv from "./jv-dom"
  VUE_APP_SERVER_HOST 表示axios服务器主机头
  VUE_APP_USER_SYSTEM 表示用户体系，localStorage用它做前缀。
  */
+jv.initVue = (setting) => {
+    window.jv = jv;
+
+    var {vue, axios, router, elementUI} = setting;
+
+    //接受 postMessage,弹出错误消息。
+    window.addEventListener('message', (e) => {
+        //两个属性： event,arguments
+        if (e.data.event == "error") {
+            jv.error.apply(jv, e.data.arguments);
+        }
+    }, false);
+
+    vue.prototype.$http = axios;
+
+    initEnvVue(vue);
+    //axios 可以添加以下属性: javaBooleanKey resType errorMsg;
+    //如: axios.defaults.errorMsg = true;
+    initEnvAxios(axios);
+    initElementUI(elementUI);
+    initEnvRouter(router || vue.prototype.$router);
+};
+
+
 var initEnvVue = function (vue) {
     jv.Vue = vue;
     var vueProtype = vue.prototype;
@@ -548,29 +572,6 @@ Object.defineProperty(jv.prototype, "token", {
     enumerable: false
 });
 
-
-jv.initVue = (setting) => {
-    window.jv = jv;
-
-    var {vue, axios, router, elementUI} = setting;
-
-    //接受 postMessage,弹出错误消息。
-    window.addEventListener('message', (e) => {
-        //两个属性： event,arguments
-        if (e.data.event == "error") {
-            jv.error.apply(jv, e.data.arguments);
-        }
-    }, false);
-
-    vue.prototype.$http = axios;
-
-    initEnvVue(vue);
-    //axios 可以添加以下属性: javaBooleanKey resType errorMsg;
-    //如: axios.defaults.errorMsg = true;
-    initEnvAxios(axios);
-    initElementUI(elementUI);
-    initEnvRouter(router || vue.prototype.$router);
-};
 
 
 jv.getIdFromUrl = function (url) {

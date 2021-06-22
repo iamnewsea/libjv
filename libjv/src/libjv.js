@@ -169,7 +169,7 @@ jv.JvEnum = function JvEnum(typeName, json, keyCallback) {
 
                 return v.remark || v.name || "";
             },
-            enumerable: false, configurable: true
+            enumerable: true, configurable: true
         });
     };
 }

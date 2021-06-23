@@ -775,6 +775,15 @@ jv.getUrlWithout_ = url => {
     return jv.param(queryJson, true);
 }
 
+jv.getFullUrl = url => {
+    url = url || ""
+    if (url.startsWith("http://") ||
+        url.startsWith("https://") ||
+        url.startsWith("//")) return url;
+
+    return window.location.origin + (window.BASE_URL + url).replaceAll("//", "/");
+}
+
 /**
  * 把 JSON 转换为 URL 格式。
  * @param obj

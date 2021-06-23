@@ -9,7 +9,7 @@
         value(sep) {
             if (!this) return [];
             return this.split(sep);
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     Object.defineProperty(String.prototype, 'getBigCamelCase', {
@@ -19,14 +19,14 @@
                 .filter(it => it)
                 .map(it => it[0].toUpperCase() + it.slice(1))
                 .join("");
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
     Object.defineProperty(String.prototype, 'getSmallCamelCase', {
         value(sep) {
             var v = this.getBigCamelCase()
             if (!v) return v;
             return v[0].toLowerCase() + v.slice(1);
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
     /**
      * 获取短横线格式
@@ -36,13 +36,13 @@
             var v = this.getSmallCamelCase();
             if (!v) return v;
             return v.replace(/[A-Z]/g, (it, index) => "-" + it.toLowerCase());
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     Object.defineProperty(String.prototype, 'replaceAll', {
         value(find, replace) {
             return this.split(find).join(replace);
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     Object.defineProperty(String.prototype, 'trimStartWith', {
@@ -70,7 +70,7 @@
                 return value.trimStartWith.apply(value, ps);
             } else return value;
         },
-        enumerable: false,configurable:true,writable:true
+        enumerable: false, configurable: true, writable: true
     });
 
     /**
@@ -102,7 +102,7 @@
                 return value.trimEndWith.apply(value, ps);
             } else return value;
         },
-        enumerable: false,configurable:true,writable:true
+        enumerable: false, configurable: true, writable: true
     });
 
     Object.defineProperty(String.prototype, 'trimWith', {
@@ -110,7 +110,7 @@
             var ret = this.trimStartWith.apply(this, arguments);
             return ret.trimEndWith.apply(ret, arguments);
         },
-        enumerable: false,configurable:true,writable:true
+        enumerable: false, configurable: true, writable: true
     });
     /**
      * "@$<li>ok</li>$@".trimPairs("<li>,</li>".split(",") , "<div>,</div>".split(",") ,"$" ,"@" )
@@ -153,7 +153,7 @@
                 return value.trimPairs.apply(value, ps);
             } else return value;
         },
-        enumerable: false,configurable:true,writable:true
+        enumerable: false, configurable: true, writable: true
     });
 
     /**
@@ -174,25 +174,25 @@
     Object.defineProperty(String.prototype, 'isTimeFormat', {
         value() {
             return /^[0-2]?\d:[0-5]?\d:[0-5]?\d$/.test(this)
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
     Object.defineProperty(String.prototype, 'isDateFormat', {
         value() {
             return /^\d{4}[-/][0-1]?\d[-/][0-3]?\d?$/.test(this)
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     Object.defineProperty(String.prototype, 'isDateTimeFormat', {
         value() {
             return /^\d{4}[-/][0-1]?\d[-/][0-3]?\d[ T]?[0-2]?\d:[0-5]?\d:[0-5]?\dZ?$/.test(this)
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
 
     Object.defineProperty(String.prototype, 'isNumberFormat', {
         value() {
             return /^[-+]?((\d+\.*\d*)|(\.\d+))$/.test(this)
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     /**
@@ -201,7 +201,7 @@
     Object.defineProperty(String.prototype, 'toCharArray', {
         value() {
             return this.split("")
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     /**
@@ -210,7 +210,7 @@
     Object.defineProperty(String.prototype, 'isUpperLetter', {
         value() {
             return this.toCharArray().every(it => it >= 65 && it <= 90);
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     /**
@@ -219,7 +219,7 @@
     Object.defineProperty(String.prototype, 'isLowerLetter', {
         value() {
             return this.toCharArray().every(it => it >= 97 && it <= 122);
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     /**
@@ -228,7 +228,7 @@
     Object.defineProperty(String.prototype, 'isDigit', {
         value() {
             return this.toCharArray().every(it => it >= 48 && it <= 57);
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
 
@@ -240,7 +240,7 @@
                 if (action(this[startIndex], startIndex) === true) return startIndex;
             }
             return -1;
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
 
@@ -265,16 +265,17 @@
     Object.defineProperty(String.prototype, 'format', {
         value() {
             var json = arguments[0],
-                style = arguments[1] || "{}", // 默认样式.
+                var_style = arguments[1] || "{}", // 默认样式.
                 itemCallback = arguments[2];
 
-            var regexp = {
+
+            var var_style_value = {
                 "{}": "{([^{}]+)}",
                 "${}": "\\${([^{}]+)}",
                 "@": "@(\\w+)"
-            } [style];
+            } [var_style];
 
-            return this.replace(new RegExp(regexp, "g"),
+            return this.replace(new RegExp(var_style_value, "g"),
                 // m 是指搜索到的整个部分， "(\\w+)"如： {id} , 而 i  是指 该部分的分组内容 ， 如 id
                 function (m, key) {
                     var value = m;
@@ -294,14 +295,14 @@
                     }
                     return value;
                 })
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     Object.defineProperty(String.prototype, "toDateString", {
         value(format, timezone) {
             if (!this) return "";
             return new Date(this).toDateString(format, timezone);
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
     /**
@@ -315,7 +316,7 @@
                     fillString = ' ';
                 }
                 return Array.init(length - this.length, fillString).join("") + this;
-            }, enumerable: false,configurable:true,writable:true
+            }, enumerable: false, configurable: true, writable: true
         });
     }
 
@@ -323,7 +324,7 @@
         Object.defineProperty(String.prototype, "includes", {
             value(find) {
                 return this.indexOf(find) >= 0;
-            }, enumerable: false,configurable:true,writable:true
+            }, enumerable: false, configurable: true, writable: true
         })
     }
 
@@ -332,7 +333,7 @@
         Object.defineProperty(String.prototype, "startsWith", {
             value(find) {
                 return !this.indexOf(find)
-            }, enumerable: false,configurable:true,writable:true
+            }, enumerable: false, configurable: true, writable: true
         });
     }
 
@@ -340,7 +341,7 @@
     Object.defineProperty(String.prototype, 'ToRound', {
         value(dotLength = 2) {
             return Number(this).ToRound(dotLength);
-        }, enumerable: false,configurable:true,writable:true
+        }, enumerable: false, configurable: true, writable: true
     });
 
 })();

@@ -1,10 +1,19 @@
 var hi = require("./hi")
 
 class LibjvPlugin {
-    apply(compiler){
-        compiler.hooks.emit.tapAsync('LibjvPlugin', (compilation, callback)=>{
-            hi(compilation,callback);
+    constructor(options) {
+        this.options = options;
+    }
+
+    apply(compiler) {
+        compiler.hooks.emit.tapAsync('LibjvPlugin', (compilation, callback) => {
+            if (this.options.hi) {
+                return hi(compilation, callback);
+            }
+
+            callback();
         })
     }
 }
+
 module.exports = LibjvPlugin

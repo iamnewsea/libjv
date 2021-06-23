@@ -1,6 +1,6 @@
 {
   "name": "libjv-plugin",
-  "version": "0.10.38",
+  "version": "0.12.0",
   "description": "libjv plugin",
   "scripts": {
     "debug": "node --inspect-brk=9229 test.js",

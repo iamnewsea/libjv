@@ -29,8 +29,7 @@
     "npm": ">= 5.0.0"
   },
   "dependencies": {
-    "libjv": "latest",
-    "spark-md5": "^3.0.1"
+    "libjv": "latest"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

@@ -17,7 +17,6 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.4.6",
     "@vue/cli-service": "^4.4.6",
-    "browser-md5-file": "1.0.0",
     "core-js": "^3.6.5",
     "element-ui": "^2.15.1",
     "file-loader": "^1.1.11",

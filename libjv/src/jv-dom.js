@@ -6,13 +6,13 @@ import jv from "./file-upload"
         return;
     }
 
-    jv.getHtml = text=>{
+    jv.textEncodeToHtml = text=>{
         var div = document.createElement("div");
         div.innerText = text;
         return div.innerHTML;
     }
 
-    jv.getText = html=>{
+    jv.htmlDecodeToText = html=>{
         var div = document.createElement("div");
         div.innerHTML = html;
         return div.innerText;

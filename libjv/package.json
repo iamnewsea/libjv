@@ -1,6 +1,6 @@
 {
   "name": "libjv",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "Es6的单页应用常用扩展",
   "scripts": {
     "build": "babel -d lib/ src/ && babel -d lib/prototype src/prototype",

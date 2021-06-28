@@ -1,5 +1,3 @@
-import jv from "libjv"
-
 (function () {
     jv.tabs_key = "$tabs";
     jv.getIframeUrl = function (path) {
@@ -144,6 +142,4 @@ import jv from "libjv"
         localStorage.patchJson(key, {lastRowId: lastRowId});
     }
 
-})();
-
-export default jv;
+})(window.jv);

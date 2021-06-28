@@ -396,7 +396,7 @@ export default {
                 //先使用字符串格式值对 data2进行查找。
                 fullModel = this.data2.filter(it => it[this.keyField] == v)[0];
 
-                v = nv;
+                    v = nv;
             } else {
                 if (jv.isNull(v)) {
                     v = this.value2;

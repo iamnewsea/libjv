@@ -12,8 +12,6 @@ import jv from "./jv-dom"
  VUE_APP_USER_SYSTEM 表示用户体系，localStorage用它做前缀。
  */
 jv.initVue = (setting) => {
-    window.jv = jv;
-
     var {vue, axios, router, elementUI} = setting;
 
     //接受 postMessage,弹出错误消息。

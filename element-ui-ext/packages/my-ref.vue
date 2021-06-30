@@ -232,8 +232,8 @@ export default {
                 if (!changed.added.length && !changed.deleted.length) return;
                 this.$emit("change", changed, this.id)
             } else {
-                this.$emit('input', this.dbRefValue[0]);
-                this.$emit("change", this.dbRefValue[0], this.id)
+                this.$emit('input', this.dbRefValue[0] || {});
+                this.$emit("change", this.dbRefValue[0] || {}, this.id)
             }
             this.oriValue = Object.assign([], this.dbRefValue);
         },

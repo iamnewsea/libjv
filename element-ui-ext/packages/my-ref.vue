@@ -33,7 +33,7 @@
                     <slot name="query" v-bind:query="scope.query"></slot>
                 </template>
 
-                <template #right-buttons>
+                <template #right-button>
                     <el-dropdown split-button size="small" trigger="click" type="primary" icon="el-icon-goods"
                                  @click="handleClick" v-if="multi" @command="removeTag">
                         选中 {{ dbRefValue.length }} 项

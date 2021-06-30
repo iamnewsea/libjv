@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="my-list">
         <div class="query" v-if="!noQueryPart">
             <!-- 通过 slot 传递 query 用法： <template #query="scope"> <input v-model="scope.query.name" /> </template> -->
             <slot name="query" v-bind:query="query2"></slot>
@@ -24,7 +24,7 @@
         <el-table :data="tableData"
                   v-loading="url && loading"
                   v-bind="[attrs]"
-                  class="my-list"
+                  class="my-list-table"
                   @row-dblclick="dbClick"
                   @row-click="tableRowClick"
                   @rowKey="rowKey"

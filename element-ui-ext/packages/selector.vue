@@ -130,7 +130,7 @@ export default {
         //使用 enum方式的个数
         enumCount: {
             type: Number, default() {
-                return 3
+                return 2
             }
         },
         //radio,checkbox

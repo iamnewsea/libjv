@@ -4,7 +4,7 @@
 <script>
     if (!Array.prototype.includes) {
         Object.defineProperty(Array.prototype, "includes", {
-            value(find) {
+            value: function(find) {
                 return this.indexOf(find) >= 0;
             }, enumerable: false, configurable: true, writable: true
         });

@@ -10,7 +10,7 @@
                      :key="tab.path" :closable="tab.name != homeName">
             <iframe frameborder="no" :src="tab.path_com"
                     v-if="tabName == tab.name || loadedTabs.includes(tab.name)"
-                    style="flex: 1;display: flex;flex-direction: column;"
+                    style="flex: 1;display: flex;flex-direction: column;width:100%"
             ></iframe>
         </el-tab-pane>
     </el-tabs>

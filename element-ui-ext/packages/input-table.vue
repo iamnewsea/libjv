@@ -1,5 +1,5 @@
 <template>
-    <my-list v-bind="attrs" v-model="tableData" :noQueryPart="true" class="input-table" noQueryPart>
+    <my-list v-bind="attrs" v-model="tableData" class="input-table" noQueryPart>
         <el-table-column type="index" clign="center" width="50"></el-table-column>
 
         <slot></slot>

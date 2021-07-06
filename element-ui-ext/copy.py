@@ -41,7 +41,7 @@ if __name__=='__main__':
         sys.exit(1)
 
     rm( os.path.abspath(os.path.join( base_path , "lib") ))
-    os.system(("npm --prefix=%s run build" ) % ( base_path ) )
+    os.system(("npm --prefix=%s run build:dev" ) % ( base_path ) )
     print("-----------------------------------")
 
     mycp(base_path,target)

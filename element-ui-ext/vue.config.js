@@ -12,6 +12,9 @@ module.exports = {
             libjv: "libjv"
         }
 
+        config.devtool = process.env.NODE_ENV == 'development' ? 'source-map' : ''
+
+
         config.performance = {
             hints: 'warning',
             //入口起点的最大体积 整数类型（以byte为单位 1200k）

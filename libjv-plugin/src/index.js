@@ -3,7 +3,7 @@ var dlg_iframe = require("./dlg_iframe")
 
 class LibjvPlugin {
     constructor(options) {
-        this.options = options;
+        this.options = options || {};
     }
 
     apply(compiler) {
@@ -12,7 +12,7 @@ class LibjvPlugin {
                 return hi(compilation, callback);
             }
 
-            if( this.options.dlgIframe !== false){
+            if (this.options.dlgIframe !== false) {
                 return dlg_iframe(compilation, callback);
             }
 

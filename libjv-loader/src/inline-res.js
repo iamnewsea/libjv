@@ -4,7 +4,7 @@ var fs = require("fs");
 var jv = require("libjv")
 
 module.exports = function (source) {
-    if(this.query.inlineRes !== true){
+    if(this.query.inlineRes === false){
         return source;
     }
     var res_tag = process.env.VUE_APP_INLINE_RES_TAG || "inline-res"

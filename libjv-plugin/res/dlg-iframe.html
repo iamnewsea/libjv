@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<body>
+<script>
+    if (!Array.prototype.includes) {
+        Object.defineProperty(Array.prototype, "includes", {
+            value(find) {
+                return this.indexOf(find) >= 0;
+            }, enumerable: false, configurable: true, writable: true
+        });
+    }
+
+    window.addEventListener("resize", function (e) {
+        e.target.frameElement.observer.forEach(function (it) {
+            it(e);
+        })
+    })
+
+    var jv = {};
+    jv.createEvent = function (eventName, evDetail) {
+        var chkEvent;
+        if (document.createEvent) {
+            chkEvent = document.createEvent("CustomEvent");
+            chkEvent.initCustomEvent(eventName, true, true, evDetail);
+        } else {
+            chkEvent = new CustomEvent(eventName, evDetail);
+        }
+        return chkEvent;
+    };
+    window.trigger = function (event) {
+        if (["click", "dblclick", "mouseup", "mousedown"].includes(event)) {
+            event = new MouseEvent(event, {view: window, bubbles: true, cancelable: true})
+        }
+        if (this.dispatchEvent) {
+            this.dispatchEvent(event);
+            return event;
+        } else {
+            this.fireEvent("on" + event.type, event)
+            return event;
+        }
+    }
+
+    var e = jv.createEvent("resize");
+
+    window.trigger(e);
+</script>
+</body>
+</html>

@@ -1,5 +1,5 @@
 module.exports = function (source) {
-    if(this.query.tagLang !== true){
+    if(this.query.tagLang === false){
         return source;
     }
 

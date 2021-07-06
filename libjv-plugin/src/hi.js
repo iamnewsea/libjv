@@ -14,7 +14,7 @@ module.exports = function (compilation, callback) {
         vars["ENVNAME"] = mode
     }
 
-    var hi_content = fs.readFileSync(path.join(__dirname, "../hi.html"), 'utf-8')
+    var hi_content = fs.readFileSync(path.join(__dirname, "../res/hi.html"), 'utf-8')
         .replaceAll("@PROJECTNAME@", process.env.npm_package_name)
         .replaceAll("@ENVNAME@", vars["ENVNAME"])
         .replaceAll("@BUILDAT@", vars["BUILDAT"])

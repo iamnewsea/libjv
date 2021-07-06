@@ -26,7 +26,8 @@ def mycp(source,toPath):
 
     cp( os.path.join(source,"lib"), os.path.join(toPath ,base_path_short_name, "lib"))
     cp( os.path.join(source,"src"), os.path.join(toPath ,base_path_short_name, "src"))
-    shutil.copyfile( os.path.join( source,"hi.html"), os.path.join(toPath ,base_path_short_name, "hi.html"))
+    cp( os.path.join(source,"res"), os.path.join(toPath ,base_path_short_name, "res"))
+
     shutil.copyfile( os.path.join( source,"package.json"), os.path.join(toPath ,base_path_short_name, "package.json"))
 
 if __name__=='__main__':

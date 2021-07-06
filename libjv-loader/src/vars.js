@@ -1,4 +1,7 @@
 module.exports = function (source) {
+    if(this.query.vars === false){
+        return source;
+    }
 
     var vars = {};
     vars["YEAR"] = (new Date()).getFullYear()

@@ -496,6 +496,9 @@ var initElementUI = function (ELEMENT) {
     ELEMENT.Dialog.props.destroyOnClose.default = true
     ELEMENT.Dialog.props.top.default = "";
     ELEMENT.Dialog.methods.setResizeDlg = function (el) {
+
+        if (!jv.dlg_iframe_page_url) return;
+
         var self = this;
         var dlg_resize = function (e) {
             var body = e.target.frameElement.parentElement;
@@ -569,7 +572,6 @@ Object.defineProperty(jv.prototype, "token", {
     },
     enumerable: false
 });
-
 
 
 jv.getIdFromUrl = function (url) {

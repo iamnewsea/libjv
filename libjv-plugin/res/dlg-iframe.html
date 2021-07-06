@@ -4,14 +4,14 @@
 <script>
     if (!Array.prototype.includes) {
         Object.defineProperty(Array.prototype, "includes", {
-            value: function(find) {
+            value: function (find) {
                 return this.indexOf(find) >= 0;
             }, enumerable: false, configurable: true, writable: true
         });
     }
 
     window.addEventListener("resize", function (e) {
-        e.target.frameElement.observer.forEach(function (it) {
+        e.target.frameElement && e.target.frameElement.observer.forEach(function (it) {
             it(e);
         })
     })

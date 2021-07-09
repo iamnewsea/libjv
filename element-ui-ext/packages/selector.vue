@@ -5,7 +5,7 @@
         </template>
 
         <template v-else-if="readOnlyStyle">
-            <label v-for="item in value_displays" :key="item">{{ item }}</label>
+            <label v-for="item in value_displays" :key="value_version">{{ item }}</label>
         </template>
 
         <template v-else-if="keyField && labelField">
@@ -46,6 +46,10 @@
                     </el-option>
                 </el-select>
             </template>
+        </template>
+
+        <template v-else>
+            <div>data2.length:{{data2.length}},value_display:{{value_displays}},key:{{keyField}}},value:{{labelField}}</div>
         </template>
     </div>
 </template>
@@ -178,46 +182,6 @@ export default {
             deep: true, immediate: true, handler(data) {
                 if (!data) return;
 
-                var type = data.Type;
-
-                if (["object", "map"].includes(type)) {
-                    var keys = Object.keys(data);
-                    if (!keys.length) {
-                        this.setData([]);
-                        return;
-                    }
-                    if (("true" in data) && ("false" in data) && keys.length < 4) {
-                        this.valueIsBoolean = true;
-                    } else if (keys.every(it => it.isNumberFormat())) {
-                        this.valueIsNumber = true;
-                    }
-
-                    if (this.valueIsBoolean) {
-                        data = keys.map(it => {
-                            var key = it;
-                            if (key === "true") key = true;
-                            else if (key === "false") key = false;
-
-                            return {name: key, remark: data[it]};
-                        });
-                    } else if (this.valueIsNumber) {
-                        data = keys.map(it => {
-                            var key = it;
-                            if (key === "0") key = 0;
-                            else if (key) key = jv.asInt(key);
-
-                            return {name: key, remark: data[it]};
-                        });
-                    } else {
-                        data = keys.map(it => {
-                            return {name: it, remark: data[it]};
-                        });
-                    }
-
-                    this.keyField = "name"
-                    this.labelField = "remark"
-                }
-
                 this.setData(data);
             }
         },
@@ -239,7 +203,8 @@ export default {
         value: {
             deep: true, immediate: true, handler(v) {
                 this.ori_value = v;
-                this.setValue(v);
+                this.value_version ++;
+                this.setValue(v, {cause: "value"});
             }
         },
         readOnly: {
@@ -307,10 +272,9 @@ export default {
             //数据绑定的 labelField
             labelField: "",
             readOnlyStyle: false,
-            dataIsValueArray: false,
             valueIsBoolean: false,    //如果 data 包含 true,false 或 value值为boolean
             valueIsNumber: false,    //如果 data 只包含 数字Key！
-
+            value_version: 1,
             value1_click_v1: "", //click下会有两次点击，记录第一次点击时的值
         };
     },
@@ -376,7 +340,7 @@ export default {
             });
         },
         changed(set_v, param) {
-            param = param || {};
+            param = param || {cause: "change"};
             var v = set_v, fullModel;
             if (this.type == "radio") {
                 if (jv.isNull(v)) {
@@ -445,17 +409,17 @@ export default {
         },
 
         //可能是对象，也可能是值。在处理之前，先转成值。
-        setValue(v) {
+        setValue(v, param) {
             if (jv.isNull(v)) {
                 v = this.ori_value;
             }
 
             if (this.type == "radio") {
-                this.setValue_1(v);
+                this.setValue_1(v, param);
                 return;
             }
 
-            this.setValue_2(v);
+            this.setValue_2(v, param);
         },
         setFields() {
             if (!this.fields) {
@@ -495,12 +459,12 @@ export default {
 
             var type = data.Type;
             if (["array", "set"].includes(type) && data.length) {
-                var v0 = data[0];
+                var v0 = data[0],dataIsValueArray;
                 if (jv.isNull(v0) == false) {
-                    this.dataIsValueArray = !v0.ObjectType;
+                    dataIsValueArray = !v0.ObjectType;
                 }
 
-                if (this.dataIsValueArray) {
+                if (dataIsValueArray) {
                     this.keyField = "name"
                     this.labelField = "remark"
 
@@ -544,6 +508,43 @@ export default {
                     }
                 }
             }
+            else if (["object", "map"].includes(type)) {
+                var keys = Object.keys(data);
+                if (!keys.length) {
+                    this.setData([]);
+                    return;
+                }
+                if (("true" in data) && ("false" in data) && keys.length < 4) {
+                    this.valueIsBoolean = true;
+                } else if (keys.every(it => it.isNumberFormat())) {
+                    this.valueIsNumber = true;
+                }
+
+                if (this.valueIsBoolean) {
+                    data = keys.map(it => {
+                        var key = it;
+                        if (key === "true") key = true;
+                        else if (key === "false") key = false;
+
+                        return {name: key, remark: data[it]};
+                    });
+                } else if (this.valueIsNumber) {
+                    data = keys.map(it => {
+                        var key = it;
+                        if (key === "0") key = 0;
+                        else if (key) key = jv.asInt(key);
+
+                        return {name: key, remark: data[it]};
+                    });
+                } else {
+                    data = keys.map(it => {
+                        return {name: it, remark: data[it]};
+                    });
+                }
+
+                this.keyField = "name"
+                this.labelField = "remark"
+            }
 
             // this.setValue(this.value);
 
@@ -562,13 +563,12 @@ export default {
             this.changed(null, {cause: "data"});
         },
         //设置单选值
-        setValue_1(v) {
+        setValue_1(v, param) {
             if (jv.isNull(v)) {
                 v = "";
             }
 
             if (v === "") {
-
             } else if (this.valueIsBoolean) {
                 v = jv.asBoolean(v)
             } else if (this.valueIsNumber) {
@@ -577,11 +577,11 @@ export default {
 
             this.value1 = v;
 
-            this.changed();
+            this.changed(null, param);
         },
 
         //设置多选值
-        setValue_2(v) {
+        setValue_2(v, param) {
             if (jv.isNull(v)) {
                 v = [];
             }
@@ -592,16 +592,6 @@ export default {
 
             v = v.filter(it => !jv.isNull(it));
 
-            if (!v.length) {
-                this.value2 = [];
-                return;
-            }
-
-            //如果 v 是对象，先转成值
-            // if (this.dataIsValueArray) {
-            // } else {
-            //     v = v.map(it => it[this.keyField]);
-            // }
 
             if (this.valueIsObject) {
                 v = v.map(it => it[this.keyField]);
@@ -615,7 +605,7 @@ export default {
 
             this.value2 = v;
 
-            this.changed();
+            this.changed(null, param);
         },
     }
 }

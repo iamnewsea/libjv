@@ -5,7 +5,7 @@
         </template>
 
         <template v-else-if="readOnlyStyle">
-            <label v-for="item in value_displays" :key="value_version">{{ item }}</label>
+            <label v-for="item in value_displays" :key="item">{{ item }}</label>
         </template>
 
         <template v-else-if="keyField && labelField">
@@ -49,7 +49,11 @@
         </template>
 
         <template v-else>
-            <div>data2.length:{{data2.length}},value_display:{{value_displays}},key:{{keyField}}},value:{{labelField}}</div>
+            <div>
+                data2.length:{{ data2.length }},value_display:{{ value_displays }},key:{{
+                    keyField
+                }}},value:{{ labelField }}
+            </div>
         </template>
     </div>
 </template>
@@ -203,8 +207,9 @@ export default {
         value: {
             deep: true, immediate: true, handler(v) {
                 this.ori_value = v;
-                this.value_version ++;
-                this.setValue(v, {cause: "value"});
+                this.setValue(v);
+
+                this.changed(null, {cause: "value"})
             }
         },
         readOnly: {
@@ -274,7 +279,6 @@ export default {
             readOnlyStyle: false,
             valueIsBoolean: false,    //如果 data 包含 true,false 或 value值为boolean
             valueIsNumber: false,    //如果 data 只包含 数字Key！
-            value_version: 1,
             value1_click_v1: "", //click下会有两次点击，记录第一次点击时的值
         };
     },
@@ -459,7 +463,7 @@ export default {
 
             var type = data.Type;
             if (["array", "set"].includes(type) && data.length) {
-                var v0 = data[0],dataIsValueArray;
+                var v0 = data[0], dataIsValueArray;
                 if (jv.isNull(v0) == false) {
                     dataIsValueArray = !v0.ObjectType;
                 }
@@ -507,8 +511,7 @@ export default {
                         this.valueIsNumber = true;
                     }
                 }
-            }
-            else if (["object", "map"].includes(type)) {
+            } else if (["object", "map"].includes(type)) {
                 var keys = Object.keys(data);
                 if (!keys.length) {
                     this.setData([]);
@@ -546,7 +549,7 @@ export default {
                 this.labelField = "remark"
             }
 
-            // this.setValue(this.value);
+            this.setValue(this.value);
 
             if (jv.dataEquals(this.data2, data)) {
                 return;
@@ -563,7 +566,7 @@ export default {
             this.changed(null, {cause: "data"});
         },
         //设置单选值
-        setValue_1(v, param) {
+        setValue_1(v) {
             if (jv.isNull(v)) {
                 v = "";
             }
@@ -576,12 +579,10 @@ export default {
             }
 
             this.value1 = v;
-
-            this.changed(null, param);
         },
 
         //设置多选值
-        setValue_2(v, param) {
+        setValue_2(v) {
             if (jv.isNull(v)) {
                 v = [];
             }
@@ -604,8 +605,6 @@ export default {
             }
 
             this.value2 = v;
-
-            this.changed(null, param);
         },
     }
 }

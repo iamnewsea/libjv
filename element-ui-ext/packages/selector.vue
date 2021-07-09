@@ -428,7 +428,7 @@ export default {
             if (this.value !== v) {
                 this.$emit("input", v, param);
                 this.$emit("change", v, fullModel || {}, param);
-            } else if (param.cause) {
+            } else if (param) {
                 this.$emit("change", v, fullModel || {}, param);
             }
 

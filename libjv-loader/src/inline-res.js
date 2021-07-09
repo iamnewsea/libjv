@@ -4,7 +4,7 @@ var fs = require("fs");
 var jv = require("libjv")
 
 module.exports = function (source) {
-    if(this.query.inlineRes === false){
+    if (this.query.inlineRes === false) {
         return source;
     }
     var res_tag = process.env.VUE_APP_INLINE_RES_TAG || "inline-res"
@@ -68,11 +68,7 @@ module.exports = function (source) {
 
     if (jv.inlineResLoadered.includes(filePath) == false) {
         jv.inlineResLoadered.push(filePath);
-        console.log("")
-        console.log(filePath)
-        console.log("----------")
-        console.log(ret);
-        console.log("----------")
+        console.log("libjv-loader.inline-res: " + filePath)
     }
     return ret;
 }

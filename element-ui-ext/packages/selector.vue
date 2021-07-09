@@ -376,6 +376,7 @@ export default {
             });
         },
         changed(set_v, param) {
+            param = param || {};
             var v = set_v, fullModel;
             if (this.type == "radio") {
                 if (jv.isNull(v)) {
@@ -427,11 +428,8 @@ export default {
 
             if (this.value !== v) {
                 this.$emit("input", v, param);
-                this.$emit("change", v, fullModel || {}, param);
-            } else if (param) {
-                this.$emit("change", v, fullModel || {}, param);
             }
-
+            this.$emit("change", v, fullModel || {}, param);
             return;
         },
         dblclick() {

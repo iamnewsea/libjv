@@ -375,7 +375,7 @@ export default {
                 this.setData(data);
             });
         },
-        changed(set_v) {
+        changed(set_v, param) {
             var v = set_v, fullModel;
             if (this.type == "radio") {
                 if (jv.isNull(v)) {
@@ -425,8 +425,13 @@ export default {
                 }
             }
 
-            this.$emit("input", v);
-            this.$emit("change", v, fullModel || {});
+            if (this.value !== v) {
+                this.$emit("input", v, param);
+                this.$emit("change", v, fullModel || {}, param);
+            } else if (param.cause) {
+                this.$emit("change", v, fullModel || {}, param);
+            }
+
             return;
         },
         dblclick() {
@@ -542,7 +547,7 @@ export default {
                 }
             }
 
-            this.setValue(this.value);
+            // this.setValue(this.value);
 
             if (jv.dataEquals(this.data2, data)) {
                 return;
@@ -553,8 +558,10 @@ export default {
             //如果是单选，并且只有一个，自动选择。
             if (this.type == "radio" && data.length == 1 && this.value1 != data[0][this.keyField]) {
                 this.value1 = data[0][this.keyField]
-                this.changed();
             }
+
+            //数据源改变，触发 changed
+            this.changed(null, {cause: "data"});
         },
         //设置单选值
         setValue_1(v) {
@@ -563,37 +570,16 @@ export default {
             }
 
             if (v === "") {
-                this.value1 = "";
-                return;
-            }
 
-            //如果 v 是对象，先转成值
-            // var type = v.Type;
-            // if (["map", "object"].includes(type)) {
-            //     if (!this.keyField) {
-            //         return;
-            //     }
-            //
-            //     v = v[this.keyField];
-            // }
-
-            // if (this.valueIsObject) {
-            //     v = v[this.keyField]
-            // }
-
-            if (this.valueIsBoolean) {
+            } else if (this.valueIsBoolean) {
                 v = jv.asBoolean(v)
             } else if (this.valueIsNumber) {
                 v = jv.asInt(v);
             }
-            // if (this.dataIsEnum || this.dataIsObject || this.dataIsValueArray || (this.returnValueField == this.keyField)) {
-            //
-            // }
-            //
-            //
-            // var v2 = v[this.keyField];
 
             this.value1 = v;
+
+            this.changed();
         },
 
         //设置多选值
@@ -630,6 +616,8 @@ export default {
             }
 
             this.value2 = v;
+
+            this.changed();
         },
     }
 }

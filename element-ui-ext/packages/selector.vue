@@ -312,16 +312,17 @@ export default {
             }
 
             var method = (this.urlMethod || "post").toLowerCase();
+            var query = {};
+            this.$emit("param", query);
 
+            var cacheKey = "[selector]" + url + JSON.stringify(query);
             if (this.cache) {
-                var data = jv.cache["[selector]" + url];
+                var data = jv.cache[cacheKey];
                 if (data) {
                     return this.setData(data);
                 }
             }
 
-            var query = {};
-            this.$emit("param", query);
             //请求的是标准的列表接口，也可以直接返回 list
             this.$http[method](url, query).then(res => {
                 this.$emit("loaded", res);
@@ -338,7 +339,7 @@ export default {
                 // else data.Type == "array"
 
                 if (this.cache) {
-                    jv.cache["[selector]" + url] = data;
+                    jv.cache[cacheKey] = data;
                 }
                 this.setData(data);
             });

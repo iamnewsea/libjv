@@ -358,6 +358,8 @@ export default {
         },
         changed(set_v, param) {
             param = param || {cause: "change"};
+            param.cause = param.cause || "change";
+
             var v = set_v, fullModel;
             if (this.type == "radio") {
                 if (jv.isNull(v)) {

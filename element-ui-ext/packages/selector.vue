@@ -19,7 +19,7 @@
                 </el-radio-group>
 
                 <el-select :size="size" v-model="value1" placeholder="请选择" v-else :clearable="clearable"
-                           @change="changed" style="width:100%">
+                           @change="changed" :value-key="keyField" style="width:100%">
                     <el-option
                         v-for="item in data2"
                         :key="item[keyField]"
@@ -37,7 +37,7 @@
                     </component>
                 </el-checkbox-group>
                 <el-select :size="size" v-model="value2" multiple placeholder="请选择" v-else :clearable="clearable"
-                           @change="changed" style="width:100%">
+                           @change="changed" :value-key="keyField" style="width:100%">
                     <el-option
                         v-for=" item in data2"
                         :key="item[keyField]"
@@ -550,13 +550,15 @@ export default {
                 this.labelField = "remark"
             }
 
-            this.setValue(this.value);
 
             if (jv.dataEquals(this.data2, data)) {
                 return;
             }
 
             this.data2 = data.map(it => it)
+
+            //ajax数据改变后，重新设置value
+            this.setValue(this.value);
 
             //如果是单选，并且只有一个，自动选择。
             if (this.type == "radio" && data.length == 1 && this.value1 != data[0][this.keyField]) {

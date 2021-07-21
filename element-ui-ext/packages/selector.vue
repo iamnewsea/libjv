@@ -109,7 +109,7 @@ export default {
         /**
          * 当data是Array的时候，需要指定 field的两个值,第一个是 key , 第2个是 value
          * v-model 表示 keyField
-         * 如果是 枚举, valueIsBoolean ,valueArray ,valueIsObject 那么 $emit的值是 item.value。
+         * 如果是 枚举, valueIsBooleanInData ,valueArray ,valueIsObject 那么 $emit的值是 item.value。
          * 返回值 是 fields.split(",").first()
          *
          * 如果想返回对象， v-model == {code,name} ：
@@ -163,7 +163,9 @@ export default {
             type: String, default() {
                 return "(空)"
             }
-        }
+        },
+        valueIsBoolean: {type: Boolean, default: null},
+        valueIsNumber: {type: Boolean, default: null},
         //默认:如果是json，返回 key.如果是 valueArray ["a","b"] ，会返回值。 枚举会返回name,其它情况返回整条数据。
         //该字段仅对返回整条数据的情况有效,指定返回该条数据的哪个值
         // valueField: {type: String, default: ""}
@@ -215,6 +217,16 @@ export default {
         readOnly: {
             immediate: true, handler(v) {
                 this.readOnlyStyle = v;
+            }
+        },
+        valueIsBoolean: {
+            immediate: true, handler(v) {
+                this.valueIsBooleanInData = v;
+            }
+        },
+        valueIsNumber: {
+            immediate: true, handler(v) {
+                this.valueIsNumberInData = v;
             }
         }
     },
@@ -277,8 +289,8 @@ export default {
             //数据绑定的 labelField
             labelField: "",
             readOnlyStyle: false,
-            valueIsBoolean: false,    //如果 data 包含 true,false 或 value值为boolean
-            valueIsNumber: false,    //如果 data 只包含 数字Key！
+            valueIsBooleanInData: false,    //如果 data 包含 true,false 或 value值为boolean
+            valueIsNumberInData: false,    //如果 data 只包含 数字Key！
             value1_click_v1: "", //click下会有两次点击，记录第一次点击时的值
         };
     },
@@ -357,9 +369,9 @@ export default {
                 if (jv.isNull(v) || (v === "")) {
                     v = "";
                     nv = "";
-                } else if (this.valueIsBoolean) {
+                } else if (this.valueIsBooleanInData) {
                     nv = jv.asBoolean(v)
-                } else if (this.valueIsNumber) {
+                } else if (this.valueIsNumberInData) {
                     nv = jv.asInt(v);
                 }
 
@@ -375,9 +387,9 @@ export default {
                 v = v.filter(it => !jv.isNull(it));
 
                 var nv = v;
-                if (this.valueIsBoolean) {
+                if (this.valueIsBooleanInData) {
                     nv = v.map(it => jv.asBoolean(it))
-                } else if (this.valueIsNumber) {
+                } else if (this.valueIsNumberInData) {
                     nv = v.map(it => jv.asInt(it))
                 }
 
@@ -504,12 +516,12 @@ export default {
 
                     //需要提前定义 fields
                     var keys = data.map(it => it[this.keyField].toString());
-                    if (keys.filter(it => {
+                    if (this.valueIsBoolean === null && (keys.filter(it => {
                         return (it === "true") || (it === "false");
-                    }).length == 2) {
-                        this.valueIsBoolean = true;
-                    } else if (keys.every(it => it.isNumberFormat())) {
-                        this.valueIsNumber = true;
+                    }).length == 2)) {
+                        this.valueIsBooleanInData = true;
+                    } else if (this.valueIsNumber === null && keys.every(it => it.isNumberFormat())) {
+                        this.valueIsNumberInData = true;
                     }
                 }
             } else if (["object", "map"].includes(type)) {
@@ -518,13 +530,13 @@ export default {
                     this.setData([]);
                     return;
                 }
-                if (("true" in data) && ("false" in data) && keys.length < 4) {
-                    this.valueIsBoolean = true;
-                } else if (keys.every(it => it.isNumberFormat())) {
-                    this.valueIsNumber = true;
+                if (this.valueIsBoolean === null && (("true" in data) && ("false" in data) && keys.length < 4)) {
+                    this.valueIsBooleanInData = true;
+                } else if (this.valueIsNumber === null && (keys.every(it => it.isNumberFormat()))) {
+                    this.valueIsNumberInData = true;
                 }
 
-                if (this.valueIsBoolean) {
+                if (this.valueIsBooleanInData) {
                     data = keys.map(it => {
                         var key = it;
                         if (key === "true") key = true;
@@ -532,7 +544,7 @@ export default {
 
                         return {name: key, remark: data[it]};
                     });
-                } else if (this.valueIsNumber) {
+                } else if (this.valueIsNumberInData) {
                     data = keys.map(it => {
                         var key = it;
                         if (key === "0") key = 0;
@@ -575,9 +587,9 @@ export default {
             }
 
             if (v === "") {
-            } else if (this.valueIsBoolean) {
+            } else if (this.valueIsBooleanInData) {
                 v = jv.asBoolean(v)
-            } else if (this.valueIsNumber) {
+            } else if (this.valueIsNumberInData) {
                 v = jv.asInt(v);
             }
 
@@ -601,9 +613,9 @@ export default {
                 v = v.map(it => it[this.keyField]);
             }
 
-            if (this.valueIsBoolean) {
+            if (this.valueIsBooleanInData) {
                 v = v.map(it => jv.asBoolean(it))
-            } else if (this.valueIsNumber) {
+            } else if (this.valueIsNumberInData) {
                 v = v.map(it => jv.asInt(it))
             }
 

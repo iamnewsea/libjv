@@ -46,7 +46,9 @@ var initEnvVue = function (vue) {
     Object.keys(envs).forEach(key => {
         if (key.startsWith("VUE_APP_")) {
             var key2 = key.slice(8);
-            window[key2] = envs[key];
+            var value = envs[key];
+            window[key] = value;
+            window[key2] = value;
         }
     });
 

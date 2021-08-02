@@ -64,7 +64,7 @@ import jv from "./libjv"
         },
         //名称
         "name": function (value, chk_body) {
-            return (/^[\w\d]+$/).test(value) ? "" : "只能输入数字及字母";
+            return (/^[A-Za-z0-9]+$/).test(value) ? "" : "只能输入数字及字母";
         },
         //*号必填
         "*": function (value, chk_body) {

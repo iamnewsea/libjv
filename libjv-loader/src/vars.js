@@ -14,13 +14,9 @@ module.exports = function (source) {
         vars["ENVNAME"] = mode
     }
 
-    var envs = process.env
-    Object.keys(envs).filter(it => it.startsWith("VUE_APP_")).forEach(key => {
-        var key2 = key.slice(8);
-        vars[key2] = envs[key2];
-    })
+    var envs = Object.assign({},envs,process.env);
 
-    source = source.replace(/@([\w_]*)@/ig, (match, groupValue, startIndex) => {
+    source = source.replace(/@(\w*)@/ig, (match, groupValue, startIndex) => {
         if (groupValue in vars) return vars[groupValue];
         if (groupValue in envs) return envs[groupValue]
         return match;

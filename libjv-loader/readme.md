@@ -1,10 +1,14 @@
 # libjv-plugin 
+作用：
 
-在编译时动态生成 hi.html，显示更多信息。
+1. 在编译时编译 多语言组件,`<c>` `<e>` 分别表示中文和英文
+2. 编译时替换变量： @{去除VUE_APP_前缀的变量名}@
+3. 编译 `<inline-res>`  标签。
+
 
 1. package.json  devDependencies 添加：
 ```
-yarn add libjv-plugin -D
+yarn add libjv-loader -D
 ```
 
 2. vue.config.js ：
@@ -34,5 +38,3 @@ yarn add libjv-plugin -D
         config.module.rule("vue").use("libjv-loader").loader("libjv-loader")
     }
 ```
-
-在编译时，自动生成 /dist/hi.html。

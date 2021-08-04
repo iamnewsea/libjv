@@ -52,6 +52,11 @@ var initEnvVue = function (vue) {
         }
     });
 
+    if (window.VUE_APP_SERVER_HOST.startsWith("//")) {
+        window.VUE_APP_SERVER_HOST = window.location.protocol + window.VUE_APP_SERVER_HOST;
+        window.SERVER_HOST = window.VUE_APP_SERVER_HOST;
+    }
+
     jv.USER_SYSTEM = window.USER_SYSTEM;
     vueProtype.SERVER_HOST = window.SERVER_HOST;
 

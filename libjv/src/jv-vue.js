@@ -337,8 +337,12 @@ var initEnvAxios = function (axios) {
 
 // Add a request interceptor
     axios.interceptors.request.use(function (config) {
-        if (config.url && (config.url.startsWith("http://") || config.url.startsWith("https://") || config.url.startsWith("//"))) {
+        if (config.url && (config.url.toLowerCase().startsWith("http://") || config.url.toLowerCase().startsWith("https://") || config.url.startsWith("//"))) {
             config.baseURL = "";
+
+            if (config.url.startsWith("//")) {
+                config.url = window.location.protocol + config.url;
+            }
         }
 
         console.log("ajax:" + (new Date()).valueOf().toDateString() + " [" + config.method + "] " + config.baseURL + config.url);
@@ -470,9 +474,7 @@ var initEnvAxios = function (axios) {
         } else {
             //网络没有返回， 网络连接问题。
             if (error.config) {
-                msg += "<div>"
-                    + ((error.config.url.startsWith("http://") || error.config.url.startsWith("https://")) ? "" : error.config.baseURL)
-                    + error.config.url + "</div>";
+                msg += "<div>" + jv.getFullUrl(error.config.url) + "</div>";
             }
             msg += " 网络连接失败,请检查网络再试。";
 

@@ -777,9 +777,13 @@ jv.getUrlWithout_ = url => {
 
 jv.getFullUrl = url => {
     url = url || ""
-    if (url.startsWith("http://") ||
-        url.startsWith("https://") ||
-        url.startsWith("//")) return url;
+    if (url.toLowerCase().startsWith("http://") ||
+        url.toLowerCase().startsWith("https://"))
+         return url;
+
+    if( url.startsWith("//")){
+        return window.location.protocol + url;
+    }
 
     return window.location.origin + (window.BASE_URL + url).replaceAll("//", "/");
 }

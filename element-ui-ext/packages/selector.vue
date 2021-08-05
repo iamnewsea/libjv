@@ -208,6 +208,7 @@ export default {
         },
         value: {
             deep: true, immediate: true, handler(v) {
+                if (jv.dataEquals(this.ori_value, v)) return;
                 this.ori_value = v;
                 this.setValue(v);
 

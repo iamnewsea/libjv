@@ -1,4 +1,4 @@
-var cityService = {};
+var cityService = window.jv;
 
 (function (jv) {
     jv.cityData = [{

@@ -1,4 +1,4 @@
-var elemExtUtils = {};
+var elemExtUtils = window.jv;
 
 (function (jv) {
     jv.tabs_key = "$tabs";

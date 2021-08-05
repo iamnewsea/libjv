@@ -1,6 +1,6 @@
-import jv from "libjv"
+var cityService = {};
 
-(function () {
+(function (jv) {
     jv.cityData = [{
         c: 110000,
         n: '北京',
@@ -266,6 +266,6 @@ import jv from "libjv"
         return ret;
     }
 
-})();
+})(cityService);
 
-export default jv;
+export default cityService;

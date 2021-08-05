@@ -1,4 +1,6 @@
-(function () {
+var elemExtUtils = {};
+
+(function (jv) {
     jv.tabs_key = "$tabs";
     jv.getIframeUrl = function (path) {
         var json = jv.query2Json(BASE_URL.slice(0, -1) + path);
@@ -142,4 +144,6 @@
         localStorage.patchJson(key, {lastRowId: lastRowId});
     }
 
-})(window.jv);
+})(elemExtUtils);
+
+export default elemExtUtils;

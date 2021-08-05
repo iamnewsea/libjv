@@ -9,7 +9,9 @@ module.exports = {
     // },
     configureWebpack: config => {
         externals = {
-            libjv: "libjv"
+            libjv: "libjv",
+            vue: 'Vue',
+            'element-ui': 'ELEMENT',
         }
 
         config.devtool = process.env.NODE_ENV == 'development' ? 'source-map' : ''

@@ -10,7 +10,9 @@
     </el-cascader>
 </template>
 <script type="text/javascript">
-import jv from "./vue-city"
+import cityService from "./vue-city"
+
+Object.assign(jv,cityService);
 
 export default {
     name: 'my-city',
@@ -47,22 +49,22 @@ export default {
                     this.cityValue = [];
                     return;
                 }
-                jv.city.confirm(code, this.level, it => {
-                    this.cityValue = jv.city.getEachCitys(code).map(it => it.value);
-                    // console.log(jv.cityData);
+                cityService.city.confirm(code, this.level, it => {
+                    this.cityValue = cityService.city.getEachCitys(code).map(it => it.value);
+                    // console.log(cityService.cityData);
                 })
             }
         }
     },
     methods: {
         lazyLoad(node, resolve) {
-            jv.city.loadChildren(!node.level ? 0 : node.value, jv.asInt(this.level), it => {
+            cityService.city.loadChildren(!node.level ? 0 : node.value, jv.asInt(this.level), it => {
                 resolve(it);
             });
         },
         cityChange(vals) {
             var code = vals.last(),
-                city = jv.city.getByCode(code);
+                city = cityService.city.getByCode(code);
 
             if (!city) {
                 throw new Error("找不到城市:" + code);

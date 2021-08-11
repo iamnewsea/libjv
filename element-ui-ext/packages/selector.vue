@@ -208,11 +208,13 @@ export default {
         },
         value: {
             deep: true, immediate: true, handler(v) {
+                var changed = !jv.dataEquals(this.ori_value, v);
+
                 this.ori_value = v;
                 this.setValue(v);
 
-                if (!jv.dataEquals(this.ori_value, v)) {
-                    this.changed(null, {cause: "value"})
+                if (changed) {
+                    this.changed(v, {cause: "value"})
                 }
             }
         },

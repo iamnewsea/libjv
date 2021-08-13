@@ -7,7 +7,7 @@ import jv from './vue-chk'
 //     jv.check_upload_url = "/sys/check_upload"
 // }
 
-jv.upload_url = "/sys/upload";
+jv.uploadUrl = "/sys/upload";
 
 jv.getFileMd5 = (file) => {
     return new Promise((resolve, reject) => {
@@ -142,38 +142,6 @@ jv.compressImage = (op) => {
 };
 
 
-jv.uploadFileAjaxPost = (file, fileName, axios, post_param, axiosConfig, percentCallback) => {
-    // file.name = file.name || "file";
-
-    const formData = new FormData();
-    formData.append(fileName.split("/").last(), file);
-    for (var key in post_param) {
-        formData.append(key, post_param[key]);
-    }
-
-    return axios.post(jv.upload_url, formData, Object.assign({}, {
-        onUploadProgress: e => {
-            if (e.total > 0) {
-                e.percent = parseInt(e.loaded / e.total * 90);
-            }
-            percentCallback(e.percent + 10);
-        }
-    }, {
-        // "Content-Type": "multipart/form-data",  //文件上传不用添加。
-        timeout: 900000    //单位毫秒。最长15分钟
-    }, axiosConfig)).then(res => {
-        if (res.data.msg) {
-            return new Error(res.data.msg);
-        }
-        if (jv.isNull(res.data.data)) {
-            return new Error("服务器未返回数据");
-        }
-
-        percentCallback(100);
-        return res;
-    })
-};
-
 /**
  * option:
  * imageBase64: 必传
@@ -195,6 +163,7 @@ jv.doUploadFile = option => {
         post_param = option.postParam || {},
         axios = option.axios,
         axiosConfig = option.axiosConfig,
+        uploadUrl = option.uploadUrl || jv.uploadUrl,
         maxWidth = option.maxWidth;
 
     if (!imgBase64 && !file) {
@@ -209,37 +178,65 @@ jv.doUploadFile = option => {
 
     //真正上传从 10% 开始。
     var doWork = file => {
-        // file.name = file.name || fileName;
-        if (!jv.check_upload_url) {
-            return jv.uploadFileAjaxPost(file, fileName, axios, post_param, axiosConfig, process_callback)
+        const formData = new FormData();
+        formData.append(fileName.split("/").last(), file);
+        for (var key in post_param) {
+            formData.append(key, post_param[key]);
         }
 
-        return jv.getFileMd5(file)
-            .then(md5 => {
-                process_callback(5);
+        return axios.post(uploadUrl, formData, Object.assign({}, {
+            onUploadProgress: e => {
+                if (e.total > 0) {
+                    e.percent = parseInt(e.loaded / e.total * 90);
+                }
+                process_callback(e.percent + 10);
+            }
+        }, {
+            // "Content-Type": "multipart/form-data",  //文件上传不用添加。
+            timeout: 900000    //单位毫秒。最长15分钟
+        }, axiosConfig)).then(res => {
+            if (res.data.msg) {
+                return new Error(res.data.msg);
+            }
+            if (jv.isNull(res.data.data)) {
+                return new Error("服务器未返回数据");
+            }
 
-                var param = Object.assign({md5: md5}, post_param);
+            process_callback(100);
+            return res;
+        })
 
-                // if (this.proxy && this.proxyCorpId) {
-                //   param["_corp_id_"] = this.proxyCorpId
-                // }
 
-                // 8.检查服务器文件的 Md5值。
-                return axios.post(jv.check_upload_url, param, Object.assign({}, axiosConfig))
-                    .then(res => {
-                        process_callback(10);
-                        // 8.1 如果服务器存在该文件，返回 data 属性，且 data 属性有 id
-                        var data = res.data.data;
-                        if (data && data.id) {
-                            process_callback(100);
-                            return res;
-                        } else {
-                            return jv.uploadFileAjaxPost(file, fileName, axios, post_param, axiosConfig, process_callback)
-                        }
-                    });
-            }).catch(err => {
-                process_callback(0);
-            });
+        // if (!jv.check_upload_url) {
+        //     return jv.uploadFileAjaxPost(file, fileName, axios, post_param, axiosConfig, process_callback)
+        // }
+
+        // return jv.getFileMd5(file)
+        //     .then(md5 => {
+        //         process_callback(5);
+        //
+        //         var param = Object.assign({md5: md5}, post_param);
+        //
+        //         // if (this.proxy && this.proxyCorpId) {
+        //         //   param["_corp_id_"] = this.proxyCorpId
+        //         // }
+        //
+        //         // 8.检查服务器文件的 Md5值。
+        //         return axios.post(jv.check_upload_url, param, Object.assign({}, axiosConfig))
+        //             .then(res => {
+        //                 process_callback(10);
+        //                 // 8.1 如果服务器存在该文件，返回 data 属性，且 data 属性有 id
+        //                 var data = res.data.data;
+        //                 if (data && data.id) {
+        //                     process_callback(100);
+        //                     return res;
+        //                 } else {
+        //                     return jv.uploadFileAjaxPost(file, fileName, axios, post_param, axiosConfig, process_callback)
+        //                 }
+        //             });
+        //     }).catch(err => {
+        //         process_callback(0);
+        //     });
     };
 
 

@@ -117,6 +117,9 @@ export default {
             //h5模式，没有浮层。
             type: Boolean, default: false
         },
+        url: {
+            type: String, default: ""
+        },
         poster: {
             //默认的封面。如果找不到，使用默认的。
             type: String, default: () => ""
@@ -374,13 +377,13 @@ export default {
             }
 
             var result = true;
-            this.$emit("change",files,val=>{
-                if( val === false){
+            this.$emit("change", files, val => {
+                if (val === false) {
                     result = false;
                 }
             })
 
-            if(result === false){
+            if (result === false) {
                 return;
             }
 
@@ -483,6 +486,7 @@ export default {
         //7.检查Md5,上传
         doUpload(file, imgBase64, fileName, item) {
             return jv.doUploadFile({
+                uploadUrl: this.url,
                 file: file,
                 imageBase64: imgBase64,
                 fileName: fileName,

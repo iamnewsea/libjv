@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>登录中</title>
+    <script>
+        window.addEventListener('message', (e) => {
+            var token = e.data.token;
+            if (!token) {
+                return;
+            }
+            localStorage.setItem("@VUE_APP_USER_SYSTEM@:token", token)
+
+            var callback = e.source[e.data.callback];
+            if (callback) {
+                callback();
+            }
+        }, false);
+    </script>
+</head>
+<body>
+</body>
+</html>

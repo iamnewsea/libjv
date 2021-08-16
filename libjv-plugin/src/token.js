@@ -4,11 +4,12 @@ module.exports = function (compilation, callback) {
     var jv = require("libjv")
 
     /**
-    window.token_callback = function () {
+     window.token_callback = function () {
         alert(1);
     }
 
-    window.postMessage({token: 'OK', callback: "token_callback"}, "*")
+     //参数 tokenKey 默认值= @VUE_APP_USER_SYSTEM@:token
+     window.postMessage({token: 'OK', callback: "token_callback"}, "*")
      */
     var hi_content = fs.readFileSync(path.join(__dirname, "../res/token.html"), 'utf-8')
 

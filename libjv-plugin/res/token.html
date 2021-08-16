@@ -12,7 +12,7 @@
             var tokenKey = e.data.tokenKey || "@VUE_APP_USER_SYSTEM@:token";
             localStorage.setItem(tokenKey, token)
 
-            e.source.postMessage("tokenSaved");
+            e.source.postMessage(e.data.event || "tokenSaved");
         }, false);
     </script>
 </head>

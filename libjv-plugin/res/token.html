@@ -11,10 +11,8 @@
             }
             var tokenKey = e.data.tokenKey || "@VUE_APP_USER_SYSTEM@:token";
             localStorage.setItem(tokenKey, token)
-            var callback = e.source[e.data.callback];
-            if (callback) {
-                callback();
-            }
+
+            e.source.postMessage("tokenSaved");
         }, false);
     </script>
 </head>

@@ -21,6 +21,56 @@
         }, enumerable: false, configurable: true
     });
 
+    //按字节截取，但不截断字符,舍弃半个字符。
+    Object.defineProperty(String.prototype, 'byteSlice', {
+        value(byteStart, byteEnd) {
+            var byteLength = this.byteLength, len = this.length;
+            if (!byteLength) return this;
+
+            if (byteStart < 0) {
+                byteStart = byteLength + byteStart % byteLength
+            }
+            if (byteEnd < 0) {
+                byteEnd = byteLength + byteEnd % byteLength
+            }
+
+            var sliceByteLength = byteEnd - byteStart,
+                start_index = 0, step_length = 0;
+
+            for (var i = 0; i < len; i++) {
+                if (byteStart == 0) break;
+                else if( byteStart < 0){
+                    sliceByteLength--
+                    break;
+                }
+                start_index++;
+                //字符编码大于255，说明是双字节字符
+                if (this.charCodeAt(i) > 255) {
+                    byteStart -= 2;
+                } else {
+                    byteStart--;
+                }
+            }
+
+            for (var i = start_index; i < len; i++) {
+                if (sliceByteLength == 0) break;
+                else if (sliceByteLength < 0) {
+                    step_length--;
+                    break;
+                }
+                step_length++;
+                //字符编码大于255，说明是双字节字符
+                if (this.charCodeAt(i) > 255) {
+                    sliceByteLength -= 2;
+                } else {
+                    sliceByteLength--;
+                }
+            }
+
+            return this.slice(start_index, start_index + step_length);
+        }, enumerable: false, configurable: true
+    });
+
     //只做一件事。 空字符串时，返回空数组。
     Object.defineProperty(String.prototype, 'Split', {
         value(sep) {

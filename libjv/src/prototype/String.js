@@ -3,6 +3,23 @@
         return;
     }
 
+    //双字节按 2个字符
+    Object.defineProperty(String.prototype, 'byteLength', {
+        get() {
+            var length = 0;
+            for (var i = 0, len = this.length; i < len; i++) {
+
+                //字符编码大于255，说明是双字节字符
+                if (this.charCodeAt(i) > 255) {
+                    length += 2;
+                } else {
+                    length++;
+                }
+            }
+
+            return length;
+        }, enumerable: false, configurable: true
+    });
 
     //只做一件事。 空字符串时，返回空数组。
     Object.defineProperty(String.prototype, 'Split', {

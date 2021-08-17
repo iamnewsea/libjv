@@ -476,15 +476,15 @@ export default {
                         return;
                     }
 
-                    this.doUpload(null, base64Data, fileName, item);
+                    this.doUpload(null, base64Data, fileType, fileName, item);
                 });
             } else {
-                return this.doUpload(rawFile, null, fileName, item);
+                return this.doUpload(rawFile, null, fileType, fileName, item);
             }
         },
 
         //7.检查Md5,上传
-        doUpload(file, imgBase64, fileName, item) {
+        doUpload(file, imgBase64, fileType, fileName, item) {
             return jv.doUploadFile({
                 uploadUrl: this.url,
                 file: file,
@@ -492,7 +492,7 @@ export default {
                 fileName: fileName,
                 axios: this.$http,
                 axiosConfig: this.axiosConfig,
-                maxWidth: this.maxWidth,
+                maxWidth: fileType === "img" ? this.maxWidth : 0,
                 processCallback: p => item.percentage = p
             }).then(res => {
                 if (!res) {

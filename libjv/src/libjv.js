@@ -41,7 +41,7 @@ jv.fileTypes = {
     video: {type: "video", exts: "mp4,avi,webm,ogg,mov".split(","), remark: "视频文件"}
 };
 
-jv.getFileType = function (fileName) {
+jv.getFileTypeInfo = function (fileName) {
     var dotIndex = fileName.lastIndexOf('.');
     if (dotIndex < 0) return {};
 

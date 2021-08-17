@@ -272,7 +272,7 @@ export default {
         setItem(fileItemData) {
             delete fileItemData.percentage;
             var name = fileItemData.name || (fileItemData.url && fileItemData.url.split("/").last());
-            fileItemData.fileType = jv.getFileType(name).type;
+            fileItemData.fileType = jv.getFileTypeInfo(name).type;
             fileItemData.showName = name.slice(-12);
         },
         setMyValue(v) {
@@ -352,7 +352,7 @@ export default {
 
             var errorFileType = Array.from(files).some((rawFile, index) => {
                 var fileName = rawFile.name;
-                var chkItem = jv.getFileType(fileName);
+                var chkItem = jv.getFileTypeInfo(fileName);
 
 
                 if (this.fileType && (chkItem.type != this.fileType)) {
@@ -409,9 +409,9 @@ export default {
             //     });
             // };
 
-            var fileName = rawFile.name, fileType = jv.getFileType(fileName);
+            var fileName = rawFile.name, fileTypeInfo = jv.getFileTypeInfo(fileName),fileType = fileTypeInfo.type;
 
-            var item = {percentage: 1, name: fileName, fileType: fileType.type, ext: fileType.ext};
+            var item = {percentage: 1, name: fileName, fileType: fileType, ext: fileTypeInfo.ext};
             this.myValue.push(item);
 
             //如果定义了 @upload , 则调用自己的函数 。
@@ -443,7 +443,7 @@ export default {
             }
 
 
-            if (fileType.type == "img" && this.scales_value.length) {
+            if (fileType == "img" && this.scales_value.length) {
                 return jv.file2Base64Data(rawFile).then(base64Data => {
                     jv.openEditImage({
                         image: base64Data,
@@ -464,7 +464,7 @@ export default {
                         }
                     });
                 });
-            } else if (fileType.type == "video" && this.videoTime) {
+            } else if (fileType == "video" && this.videoTime) {
                 var self = this;
 
                 var audioElement = new Audio(URL.createObjectURL(rawFile));

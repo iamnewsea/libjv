@@ -241,33 +241,33 @@ jv.doUploadFile = option => {
 
 
     process_callback(1);
-    var ret = Promise.resolve(imgBase64);
-
-    if (maxWidth) {
-        if (!imgBase64) {
-            ret = jv.file2Base64Data(file)
-        } else {
-            ret = Promise.resolve(imgBase64);
-        }
 
 
-        ret = ret
-            .then(imgBase64 => jv.compressImage({
-                imageData: imgBase64,
-                fileName: fileName,
-                maxWidth: maxWidth,
-                filter: (image) => {
-                    process_callback(2);
-                    //如果图片 <= 256 ,则不处理.
-                    if (image.naturalWidth <= maxWidth) {
-                        return false;
-                    }
-                }
-            }));
-    }
+    // if (maxWidth) {
+    //     if (!imgBase64) {
+    //         ret = jv.file2Base64Data(file)
+    //     } else {
+    //         ret = Promise.resolve(imgBase64);
+    //     }
+    //
+    //
+    //     ret = ret
+    //         .then(imgBase64 => jv.compressImage({
+    //             imageData: imgBase64,
+    //             fileName: fileName,
+    //             maxWidth: maxWidth,
+    //             filter: (image) => {
+    //                 process_callback(2);
+    //                 //如果图片 <= 256 ,则不处理.
+    //                 if (image.naturalWidth <= maxWidth) {
+    //                     return false;
+    //                 }
+    //             }
+    //         }));
+    // }
 
 
-    return ret
+    return Promise.resolve(imgBase64)
         .then(imgBase64 => {
             if (imgBase64) {
                 return jv.base64Data2File(imgBase64)

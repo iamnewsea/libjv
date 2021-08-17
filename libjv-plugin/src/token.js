@@ -12,6 +12,7 @@ module.exports = function (compilation, callback) {
      window.postMessage({token: 'OK', callback: "token_callback"}, "*")
      */
     var hi_content = fs.readFileSync(path.join(__dirname, "../res/token.html"), 'utf-8')
+        .replaceAll("@VUE_APP_USER_SYSTEM@", process.env.VUE_APP_USER_SYSTEM)
 
     // 将这个列表作为一个新的文件资源，插入到 webpack 构建中：
     compilation.assets['token.html'] = {

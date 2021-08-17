@@ -1,4 +1,5 @@
 var hi = require("./hi")
+var token = require("./token")
 var dlg_iframe = require("./dlg_iframe")
 
 class LibjvPlugin {
@@ -11,6 +12,10 @@ class LibjvPlugin {
             var list = [];
             if (this.options.hi !== false) {
                 list.push(hi);
+            }
+
+            if (this.options.token !== false) {
+                list.push(token);
             }
 
             if (this.options.dlgIframe !== false) {

@@ -354,13 +354,13 @@ export default {
                 var fileName = rawFile.name;
                 var chkItem = jv.getFileType(fileName);
 
-                if ((this.fileType || '*') != "*") {
-                    if (chkItem.type != this.fileType) {
-                        var needType = (jv.fileTypes[this.fileType] || {}).remark || this.fileType;
-                        jv.error(`第 ${index + 1} 个文件 ${chkItem.remark || chkItem.ext} 不允许，需要 ${needType} 类型！`);
-                        return true;
-                    }
+
+                if (this.fileType && (chkItem.type != this.fileType)) {
+                    var needType = (jv.fileTypes[this.fileType] || {}).remark || this.fileType;
+                    jv.error(`第 ${index + 1} 个文件 ${chkItem.remark || chkItem.ext} 不允许，需要 ${needType} 类型！`);
+                    return true;
                 }
+
 
                 if (this.exts_value.length) {
                     if (!this.exts_value.includes(chkItem.ext)) {

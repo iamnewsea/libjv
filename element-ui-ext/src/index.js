@@ -29,8 +29,8 @@ import image_edit from '../packages/image-edit.vue';
 import "./base.scss"
 import "./menu.scss"
 
-import Col from "../packages/col"
-import Row from "../packages/row"
+// import Col from "../packages/col"
+// import Row from "../packages/row"
 
 const js_components = [
     // Col, Row

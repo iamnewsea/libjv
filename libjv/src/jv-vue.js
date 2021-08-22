@@ -34,6 +34,7 @@ jv.initVue = (setting) => {
 
 
 var initEnvVue = function (vue) {
+    if (!vue) return;
     jv.Vue = vue;
     var vueProtype = vue.prototype;
     vueProtype.jv = jv;
@@ -320,6 +321,7 @@ var initEnvVue = function (vue) {
 }
 
 var initEnvAxios = function (axios) {
+    if (!axios) return;
     jv.ajax = axios;
 
     axios.defaults.baseURL = window.SERVER_HOST;
@@ -557,6 +559,7 @@ jv.getRouteMetaTabName = function (route) {
 }
 
 var initEnvRouter = function (router) {
+    if (!router) return;
     jv.router = router;
 
     //给默认的 main

@@ -437,19 +437,6 @@ var initEnvAxios = function (axios) {
 
         return response;
     }, (error) => {
-        if (!error.isAxiosError) {
-            //js执行错误
-            if (error instanceof Error) {
-                console.log(error);
-                if (error.message) {
-                    jv.error(error.message);
-                    return Promise.reject(error);
-                }
-            }
-
-            return Promise.reject(error);
-        }
-
         var resp = error.response, msg = "";
         //如果网络有返回
         if (resp) {
@@ -476,18 +463,31 @@ var initEnvAxios = function (axios) {
             msg = data && (msgIsError && data.msg) || data.message || "系统错误:" + JSON.stringify(data);
             console.error(msg);
             jv.error(msg.slice(0, 250));
-        } else {
-            //网络没有返回， 网络连接问题。
-            if (error.config) {
-                msg += "<div>" + jv.getFullUrl(error.config.url) + "</div>";
-            }
-            msg += " 网络连接失败,请检查网络再试。";
+            return Promise.reject(error);
 
-            console.error(msg);
-            document.write(msg);
         }
 
-        return Promise.reject(error);
+
+        //js执行错误
+        if (error instanceof Error) {
+            console.log(error);
+            if (error.message) {
+                jv.error(error.message);
+            }
+            return Promise.reject(error);
+        }
+        // return Promise.reject(error);
+        // if (!error.isAxiosError) {}
+
+
+        //网络没有返回， 网络连接问题。
+        if (error.config) {
+            msg += "<div>" + jv.getFullUrl(error.config.url) + "</div>";
+        }
+        msg += " 网络连接失败,请检查网络再试。";
+
+        console.error(msg);
+        document.write(msg);
     });
 }
 

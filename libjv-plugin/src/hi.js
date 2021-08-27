@@ -13,11 +13,18 @@ module.exports = function (compilation, callback) {
 
         vars["ENVNAME"] = mode
     }
+    
+    var getEnvValue = function(key){
+        return vars[key] || "";
+    }
 
     var hi_content = fs.readFileSync(path.join(__dirname, "../res/hi.html"), 'utf-8')
         .replaceAll("@PROJECTNAME@", process.env.npm_package_name)
-        .replaceAll("@ENVNAME@", vars["ENVNAME"])
-        .replaceAll("@BUILDAT@", vars["BUILDAT"])
+        .replaceAll("@ENVNAME@", getEnvValue("ENVNAME"))
+        .replaceAll("@BUILDAT@", getEnvValue("BUILDAT"))
+        .replaceAll("@HOSTNAME@", getEnvValue("HOSTNAME"))
+        .replaceAll("@GIT_COMMIT_ID@", getEnvValue("GIT_COMMIT_ID"))
+        .replaceAll("@GIT_COMMIT_TIME@", getEnvValue("GIT_COMMIT_TIME"))
 
     // 将这个列表作为一个新的文件资源，插入到 webpack 构建中：
     compilation.assets['hi.html'] = {

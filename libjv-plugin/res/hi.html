@@ -3,6 +3,11 @@
 <head>
     <meta charset="utf-8">
     <style>
+        html {
+            height: 100%;
+            font-size: 10px;
+        }
+
         body {
             margin: 0;
             display: flex;
@@ -11,19 +16,60 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            font-size: 2rem;
         }
 
-        body div {
+        fieldset {
+            border: 1px solid gray;
+            padding: 3rem;
+            position: relative;
+            border-radius: 5px;
+            background-color: #f1fffe;
+        }
+
+        legend {
+            border-radius: 5px;
+            background-color: darkcyan;
+            color: white;
+            padding: 0.5rem 1rem;
+        }
+
+        div {
             align-items: center;
             justify-content: center;
-            letter-spacing: 4px;
-            font-size: x-large;
-            margin: 20px;
+            letter-spacing: 0.3rem;
+            margin: 2rem;
         }
     </style>
 </head>
 <body>
-<div>@PROJECTNAME@:@ENVNAME@</div>
-<div>构建时间:@BUILDAT@</div>
+<fieldset>
+    <legend>@PROJECTNAME@</legend>
+    <div>环境:@ENVNAME@</div>
+    <div>构建时间:@BUILDAT@</div>
+    <div>POD名称:@HOSTNAME@</div>
+    <div>Git提交Id:@GIT_COMMIT_ID@</div>
+    <div>Git提交时间:@GIT_COMMIT_TIME@</div>
+</fieldset>
+<script>
+    (function (doc, win) {
+        var docEl = doc.documentElement,
+            resizeEvt = 'orientationchange' in window ? 'orientationchange' : 'resize',
+            recalc = function () {
+                var clientWidth = docEl.clientWidth;
+                if (!clientWidth) return;
+                if (clientWidth > 640) {
+                    docEl.style.fontSize = '10px';
+                } else if (clientWidth < 320) {
+                    docEl.style.fontSize = '5px';
+                } else {
+                    docEl.style.fontSize = 10 * (clientWidth / 640) + 'px';
+                }
+            };
+        if (!doc.addEventListener) return;
+        win.addEventListener(resizeEvt, recalc, false);
+        doc.addEventListener('DOMContentLoaded', recalc, false);
+    })(document, window);
+</script>
 </body>
 </html>

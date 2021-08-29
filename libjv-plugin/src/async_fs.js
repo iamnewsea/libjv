@@ -41,20 +41,11 @@ const keys = [
     'writeFile',
     'appendFile',
     'realpath',
-    'mkdtemp'
+    'mkdtemp',
+    "copyFile",
+    "copyPath"
 ];
 
-keys.forEach(key => {
-    fs[key + suffix] = function () {
-        return new Promise((resolve, reject) => {
-            fs[key].apply(fs, Array.prototype.slice.apply(arguments).concat((err, data) => err ? reject(err) : resolve(data)));
-        });
-    };
-});
-
-var no_error_keys = [
-    "exists"
-]
 
 fs.copyFile = function(srcPath, tarPath, callback) {
     var rs = fs.createReadStream(srcPath)
@@ -116,6 +107,17 @@ fs.copyPath = function(srcDir, tarDir, callback) {
     })
 }
 
+keys.forEach(key => {
+    fs[key + suffix] = function () {
+        return new Promise((resolve, reject) => {
+            fs[key].apply(fs, Array.prototype.slice.apply(arguments).concat((err, data) => err ? reject(err) : resolve(data)));
+        });
+    };
+});
+
+var no_error_keys = [
+    "exists"
+]
 
 no_error_keys.forEach(key => {
     fs[key + suffix] = function () {

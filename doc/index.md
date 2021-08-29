@@ -6,12 +6,12 @@
 如果发布到 `cnpm` ，使用 `cnpm sync libjv` 进行同步。
 
 #### 如果发到私服:
-> registry "http://saas-dev.nancal.com:31016/repository/npm-hosted/"
+> registry "http://nexus.cloudnk.cn/repository/npm-hosted/"
 
 #### 如果使用私服:
 > registry "https://registry.npm.taobao.org"  
 或  
-> registry "http://saas-dev.nancal.com:31016/repository/npm-group/"
+> registry "http://nexus.cloudnk.cn/repository/npm-group/"
 
 ### 版本：
 npm包版本只支持三级版本号： 主版本.次版本.修订版本

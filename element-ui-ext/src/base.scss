@@ -148,3 +148,14 @@ iframe.fullscreen {
   z-index: 1999;
 }
 
+.no-wrap{
+  flex-wrap: nowrap;
+  word-break: keep-all;
+  word-wrap: normal;
+}
+
+.wrap{
+  flex-wrap: wrap;
+  word-break: keep-all;
+  word-wrap: break-word;
+}

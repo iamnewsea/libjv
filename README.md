@@ -62,7 +62,7 @@ yarn publish
 
 如果使用npm发版：
 ```
-npm config set registry http://saas-dev.nancal.com:31016/repository/npm-hosted/
+npm config set registry http://nexus.cloudnk.cn/repository/npm-hosted/
 npm login
 npm publish
 ```

@@ -1,6 +1,7 @@
 var hi = require("./hi")
 var token = require("./token")
 var dlg_iframe = require("./dlg_iframe")
+require('./async_fs')
 
 class LibjvPlugin {
     constructor(options) {
